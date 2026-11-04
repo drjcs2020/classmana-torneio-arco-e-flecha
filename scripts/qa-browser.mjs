@@ -35,6 +35,7 @@ try{
  assert.equal(await page.locator('body').getAttribute('data-page'),'arena');
  assert(await page.locator('#world').isVisible());
  assert.equal(await page.locator('#stage').getAttribute('data-level'),'lendario');
+ page.once('dialog',dialog=>dialog.accept());
  await page.locator('#leave-arena').click();
  await page.waitForURL(base,{timeout:12000});
  await page.close();
