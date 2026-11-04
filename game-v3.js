@@ -41,27 +41,45 @@ function fillRivals(){
  lbl.querySelector('small').textContent='Selecione o nome do colega; não há senha de desafio.';
 }
 
+const ARCHER_SKINS={
+ A:{m:"aguia-masculino.webp",f:"aguia-feminino.webp",desc:"Armadura azul e dourada, precisão do vento.",mascot:"Águia Dourada"},
+ B:{m:"leao-masculino.webp",f:"leao-feminino.webp",desc:"Armadura vermelha e dourada, coragem do fogo.",mascot:"Leão de Fogo"},
+ C:{m:"dragao-masculino.webp",f:"dragao-feminino.webp",desc:"Armadura verde-esmeralda e arco dracônico.",mascot:"Dragão de Esmeralda"}
+};
+let selectedSkins={};
+try{selectedSkins=JSON.parse(localStorage.getItem("classmana-archer-skins-v1")||"{}")||{}}catch{}
+function archerGender(){return selectedSkins[house]==="f"?"f":"m"}
+function archerImage(){return "assets/archers/"+ARCHER_SKINS[house][archerGender()]}
+function refreshArcher(){
+ const female=archerGender()==="f",title=(female?"Arqueira":"Arqueiro")+" da "+H[house].name;
+ const img=$('hero-preview-img'),name=$('hero-preview-name'),desc=$('hero-preview-desc');
+ if(img){img.src=archerImage();img.alt=title+" com arco e aljava"}
+ if(name)name.textContent=title+" · "+H[house].grade;
+ if(desc)desc.textContent=ARCHER_SKINS[house].desc+" Mascote da Casa: "+ARCHER_SKINS[house].mascot+".";
+ const panel=$('hero-preview');if(panel)panel.dataset.house=house;
+ const hud=$('hud-archer-image');if(hud){hud.src=archerImage();hud.alt=title;}
+ document.querySelectorAll('[data-archer-gender]').forEach(btn=>{
+  const active=btn.dataset.archerGender===archerGender();
+  btn.classList.toggle('selected',active);btn.setAttribute('aria-pressed',String(active));
+ });
+}
+function chooseArcher(g){
+ if(g!=="m"&&g!=="f")return;
+ selectedSkins[house]=g;try{localStorage.setItem("classmana-archer-skins-v1",JSON.stringify(selectedSkins))}catch{}
+ refreshArcher();
+ const p=$('hero-preview');if(p){p.classList.remove('archer-switch-animation');void p.offsetWidth;p.classList.add('archer-switch-animation');}
+}
 function selectHouse(k){
+ if(!H[k])return;
  house=k;
  document.querySelectorAll('.house').forEach(el=>{
-  const selected=el.dataset.house===k;
-  el.classList.toggle('selected',selected);el.setAttribute('aria-pressed',String(selected));
-  el.querySelector('.house-check').textContent=selected?'✓ SELECIONADA':'ESCOLHER CASA';
+  const active=el.dataset.house===k;
+  el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));
+  el.querySelector('.house-check').textContent=active?'✓ SELECIONADA':'ESCOLHER CASA';
  });
  const stage=$('stage');stage.classList.remove('house-a','house-b','house-c');stage.classList.add('house-'+k.toLowerCase());
- const logo={A:'brasao-4a-transparente.png',B:'arte-028.png',C:'arte-029.png'}[k];
  const badge=$('stage-house-badge');if(badge){badge.dataset.house=k;badge.querySelector('img').src=window.CLASSMANA_HOUSES[k].emblem;badge.querySelector('strong').textContent=H[k].name;}
- const hero={
-  A:{portrait:'hero_fada.png',name:'Águia Dourada — 4º A',desc:'O guardião da floresta e dos ventos protege os arqueiros da Casa azul e dourada.'},
-  B:{portrait:'hero_chama.png',name:'Leão de Fogo — 4º B',desc:'As chamas do reino acompanham os arqueiros da Casa vermelha e dourada.'},
-  C:{portrait:'hero_dragao.png',name:'Dragão de Esmeralda — 4º C',desc:'O dragão protetor acompanha os arqueiros da Casa verde-esmeralda.'}
- }[k];
- const panel=$('hero-preview');if(panel){
-  panel.style.animation='none';void panel.offsetWidth;panel.style.animation='';
-  $('hero-preview-img').src='assets/characters/'+hero.portrait;
-  $('hero-preview-name').textContent=hero.name;
-  $('hero-preview-desc').textContent=hero.desc;
- }
+ refreshArcher();
  scene?.setHouse(k);
  fillPlayer(incoming?.rivalId?.[0]===k?incoming.rivalId:null);
 }
@@ -146,7 +164,7 @@ async function startMatch(accepted=null){
   onlineReplayPoints:0,seed:Math.floor(rand(100000,999999))};
  reticle={x:.50,y:.45};$('finish').classList.add('hidden');
  $('instruction').textContent='MOVA A MIRA DO ARCO • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';
- openView('arena');ensureScene();changeTarget();updateReticle();uiHud();
+ openView('arena');refreshArcher();ensureScene();changeTarget();updateReticle();uiHud();
 }
 
 function updateReticle(){
@@ -407,7 +425,11 @@ async function startOnlineClient(){
 
 // Interações do jogo.
 document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>openView(el.dataset.view)));
-document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>selectHouse(el.dataset.house)));
+document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>{
+ selectHouse(el.dataset.house);
+ el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
+}));
+document.querySelectorAll('[data-archer-gender]').forEach(el=>el.addEventListener('click',()=>chooseArcher(el.dataset.archerGender)));
 $('hero-play').addEventListener('click',()=>{
  $('setup').scrollIntoView({behavior:'smooth',block:'center'});
  $('player').focus();
