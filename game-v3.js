@@ -46,7 +46,7 @@ function selectHouse(k){
  }[k];
  const panel=$('hero-preview');if(panel){
   panel.style.animation='none';void panel.offsetWidth;panel.style.animation='';
-  $('hero-preview-img').src='https://raw.githubusercontent.com/drjcs2020/classmana-batalha-dos-monstros-V2/main/assets/'+hero.portrait;
+  $('hero-preview-img').src='assets/characters/'+hero.portrait;
   $('hero-preview-name').textContent=hero.name;
   $('hero-preview-desc').textContent=hero.desc;
  }
