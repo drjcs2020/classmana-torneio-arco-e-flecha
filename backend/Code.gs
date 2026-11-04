@@ -1,15 +1,15 @@
 /**
  * ClassMana — Torneio de Arco e Flecha, API assíncrona v1.
  * Implantar como Google Apps Script Web App: executar como PROPRIETÁRIO,
- * acesso Qualquer pessoa (não compartilhe a planilha). O servidor confere PINs,
- * acessos, desafios, pontuação e gravações. Nenhuma senha aparece no repositório.
+ * acesso Qualquer pessoa (não compartilhe a planilha). Identificação por nome,
+ * SEM PIN: conveniente para a escola, mas NÃO comprova a identidade real.
  *
  * Frontend: POST por form/iframe (evita bloqueio CORS do Apps Script),
  * GET JSONP apenas para respostas/consultas. IDs de operação aleatórios e
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 1;
+const CM_V = 2;
 const CM_TTL = 7*24*3600*1000;
 const CM_TYPES = ['mesma_turma','entre_equipes','interclasses'];
 const CM_STATUS = {CRIADOR:'CRIADOR_JOGANDO',PENDENTE:'PENDENTE',ACEITO:'ACEITO',RECUSADO:'RECUSADO',CONCLUIDO:'CONCLUIDO'};
@@ -52,9 +52,12 @@ function cmDo_(e){const p=e.parameter||{},action=String(p.action||''),token=Stri
 let result;
 try{
  if(action==='login'){
-  const id=String(p.id||'').trim().toUpperCase(),pin=String(p.pin||'');const sr=cmStudent_(db,id);const student=sr.data;
-  if(!student[4]||!student[5]||String(student[5])!==cmDigest_(student[4]+':'+pin))throw Error('Código ou PIN incorreto; peça orientação ao professor');
-  cmSheet_(db,'Sessoes').appendRow([cmDigest_(token),id,new Date(Date.now()+CM_TTL).toISOString(),cmNow_()]);cmLog_(db,id,'login',{});
+  const id=String(p.id||'').trim().toUpperCase();
+  if(!/^[ABC]\d{2}$/.test(id))throw Error('Selecione um aluno da lista.');
+  const student=cmStudent_(db,id).data;
+  // A identificação por nome é deliberadamente simples e não equivale a login seguro.
+  cmSheet_(db,'Sessoes').appendRow([cmDigest_(token),id,new Date(Date.now()+CM_TTL).toISOString(),cmNow_()]);
+  cmLog_(db,id,'selecionou_perfil',{});
   result={ok:true,user:cmPublicStudent_(student),expires:Date.now()+CM_TTL};
  } else {
   const actor=cmPublicStudent_(cmSession_(db,token).data),id=actor.id;
@@ -129,10 +132,5 @@ else if(action==='opResult'){
  else if(action==='challenge'){o={ok:true,challenge:cmVisible_(db,cmFindChallenge_(db,String(p.id||'')),id)}}
  else throw Error('Consulta inválida');}
 }catch(err){o={ok:false,error:String(err.message||err)}}return cmReply_(o,p.callback)}
-/** Run exactly ONCE as the spreadsheet owner after pasting/deploying the script.
- * It produces PINs only in the PRIVATE Credenciais_professor tab, never online.
- * Re-running does not replace PINs already created. */
-function setupOnce(){const db=cmBook_();const rows=cmRows_(cmSheet_(db,'Alunos'));if(!db.getSheetByName('Operacoes')){const sh=db.insertSheet('Operacoes');sh.appendRow(CM_COL.Operacoes);sh.setFrozenRows(1)}
-const creds=cmSheet_(db,'Credenciais_professor');let created=0;
-for(const row of rows){const a=row.data;if(a[4]&&a[5])continue;const pin=cmUuid_().slice(0,8).toUpperCase(),salt=cmUuid_();cmSheet_(db,'Alunos').getRange(row.row,5,1,2).setValues([[salt,cmDigest_(salt+':'+pin)]]);creds.appendRow([a[0],pin,cmNow_(),'PENDENTE']);created++;}
-const cfg=cmSheet_(db,'Configuracao');const values=cmRows_(cfg);const status=values.find(x=>x.data[0]==='status');if(status)cfg.getRange(status.row,2).setValue('PIN_GERADOS_AGUARDANDO_PUBLICACAO');return {created,total:rows.length}}
+/** Compatibilidade: a versão por seleção de nome não exige configuração de PIN. */
+function setupOnce(){return {message:'Sem PIN: não é necessário executar setupOnce.'}}
