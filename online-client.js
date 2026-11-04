@@ -62,7 +62,7 @@ class ArcheryOnline {
  async list(){const r=await this.get('roster');if(!r.ok)throw Error(r.error);this.roster=r.players||[];return this.roster}
  async inbox(){if(!this.user)throw Error('Escolha seu nome na lista.');const r=await this.get('inbox',{token:this.token});if(!r.ok)throw Error(r.error);return r.challenges||[]}
  async ranking(){const r=await this.get('ranking');if(!r.ok)throw Error(r.error);return r}
- async create(kind,to){return (await this.post('challenge',{kind,to})).challenge}
+ async create(kind,to,level='iniciante'){return (await this.post('challenge',{kind,to,level})).challenge}
  async answer(id,decision){return (await this.post('answer',{id,decision})).challenge}
  async submit(id,shots){return this.post('submit',{id,shots})}
  async challenge(id){const r=await this.get('challenge',{token:this.token,id});if(!r.ok)throw Error(r.error);return r.challenge}
