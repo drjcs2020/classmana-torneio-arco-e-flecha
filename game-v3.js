@@ -7,6 +7,33 @@ const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B
 const R=window.CLASSMANA_ROSTER||{A:[],B:[],C:[]};
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 let house='A',view='inicio',scene=null,match=null,reticle={x:.50,y:.45},pointerStart=0,holding=false,storage=[];
+const EQUIPMENT={
+ bows:{classico:'Arco Clássico',real:'Arco Real',vento:'Arco dos Ventos'},
+ arrows:{rubi:'Pena Rubra',esmeralda:'Esmeralda',solar:'Flecha Solar'}
+};
+function readEquipment(){
+ try{const x=JSON.parse(localStorage.getItem('classmana-archery-equipment-v1')||'{}');
+  return {bow:EQUIPMENT.bows[x.bow]?x.bow:'classico',arrow:EQUIPMENT.arrows[x.arrow]?x.arrow:'rubi'};}
+ catch{return {bow:'classico',arrow:'rubi'}}
+}
+let equipment=readEquipment();
+function applyEquipment(){
+ for(const el of document.querySelectorAll('[data-equip-bow],[data-equip-arrow]')){
+  const choice=el.dataset.equipBow??el.dataset.equipArrow;
+  const active=el.dataset.equipBow?choice===equipment.bow:choice===equipment.arrow;
+  el.classList.toggle('chosen',active);el.setAttribute('aria-pressed',String(active));
+ }
+ const status=$('equipment-summary');
+ if(status)status.textContent='Seu equipamento: '+EQUIPMENT.bows[equipment.bow]+' + '+EQUIPMENT.arrows[equipment.arrow]+' · personalização visual, sem vantagem no placar.';
+ scene?.setEquipment?.(equipment);
+}
+function chooseEquipment(key,value){
+ if(match?.running&&view==='arena'){toast('Personalize o equipamento antes de iniciar a próxima rodada.');return}
+ if((key==='bow'&&!EQUIPMENT.bows[value])||(key==='arrow'&&!EQUIPMENT.arrows[value]))return;
+ equipment={...equipment,[key]:value};
+ try{localStorage.setItem('classmana-archery-equipment-v1',JSON.stringify(equipment))}catch{}
+ applyEquipment();
+}
 let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false;
 const TEAMS=window.CLASSMANA_TEAMS||{};
 
@@ -143,7 +170,7 @@ function worldSettings(){
   verticalShift:rules>=5?motion.y*radius/h:0,
   level,shotIndex:index,seconds,house:match?.house||house};
 }
-function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house)}
+function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house);scene?.setEquipment?.(equipment)}
 function changeTarget(){
  if(!match)return;
  const cfg=match.online?.settings?.[match.scores.length];
@@ -326,7 +353,7 @@ function encode(d){const s=JSON.stringify(d),arr=new TextEncoder().encode(s);let
 function decode(s){const b=s.replace(/-/g,'+').replace(/_/g,'/');const raw=atob(b);return JSON.parse(new TextDecoder().decode(Uint8Array.from(raw,c=>c.charCodeAt(0))))}
 function createLink(){if(!match)return;const total=match.scores.reduce((a,b)=>a+b,0);let d=match.incoming?{v:2,complete:true,a:{house:match.incoming.house,id:match.incoming.playerId,score:match.incoming.score},b:{house:match.house,id:match.playerId,score:total}}:{v:2,playerId:match.playerId,house:match.house,rivalId:match.rivalId,score:total,seed:match.seed};return `${location.href.split('#')[0]}#duel=${encode(d)}`;}
 async function share(){const link=createLink();try{await navigator.clipboard.writeText(link);toast('Link copiado! Envie ao outro arqueiro.')}catch{window.prompt('Copie o link do desafio:',link)}}
-function processLink(){try{const h=location.hash;if(!h.startsWith('#duel='))return;const d=decode(h.slice(6));if(d.v!==2)return;if(d.complete){toast('Resultado compartilhado: '+d.a.score+' × '+d.b.score+' pontos.');location.hash='';return}if(typeof d.playerId!=='string'||typeof d.rivalId!=='string'||!H[d.house]||!H[d.rivalId[0]]||d.playerId===d.rivalId||!Number.isInteger(d.score)||d.score<0||d.score>50||!choices(d.house).some(x=>x.id===d.playerId)||!choices(d.rivalId[0]).some(x=>x.id===d.rivalId))return;incoming=d;selectHouse(d.rivalId[0]);$('player').value=d.rivalId;$('mode').value=d.house===d.rivalId[0]?'challenge_same':'challenge';updateMode();$('rival-label').classList.add('hidden');$('difficulty-label').classList.add('hidden');toast('⚔️ Desafio recebido de '+byId(d.playerId)+' — '+d.score+' pontos!');$('hero-play').textContent='⚔️ ACEITAR O DESAFIO';}catch(e){console.warn('Desafio inválido',e)}}
+function processLink(){try{const h=location.hash;if(!h.startsWith('#duel='))return;const d=decode(h.slice(6));if(d.v!==2)return;if(d.complete){toast('Resultado compartilhado: '+d.a.score+' × '+d.b.score+' pontos.');location.hash='';return}if(typeof d.playerId!=='string'||typeof d.rivalId!=='string'||!H[d.house]||!H[d.rivalId[0]]||d.playerId===d.rivalId||!Number.isInteger(d.score)||d.score<0||d.score>50||!choices(d.house).some(x=>x.id===d.playerId)||!choices(d.rivalId[0]).some(x=>x.id===d.rivalId))return;incoming=d;selectHouse(d.rivalId[0]);$('player').value=d.rivalId;$('mode').value=d.house===d.rivalId[0]?'challenge_same':'challenge';updateMode();$('rival-label').classList.add('hidden');$('difficulty-label').classList.add('hidden');toast('⚔️ Desafio recebido de '+byId(d.playerId)+' — '+d.score+' pontos!');if($('mode'))$('mode').value='challenge';}catch(e){console.warn('Desafio inválido',e)}}
 const htmlSafe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function renderRanking(){
  const status=$('ranking-status');
@@ -479,11 +506,9 @@ document.querySelector('.archer-choices')?.addEventListener('keydown',e=>{
   $(next==='m'?'archer-male':'archer-female').focus();
  }
 });
-$('hero-play').addEventListener('click',()=>{
- $('hero-preview').scrollIntoView({behavior:'smooth',block:'center'});
- $('archer-'+(archerGender()==='f'?'female':'male')).focus({preventScroll:true});
- toast('Escolha seu arqueiro ou arqueira. Depois, selecione seu nome para jogar.');
-});
+document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
+document.querySelectorAll('[data-equip-arrow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('arrow',el.dataset.equipArrow)));
+applyEquipment();
 $('mode').addEventListener('change',updateMode);
 $('player').addEventListener('change',()=>{fillRivals();if($('player').value!=='guest')loginStudent().catch(console.warn)});
 $('team-scope').addEventListener('change',updateMode);
