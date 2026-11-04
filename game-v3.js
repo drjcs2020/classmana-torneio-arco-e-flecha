@@ -112,7 +112,10 @@ async function startMatch(accepted=null){
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
   if(!online.enabled){toast('Para desafios oficiais, o servidor Google Sheets precisa ser ativado.');return}
-  if(!online.user){$('login-panel').classList.remove('hidden');toast('Entre com seu PIN para participar do torneio online.');return}
+  if(!online.user||online.user.id!==userId){
+    const selected=await loginStudent();
+    if(!selected)return;
+   }
   userId=online.user.id;
   if(!fromInbox){
    if(!rivalId||!choices(rivalId[0]).some(x=>x.id===rivalId)){toast('Escolha um adversário.');return}
@@ -218,7 +221,7 @@ async function finishMatch(){
    let title,desc;
    if(isCreator&&rival===null){
     title='🏹 DESAFIO ENVIADO!';
-    desc='Você fez '+total+' pontos. '+ch.recipient.name+' receberá um aviso quando entrar com o PIN e poderá aceitar ou recusar.';
+    desc='Você fez '+total+' pontos. '+ch.recipient.name+' verá o convite ao escolher seu nome e poderá aceitar ou recusar.';
    }else{
     title=total>rival?'🏆 VITÓRIA NO DESAFIO!':total===rival?'🤝 EMPATE HONROSO!':'🏹 CONTINUE TREINANDO!';
     desc='Resultado salvo: '+total+' pontos contra '+rival+' pontos de '+(isCreator?ch.recipient.name:ch.creator.name)+'.';
@@ -288,30 +291,33 @@ async function renderRanking(){
 }
 
 function showOnlineStatus(){
- const ok=online.enabled&&online.state==='ready',user=online.user;
- $('online-status').classList.toggle('ok',ok);
- $('online-status').classList.toggle('error',!ok);
- $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🔐 Perfil do arqueiro';
- $('online-banner').textContent=ok?'🟢 PLACAR ONLINE ATIVO':'⚠️ TREINO LOCAL · ONLINE PENDENTE';
- $('online-status').textContent=!online.enabled?'⚠️ Banco criado; API do Google Apps Script ainda não ativada.':
-   !ok?'⏳ Consultando o serviço online...':user?'✅ Conectado: resultados salvos na planilha online.':'✅ Ranking disponível. Entre com o PIN para receber desafios.';
- $('open-login').classList.toggle('hidden',!!user);
+ const active=online.enabled&&online.state==='ready',user=online.user;
+ $('online-status').classList.toggle('ok',active);
+ $('online-status').classList.toggle('error',!active);
+ $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🏹 Escolha seu nome na lista';
+ $('online-banner').textContent=active?'🟢 PLACAR ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
+ $('online-status').textContent=!online.enabled?'⚠️ Servidor de resultados não configurado.':
+  !active?'⏳ Consultando o placar...':user?'✅ Você pode ver seus desafios. Não há senha ou PIN.':'✅ Placar conectado. Escolha seu nome para receber desafios, sem PIN.';
  $('logout').classList.toggle('hidden',!user);
- $('open-inbox').disabled=!user;
- if(user){selectHouse(user.house);$('player').value=user.id;fillRivals();}
+ $('open-inbox').disabled=!active;
+ if(user&&($('player').value!==user.id||house!==user.house)){
+  selectHouse(user.house);$('player').value=user.id;fillRivals();
+ }
 }
 async function loginStudent(){
- if(!online.enabled){toast('O professor precisa publicar a API antes de liberar o torneio online.');return;}
- const id=$('player').value,pin=$('student-pin').value.trim(),btn=$('submit-login');
- if(!id||id==='guest'){toast('Selecione primeiro seu nome na lista da turma.');return;}
- btn.disabled=true;btn.textContent='⏳ ENTRANDO...';$('login-help').textContent='Confirmando identidade na planilha...';
+ const id=$('player').value;
+ if(!id||id==='guest'){toast('Escolha seu nome na lista.');return null;}
+ if(!online.enabled){toast('O placar online ainda não está configurado.');return null;}
+ if(online.user?.id===id)return online.user;
  try{
-  const user=await online.login(id,pin);$('student-pin').value='';$('login-panel').classList.add('hidden');
-  showOnlineStatus();const pendentes=await refreshInbox();const count=pendentes.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
-   toast(count?'🔔 Você recebeu '+count+' desafio(s)!':'🏹 Bem-vindo ao torneio, '+user.name+'!');
-   if(count)await openInbox();
- }catch(e){$('login-help').textContent='⚠️ '+e.message;toast('Não foi possível entrar: '+e.message)}
- finally{btn.disabled=false;btn.textContent='ENTRAR'}
+  const user=await online.login(id);
+  showOnlineStatus();
+  const inbox=await refreshInbox();
+  const received=inbox.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
+  if(received){toast('🔔 Você recebeu '+received+' desafio(s)!');await openInbox();}
+  else toast('🏹 Arqueiro selecionado: '+user.name);
+  return user;
+ }catch(error){toast('⚠️ Não foi possível selecionar o perfil: '+error.message);return null;}
 }
 function renderInbox(){
  const list=$('inbox-list');list.innerHTML='';
@@ -356,7 +362,7 @@ async function refreshInbox(){
  renderInbox();return onlineInbox;
 }
 async function openInbox(){
- if(!online.user){$('login-panel').classList.remove('hidden');$('setup').scrollIntoView({behavior:'smooth',block:'center'});toast('Entre com seu PIN para receber os desafios.');return;}
+ if(!online.user){const selected=await loginStudent();if(!selected){toast('Escolha seu nome para abrir seus desafios.');return;}}
  $('online-inbox').classList.remove('hidden');
  $('inbox-status').textContent='⏳ Consultando convites recebidos...';
  try{await refreshInbox()}catch(e){$('inbox-status').textContent='⚠️ Falha ao carregar desafios: '+e.message}
