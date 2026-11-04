@@ -56,6 +56,8 @@ function refreshArcher(){
  if(img){img.src=archerImage();img.alt=title+" com arco e aljava"}
  if(name)name.textContent=title+" · "+H[house].grade;
  if(desc)desc.textContent=ARCHER_SKINS[house].desc+" Mascote da Casa: "+ARCHER_SKINS[house].mascot+".";
+ const carouselIndicator=$('archer-carousel-indicator');
+ if(carouselIndicator)carouselIndicator.textContent=female?'2 / 2 · ARQUEIRA':'1 / 2 · ARQUEIRO';
  const panel=$('hero-preview');if(panel)panel.dataset.house=house;
  const hud=$('hud-archer-image');if(hud){hud.src=archerImage();hud.alt=title;}
  document.querySelectorAll('[data-archer-gender]').forEach(btn=>{
@@ -430,6 +432,21 @@ document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>
  el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
 }));
 document.querySelectorAll('[data-archer-gender]').forEach(el=>el.addEventListener('click',()=>chooseArcher(el.dataset.archerGender)));
+const rotateArcher=()=>chooseArcher(archerGender()==='m'?'f':'m');
+$('archer-prev').addEventListener('click',rotateArcher);
+$('archer-next').addEventListener('click',rotateArcher);
+const archerCarousel=$('archer-carousel-viewport');
+archerCarousel.addEventListener('keydown',e=>{
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();rotateArcher()}
+});
+let archerSwipeX=null;
+archerCarousel.addEventListener('touchstart',e=>{archerSwipeX=e.touches[0]?.clientX??null},{passive:true});
+archerCarousel.addEventListener('touchend',e=>{
+ if(archerSwipeX===null)return;
+ const delta=(e.changedTouches[0]?.clientX??archerSwipeX)-archerSwipeX;
+ archerSwipeX=null;
+ if(Math.abs(delta)>40)rotateArcher();
+},{passive:true});
 $('hero-play').addEventListener('click',()=>{
  $('setup').scrollIntoView({behavior:'smooth',block:'center'});
  $('player').focus();
