@@ -26,9 +26,16 @@ jobs:
               curl --fail --location --retry 3 --silent --show-error "$src/$file" -o "assets/images/$file"
             fi
           done
+          mkdir -p assets/characters
+          hero="https://raw.githubusercontent.com/drjcs2020/classmana-batalha-dos-monstros-V2/main/assets"
+          for file in hero_fada.png hero_chama.png hero_dragao.png; do
+            if [ ! -s "assets/characters/$file" ]; then
+              curl --fail --location --retry 3 --silent --show-error "$hero/$file" -o "assets/characters/$file"
+            fi
+          done
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/images/brasao-4a-transparente.png assets/images/arte-028.png assets/images/arte-029.png
+          git add assets/images/brasao-4a-transparente.png assets/images/arte-028.png assets/images/arte-029.png assets/characters/hero_fada.png assets/characters/hero_chama.png assets/characters/hero_dragao.png
           if ! git diff --cached --quiet; then
             git commit -m "assets: guardar brasões oficiais no repositório independente"
             git push
