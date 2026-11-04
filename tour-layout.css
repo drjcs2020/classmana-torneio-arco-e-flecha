@@ -1,0 +1,241 @@
+
+/* CLASSMANA · Tour UI v1. Two full-viewport pages, desktop + compact mobile steps.
+ * Loaded last: overrides legacy long-scrolling prototypes. */
+:root{--tour-navy:#153d50;--tour-gold:#efbf62;--tour-border:#d2b37a}
+html,body{width:100%;height:100%;margin:0!important;overflow:hidden!important;overscroll-behavior:none}
+body{background:radial-gradient(ellipse at 15% 10%,#c2f2e6,transparent 50%),linear-gradient(125deg,#d8f6ed,#effaf0 65%,#f8edcb)!important}
+body,.page{box-sizing:border-box}
+.page{width:100%!important;max-width:1600px!important;height:100dvh;min-height:0!important;padding:0 clamp(10px,2vw,24px)!important;margin:0 auto!important;display:flex;flex-direction:column;overflow:hidden}
+.sky-sparkles{opacity:.15!important}
+.nav-bar{
+ flex:none;min-height:0!important;height:76px!important;max-height:76px!important;
+ display:flex!important;align-items:center!important;gap:16px!important;
+ margin:0!important;padding:6px clamp(13px,1.8vw,28px)!important;
+ border:2px solid #e1c18b!important;border-top:0!important;border-radius:0 0 22px 22px!important;
+ background:linear-gradient(115deg,#fffcf4,#e4fff6 55%,#fff2d4)!important;
+ box-shadow:0 5px 20px #18415b25!important;
+}
+.nav-bar .brand{flex:0 0 auto;display:flex!important;align-items:center!important;gap:10px!important;min-width:0}
+.nav-bar .brand img{height:64px!important;width:137px!important;max-width:none!important;object-fit:contain!important;filter:drop-shadow(0 3px 4px #42290b4a)}
+.nav-bar .brand .brand-caption{font:700 clamp(19px,2.15vw,32px)/.94 'Fredoka',sans-serif!important;color:#9b601e!important;letter-spacing:.6px!important;white-space:nowrap;text-shadow:0 2px #fff9df}
+.nav-bar .nav-links{display:flex!important;gap:8px!important;justify-content:center!important;flex:1!important}
+.nav-bar .nav-link{min-height:45px!important;padding:8px 14px!important;font:700 clamp(14px,1.1vw,17px)/1.18 'Fredoka',sans-serif!important;color:#214e62!important;border-radius:14px!important;border:2px solid transparent!important}
+.nav-bar .nav-link.active,.nav-bar .nav-link:hover{background:#ffe8af!important;border-color:#dcb76c!important;color:#6a4213!important;box-shadow:0 3px 0 #a57a3d36!important}
+.nav-bar #online-banner{flex:0 1 auto;min-width:0;margin:0!important;padding:7px 10px!important;border-radius:30px;font-size:11px!important;text-transform:uppercase;text-align:center}
+main{height:calc(100dvh - 76px)!important;min-height:0!important;flex:1;overflow:hidden!important;margin:0!important;position:relative}
+footer{display:none!important}
+.view{display:none!important}
+#view-inicio.active{display:grid!important;grid-template-columns:minmax(0,1.17fr) minmax(370px,.83fr);grid-template-rows:auto clamp(122px,18vh,162px) minmax(0,1fr);column-gap:14px;row-gap:9px;height:100%;min-height:0;padding:9px 0 14px;box-sizing:border-box;overflow:hidden}
+#view-inicio .kingdom-title{grid-column:1/-1;grid-row:1;min-height:0!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between;margin:0!important;gap:12px!important}
+#view-inicio .kingdom-title small{font:900 11px Nunito,sans-serif!important;letter-spacing:1.5px!important;color:#a26727!important}
+#view-inicio .kingdom-title h1{font:700 clamp(24px,2.3vw,35px)/1.05 Fredoka,sans-serif!important;margin:0!important;color:#174c63!important}
+#view-inicio .kingdom-title p{font:800 13px Nunito,sans-serif!important;margin:0!important;text-align:right!important;color:#597082!important;max-width:none!important}
+#view-inicio .houses{grid-column:1/-1;grid-row:2;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important;min-height:0;height:100%!important}
+#view-inicio .house{display:flex!important;height:100%!important;min-height:0!important;border-radius:18px!important;border:3px solid #d2ad6a!important;box-shadow:0 6px 17px #20485a47!important;padding:10px 5px!important}
+#view-inicio .house:before{background-position:center 46%!important;background-size:cover!important;filter:brightness(.94) saturate(1.2)!important}
+#view-inicio .house .house-name{font:700 clamp(17px,2vw,27px)/1.08 Fredoka,sans-serif!important;text-shadow:0 3px 5px #071c25cf!important}
+#view-inicio .house .house-grade{font:900 clamp(10px,.9vw,12px)/1.1 Nunito,sans-serif!important}
+#view-inicio .house .house-check{min-width:0!important;margin-top:3px!important;padding:4px 12px!important;font-size:11px!important}
+#view-inicio .house.selected{outline:3px solid #ffdc80!important;outline-offset:1px!important}
+#view-inicio .character-studio{
+ grid-column:1;grid-row:3;min-height:0!important;min-width:0!important;
+ display:grid!important;grid-template-columns:minmax(0,.99fr) minmax(0,1.01fr)!important;
+ gap:10px!important;margin:0!important;padding:11px!important;
+ border-radius:20px!important;overflow:hidden!important;align-items:stretch!important
+}
+#view-inicio .studio-character{display:flex;flex-direction:column;min-height:0;overflow:hidden;gap:4px!important}
+#view-inicio .studio-heading{padding:1px 4px!important;flex:none}
+#view-inicio .studio-heading>small{font:900 10px Nunito,sans-serif!important;letter-spacing:.8px}
+#view-inicio .studio-heading h2{font:700 clamp(19px,1.8vw,28px)/1.09 Fredoka,sans-serif!important;margin:1px 0!important;color:#1b516a!important}
+#view-inicio .studio-heading p{display:none!important}
+#view-inicio .studio-carousel{flex:1;min-height:0!important;display:grid;grid-template-columns:38px minmax(0,1fr) 38px!important;gap:1px;border-radius:15px!important;overflow:hidden}
+#view-inicio .studio-portrait{height:100%!important;min-height:0;overflow:hidden;align-items:center}
+#view-inicio #hero-preview-img{height:100%!important;max-height:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center!important}
+#view-inicio .studio-arrow{min-width:35px!important;min-height:54px!important;padding:0!important;font-size:37px!important;border-radius:13px!important;z-index:3}
+#view-inicio .studio-selected{padding:5px 8px!important;display:flex!important;flex:none;justify-content:center!important}
+#view-inicio .studio-selected strong{font:700 16px Fredoka,sans-serif!important}
+#view-inicio .studio-selected>span{display:none!important}
+#view-inicio .studio-equipment{min-height:0;overflow:hidden!important;display:flex;flex-direction:column;gap:6px!important;padding:10px!important;border-radius:15px!important}
+#view-inicio .studio-bows{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr));gap:6px!important;flex:1;min-height:0}
+#view-inicio .studio-bows .gear-choice{min-width:0!important;min-height:0!important;height:100%!important;display:grid!important;grid-template-columns:minmax(48px,70px) minmax(0,1fr) 19px!important;gap:7px!important;padding:5px 8px!important;border-radius:13px!important;text-align:left!important}
+#view-inicio .bow-preview{width:100%!important;max-width:72px;height:100%!important;min-height:0!important}
+#view-inicio .bow-preview img{width:100%;height:100%;object-fit:contain}
+#view-inicio .bow-label{gap:3px!important;min-width:0}
+#view-inicio .bow-label strong{font:700 clamp(13px,1.18vw,17px)/1.1 Fredoka,sans-serif!important}
+#view-inicio .bow-label small{font:800 11px/1.1 Nunito,sans-serif!important}
+#view-inicio .bow-check{width:20px;height:20px;font-size:13px}
+#view-inicio .official-arrow{display:none!important}
+#view-inicio .equipment-summary{display:none!important}
+#view-inicio .setup{
+ grid-column:2;grid-row:3;min-height:0!important;display:flex;flex-direction:column;gap:8px!important;
+ overflow:hidden!important;margin:0!important;padding:12px!important;border-radius:20px!important;
+ background:linear-gradient(135deg,#ffffffed,#fff5dce8)!important;
+}
+#view-inicio .online-account{min-height:0!important;max-height:62px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:7px;padding:7px 10px!important;margin:0!important;border-radius:14px!important;overflow:hidden}
+#view-inicio .online-account>div:first-child{min-width:0;overflow:hidden}
+#view-inicio .online-account strong{display:block;font:700 15px Fredoka,sans-serif!important;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+#view-inicio .online-account small{font-size:11px!important;line-height:1.2!important;max-height:2.4em;overflow:hidden}
+#view-inicio .online-account .cm-identity-warning{display:none!important}
+#view-inicio .online-account-actions{display:flex;gap:5px;flex:none}
+#view-inicio .online-account-actions .cm-online-btn{min-height:34px!important;padding:5px 8px!important;font-size:11px!important}
+#view-inicio .setup-head{min-height:0;flex:none;display:flex;align-items:center;justify-content:space-between;margin:0!important}
+#view-inicio .setup-head h2{font:700 clamp(19px,2vw,29px)/1 Fredoka,sans-serif!important;margin:0!important}
+#view-inicio .setup-head small{font:900 10px Nunito,sans-serif!important}
+#view-inicio .setup-head .stamp{font-size:10px!important;padding:6px 8px!important}
+#view-inicio .setup-fields{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(55px,auto);gap:8px!important;align-content:start;min-height:0!important;overflow-y:auto!important;scrollbar-width:thin;padding:1px 2px;flex:1}
+#view-inicio .setup-fields>label{font:900 13px/1.15 Nunito,sans-serif!important;display:flex;flex-direction:column;gap:3px;color:#214e61!important;min-width:0}
+#view-inicio .setup-fields>label.hidden{display:none!important}
+#view-inicio .setup-fields select{min-height:39px!important;width:100%;font:800 13px Nunito,sans-serif!important;padding:5px 7px!important;background:#fff!important;color:#164f67!important}
+#view-inicio .setup-fields label small{display:none!important}
+#view-inicio .course-preview{flex:none;min-height:0;background:#e6f4e9;border:1px solid #b7d8bd;border-radius:13px;padding:6px 9px;display:flex;flex-direction:column;gap:3px}
+#view-inicio .course-label{font:900 10px Nunito,sans-serif;color:#1a6656;letter-spacing:.8px}
+#view-inicio .course-nodes{display:flex;align-items:center;justify-content:space-between;gap:4px;position:relative}
+#view-inicio .course-nodes:before{content:'';position:absolute;left:10px;right:10px;top:12px;height:4px;background:linear-gradient(90deg,#a66e2e,#ffcd67,#286c5c);border-radius:8px}
+#view-inicio .course-node{z-index:1;min-width:0;flex:1;display:flex;align-items:center;justify-content:center;gap:3px;min-height:26px;padding:2px 3px;background:#fafff8;border:2px solid #93bcaa;border-radius:14px;font:900 11px Nunito,sans-serif;color:#215b52;white-space:nowrap}
+#view-inicio .course-node:last-child{background:#ffe7a4;border-color:#d6a43a}
+#view-inicio .start{flex:none;margin:0!important;min-height:51px!important;padding:9px 12px!important;font:700 21px Fredoka,sans-serif!important;white-space:nowrap;border-radius:13px!important;letter-spacing:0!important}
+.lobby-steps{display:none}
+#view-arena.active{display:flex!important;flex-direction:column;height:100%!important;min-height:0;padding:7px 0 8px;overflow:hidden}
+#view-arena .arena-top{flex:none;display:flex!important;align-items:center!important;justify-content:space-between;gap:9px!important;height:42px;min-height:42px;margin:0 0 7px!important}
+#view-arena .arena-top .back{border-radius:12px!important;font:900 13px Nunito,sans-serif!important;padding:7px 11px!important;min-height:36px}
+#view-arena .arena-header b{font:700 clamp(19px,2vw,28px)/1 Fredoka,sans-serif!important;color:#1a4d62!important;text-shadow:0 2px #fff5d8!important}
+#view-arena .arena-sound-toggle{font-size:13px!important;min-height:36px!important;padding:6px 10px!important}
+#view-arena .stage{flex:1;position:relative;min-height:0!important;max-height:none!important;height:auto!important;width:100%;overflow:hidden!important;border:3px solid #d8b573!important;border-radius:18px!important;box-shadow:0 12px 27px #153b4666!important}
+#view-arena .stage #world{position:absolute;inset:0;z-index:0;width:100%;height:100%;cursor:crosshair}
+#view-arena .battle-hud{position:absolute;z-index:6;top:0;left:0;right:0;min-height:58px;padding:5px 17px!important;border:0!important;border-bottom:2px solid #e5bb71b0!important;border-radius:0!important;background:linear-gradient(90deg,#142e2ddc,#20372ed9 48%,#17302bcf)!important;backdrop-filter:blur(7px)}
+#view-arena .battle-hud .hud-archer img{height:39px!important;width:33px!important;object-fit:contain}
+#view-arena .battle-hud small{font-size:9px!important}
+#view-arena .battle-hud strong{font-size:14px!important}
+#view-arena .battle-hud .score-display{font:700 clamp(22px,2.4vw,34px) Fredoka,sans-serif!important}
+#view-arena .range-progress{position:absolute!important;z-index:6;top:66px;left:50%;transform:translateX(-50%);width:max-content;max-width:90%;display:flex!important;align-items:center;justify-content:center;gap:5px;margin:0!important;padding:3px!important;background:#f7f9e9d8;border:1px solid #cfb477;border-radius:18px;box-shadow:0 5px 17px #1c30313f}
+#view-arena .range-step{min-width:64px!important;font-size:12px!important;padding:5px 7px!important;white-space:nowrap}
+#view-arena .range-intro{position:absolute;z-index:5;bottom:13px;right:12px;left:auto;display:flex!important;max-width:40%;margin:0!important;padding:7px 11px!important;background:#faffeddd!important;border:1px solid #bca66d!important;border-radius:13px!important;box-shadow:0 4px 10px #19392c4d}
+#view-arena .range-intro strong{font-size:14px!important}
+#view-arena .range-intro #range-mode{display:none!important}
+#view-arena .range-intro .mode-badge{font-size:10px!important;padding:4px 7px!important}
+#view-arena .game-top-left{top:121px!important;left:12px!important;z-index:6}
+#view-arena .game-top-right{top:121px!important;right:12px!important;z-index:6}
+#view-arena .game-top-right .hud-pill{font-size:12px!important;padding:7px 10px!important}
+#view-arena #distance{font-size:12px!important;padding:6px 10px!important}
+#view-arena .scene-badge{bottom:12px;left:12px;z-index:5;transform:scale(.85);transform-origin:bottom left}
+#view-arena .instruction{z-index:6;bottom:15px!important;left:50%!important;transform:translateX(-50%);font:900 12px/1.1 Nunito,sans-serif!important;letter-spacing:0!important;max-width:48%;white-space:normal!important;text-align:center;padding:7px 9px!important}
+#view-arena .playcross{z-index:6;pointer-events:none}
+#view-arena .finish{z-index:30}
+#view-arena .finish-card{max-height:90%;overflow:auto}
+#view-ranking.active,#view-regras.active{display:flex!important;flex-direction:column!important;align-items:center;position:fixed!important;inset:0!important;z-index:100;overflow:auto!important;padding:calc(env(safe-area-inset-top) + 15px) clamp(12px,3vw,35px) 20px!important;background:linear-gradient(140deg,#d8f9f0,#e9f2df 64%,#ffecbc)!important;box-sizing:border-box}
+#view-ranking .page-heading,#view-regras .page-heading{width:100%;margin-bottom:12px!important;padding:15px 20px;border-radius:16px;background:linear-gradient(95deg,#1c4949,#254f4a,#1c444c)!important;border:2px solid #e6c479;text-align:center!important}
+#view-ranking .page-heading h1,#view-regras .page-heading h1{font:700 clamp(30px,3.2vw,46px) Fredoka,sans-serif!important;color:#fbe19e!important;margin:0!important}
+#view-ranking .page-heading small,#view-regras .page-heading small{color:#f4c66c!important}
+#view-ranking .page-heading p{font-size:15px!important;color:#faf1d6!important;margin:2px 0}
+#view-ranking .notice{max-width:1000px;width:100%;padding:10px 15px!important;margin:0 auto 12px!important;background:#fff5d6!important;color:#805d25!important;border-radius:12px;font-size:14px!important}
+#view-ranking .cm-score-mode-tabs{margin:0 0 10px}
+#view-ranking .ranking-layout{width:100%;max-width:1200px;flex:1;min-height:0;overflow:auto;grid-template-columns:1fr 1fr}
+#view-ranking .ranking-panel{background:#fffffff2!important;color:#214f61!important;border:2px solid #d6bd8b!important;border-radius:16px!important;min-height:0;overflow:auto}
+#view-ranking .ranking-panel h2{color:#245369!important;font:700 24px Fredoka,sans-serif!important}
+#view-regras .rules-grid{width:100%;max-width:1200px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+#view-regras .rules-grid article{color:#254c60!important;background:#fffefa!important;border:2px solid #dbc58f!important;border-radius:14px;box-shadow:0 5px 18px #2040531a}
+#view-regras .rules-grid article b{font:700 22px Fredoka,sans-serif!important}
+#view-regras .rules-grid article p{font:800 15px/1.5 Nunito,sans-serif!important}
+#rank-play,#rules-play{font:700 18px Fredoka,sans-serif!important;min-height:45px!important;padding:8px 22px!important;margin-top:12px!important;flex:none}
+#view-ranking .cm-score-mode-tabs button{font-size:16px!important}
+@media(max-height:760px) and (min-width:1061px){
+#view-inicio .houses{max-height:125px}
+#view-inicio.active{grid-template-rows:auto clamp(103px,15vh,125px) minmax(0,1fr);row-gap:6px}
+#view-inicio .character-studio,#view-inicio .setup{padding:8px!important}
+#view-inicio .studio-heading h2{font-size:20px!important}
+#view-inicio .studio-bows .gear-choice{padding:4px!important}
+#view-inicio .studio-equipment{padding:6px!important}
+#view-inicio .setup-fields{grid-auto-rows:minmax(46px,auto);gap:4px!important}
+#view-inicio .setup-fields select{min-height:34px!important}
+#view-inicio .course-preview{padding:4px 8px}
+#view-inicio .start{min-height:43px!important}
+}
+@media(max-width:1060px){
+ .nav-bar{height:71px!important;max-height:71px!important;gap:6px!important;padding:6px 10px!important}
+ .nav-bar .brand img{height:55px!important;width:95px!important}
+ .nav-bar .brand .brand-caption{font-size:19px!important}
+ .nav-bar .nav-link{padding:6px 9px!important;min-height:36px!important;font-size:12px!important}
+ .nav-bar #online-banner{font-size:9px!important;padding:5px!important}
+ main{height:calc(100dvh - 71px)!important}
+ #view-inicio.active{display:grid!important;grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr);gap:8px;padding:10px 0}
+ #view-inicio .kingdom-title{grid-row:1;grid-column:1}
+ #view-inicio .kingdom-title p{display:none!important}
+ .lobby-steps{grid-row:2;grid-column:1;display:flex!important;align-items:center;justify-content:stretch;gap:5px;min-height:42px}
+ .lobby-steps .lobby-step{flex:1;font:700 16px Fredoka,sans-serif;color:#22556e;background:#f4fff8;border:2px solid #add1ca;border-radius:12px;padding:9px 8px;min-height:41px}
+ .lobby-steps .lobby-step.chosen{background:#ffe5a5;border-color:#dba94f;color:#654218}
+ #view-inicio .houses,#view-inicio .character-studio,#view-inicio .setup{grid-row:3;grid-column:1;min-height:0!important;height:100%;overflow:hidden}
+ #view-inicio .houses{display:none!important;grid-template-columns:1fr!important;gap:7px!important}
+ #view-inicio .house{min-height:0!important;padding:10px!important}
+ #view-inicio .character-studio,#view-inicio .setup{display:none!important}
+ #view-inicio[data-step="reino"] .houses{display:grid!important;grid-template-rows:repeat(3,minmax(0,1fr))!important}
+ #view-inicio[data-step="heroi"] .character-studio{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+ #view-inicio[data-step="partida"] .setup{display:flex!important;max-width:720px;margin:0 auto!important;width:100%}
+ #view-inicio .character-studio{gap:10px!important}
+ #view-inicio .studio-carousel{min-height:0!important}
+ #view-inicio .studio-portrait{min-height:0}
+ #view-inicio .studio-bows .gear-choice{min-height:0!important}
+ #view-inicio .setup-fields{grid-auto-rows:minmax(55px,auto)}
+}
+@media(max-width:600px){
+ .nav-bar{height:67px!important;max-height:67px!important;gap:3px!important;padding:5px 6px!important;border-radius:0 0 12px 12px!important}
+ .nav-bar .brand img{height:47px!important;width:79px!important}
+ .nav-bar .brand .brand-caption{font-size:14px!important;letter-spacing:0!important}
+ .nav-bar .nav-links{gap:2px!important}
+ .nav-bar .nav-link{font-size:11px!important;min-height:33px!important;padding:5px!important}
+ .nav-bar #online-banner{display:none!important}
+ main{height:calc(100dvh - 67px)!important}
+ #view-inicio.active{row-gap:6px;padding:6px 0}
+ #view-inicio .kingdom-title h1{font-size:25px!important}
+ #view-inicio .kingdom-title small{font-size:10px!important}
+ .lobby-steps .lobby-step{font-size:14px;padding:5px 2px!important;min-height:37px}
+ #view-inicio .house{border-radius:12px!important}
+ #view-inicio .house .house-name{font-size:23px!important}
+ #view-inicio .character-studio{padding:6px!important;gap:6px!important}
+ #view-inicio .studio-equipment{padding:6px!important}
+ #view-inicio .studio-heading h2{font-size:17px!important}
+ #view-inicio .studio-carousel{grid-template-columns:27px minmax(0,1fr) 27px!important}
+ #view-inicio .studio-arrow{font-size:27px!important;min-width:27px!important;min-height:43px!important;padding:0!important;border-radius:8px!important}
+ #view-inicio .studio-selected strong{font-size:13px!important}
+ #view-inicio .studio-bows .gear-choice{grid-template-columns:46px minmax(0,1fr) 16px!important;gap:2px!important;padding:4px!important;min-height:0!important}
+ #view-inicio .bow-label strong{font-size:12px!important}
+ #view-inicio .bow-label small{font-size:10px!important}
+ #view-inicio .studio-bows{gap:5px!important}
+ #view-inicio .setup{padding:7px!important;gap:5px!important}
+ #view-inicio .online-account{max-height:54px;min-height:0!important;padding:6px!important}
+ #view-inicio .online-account strong{font-size:13px!important}
+ #view-inicio .online-account small{font-size:10px!important}
+ #view-inicio .setup-fields{grid-template-columns:1fr!important;gap:7px!important;overflow-y:auto}
+ #view-inicio .setup-fields>label{font-size:14px!important}
+ #view-inicio .setup-fields select{font-size:13px!important;min-height:38px!important}
+ #view-inicio .course-preview{padding:4px}
+ #view-inicio .course-label{font-size:9px}
+ #view-inicio .course-node{font-size:9px;padding:1px;gap:1px;min-height:22px}
+ #view-inicio .start{font-size:19px!important;min-height:47px!important}
+ #view-arena .arena-top{height:39px;min-height:39px}
+ #view-arena .arena-header b{font-size:14px!important}
+ #view-arena .arena-sound-toggle{font-size:11px!important;padding:4px!important}
+ #view-arena .battle-hud{padding:3px 6px!important;min-height:49px}
+ #view-arena .battle-hud .score-display{font-size:20px!important}
+ #view-arena .battle-hud strong{font-size:11px!important}
+ #view-arena .range-progress{top:54px;gap:2px}
+ #view-arena .range-step{min-width:0!important;font-size:9px!important;padding:4px!important}
+ #view-arena .game-top-left{top:97px!important;left:5px!important}
+ #view-arena .game-top-right{top:97px!important;right:5px!important;flex-direction:column;align-items:flex-end;gap:3px}
+ #view-arena .wind-widget{transform:scale(.68);transform-origin:top left}
+ #view-arena #distance{font-size:10px!important;padding:5px!important;margin-top:-18px!important}
+ #view-arena .game-top-right .hud-pill{font-size:10px!important;padding:5px!important}
+ #view-arena .range-intro{bottom:6px!important;right:6px!important;max-width:53%;padding:5px!important}
+ #view-arena .range-intro strong{font-size:12px!important}
+ #view-arena .range-intro .mode-badge{display:none}
+ #view-arena .instruction{font-size:10px!important;max-width:53%;bottom:50px!important}
+ #view-arena .scene-badge{transform:scale(.6)}
+ #view-regras .rules-grid{grid-template-columns:1fr}
+ #view-ranking .ranking-layout{grid-template-columns:1fr}
+}
+@media(max-height:650px) and (min-width:601px) and (max-width:1060px){
+ #view-inicio .kingdom-title{display:none!important}
+ #view-inicio.active{grid-template-rows:auto minmax(0,1fr)}
+ .lobby-steps{grid-row:1}
+ #view-inicio .houses,#view-inicio .character-studio,#view-inicio .setup{grid-row:2}
+}
+@media(prefers-reduced-motion:reduce){.house,.studio-arrow,.gear-choice{transition:none!important}}
