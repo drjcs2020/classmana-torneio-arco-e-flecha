@@ -1,0 +1,78 @@
+/**
+ * ClassMana Arena — original synthesized SFX, no external audio or autoplay.
+ * The first user gesture unlocks Web Audio. Players may mute at any time.
+ */
+const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
+let ctx=null,bus=null,active=false,timer=null,house='A';
+let enabled=localStorage.getItem('cm_arena_sound')!=='off';
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function init(){
+ if(!enabled||!AudioContextCtor)return null;
+ try{
+  if(!ctx){
+   ctx=new AudioContextCtor();
+   bus=ctx.createGain();bus.gain.value=.20;bus.connect(ctx.destination);
+  }
+  if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+  return ctx;
+ }catch(error){console.warn('[ClassMana] Som indisponível:',error);return null;}
+}
+function tone(freq,endFreq,duration,volume=.12,type='sine',delay=0){
+ const c=init();if(!c)return;
+ const now=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();
+ o.type=type;o.frequency.setValueAtTime(Math.max(50,freq),now);
+ o.frequency.exponentialRampToValueAtTime(Math.max(50,endFreq),now+duration);
+ g.gain.setValueAtTime(.0001,now);
+ g.gain.exponentialRampToValueAtTime(Math.max(.001,volume),now+.015);
+ g.gain.exponentialRampToValueAtTime(.0001,now+duration);
+ o.connect(g);g.connect(bus);o.start(now);o.stop(now+duration+.04);
+}
+function noise(duration,volume=.12,cutoff=1200,delay=0){
+ const c=init();if(!c)return;
+ const buffer=c.createBuffer(1,Math.ceil(c.sampleRate*duration),c.sampleRate);
+ const values=buffer.getChannelData(0);
+ for(let i=0;i<values.length;i++)values[i]=(Math.random()*2-1)*Math.min(1,(i+1)/200);
+ const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),now=c.currentTime+delay;
+ s.buffer=buffer;f.type='lowpass';f.frequency.value=cutoff;
+ g.gain.setValueAtTime(.0001,now);
+ g.gain.exponentialRampToValueAtTime(volume,now+.02);
+ g.gain.exponentialRampToValueAtTime(.0001,now+duration);
+ s.connect(f);f.connect(g);g.connect(bus);s.start(now);s.stop(now+duration+.03);
+}
+function chirp(){
+ if(!active||!enabled||document.hidden)return;
+ const base=house==='A'?1050:house==='B'?840:1190;
+ for(let i=0;i<3;i++)tone(base+i*90,base*1.45+i*100,.10+i*.02,.022,'sine',i*.12);
+}
+function ambience(){
+ clearInterval(timer);timer=null;
+ if(!active||!enabled)return;
+ init();chirp();
+ timer=setInterval(()=>{if(active&&enabled&&!document.hidden)chirp()},5800);
+}
+export const arenaAudio={
+ get enabled(){return enabled&&!!AudioContextCtor},
+ setHouse(k){house=['A','B','C'].includes(k)?k:'A'},
+ setActive(value){active=!!value;ambience()},
+ toggle(){
+  enabled=!enabled;localStorage.setItem('cm_arena_sound',enabled?'on':'off');
+  if(!enabled){clearInterval(timer);timer=null;if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);}
+  else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.20,ctx.currentTime,.05);ambience()}
+  return enabled;
+ },
+ play(effect,score=0){
+  if(!enabled||document.hidden)return;
+  try{
+   if(effect==='draw'){tone(185,260,.34,.035,'triangle');noise(.23,.016,400);}
+   if(effect==='release'){noise(.26,.16,2500);tone(410,150,.20,.07,'triangle');}
+   if(effect==='fly'){noise(.35,.055,3400);tone(760,360,.24,.018,'sine');}
+   if(effect==='hit'){
+    noise(.13,.15,340);tone(120,73,.18,.12,'triangle');
+    if(score>=8){tone(520,780,.23,.07,'sine',.06);tone(660,990,.28,.05,'sine',.16);}
+   }
+   if(effect==='miss'){noise(.18,.08,650);tone(280,190,.15,.025,'sine');}
+   if(effect==='victory'){[523,659,784,1047].forEach((n,i)=>tone(n,n*1.03,.31,.065,'triangle',i*.12));}
+  }catch(error){console.warn('[ClassMana] Falha ao emitir efeito sonoro:',error)}
+ }
+};
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(timer);timer=null}else ambience()});
