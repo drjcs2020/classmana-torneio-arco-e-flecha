@@ -1,6 +1,6 @@
 /** ClassMana Arena — cliente seguro de API Google Sheets / Apps Script.
  * Escritas por formulário POST de um iframe isolado; respostas por consultas
- * JSONP identificadas por requestId não adivinhável. Sem PINs em URLs.
+ * JSONP por requestId aleatório. O aluno seleciona o nome; não há PIN.
  */
 import {ONLINE_API_URL} from './online-config.js';
 const TOKEN_KEY='cm_arc_session_v1';
@@ -47,12 +47,20 @@ class ArcheryOnline {
  async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
  }
- async login(id,pin){if(!id||id==='guest')throw Error('Escolha seu nome na turma.');if(!/^\d{0,8}[\w-]{0,8}$/.test(pin)||pin.length<6)throw Error('PIN inválido');
-  const old=this.token;this.token=randomId();try{const r=await this.post('login',{}, {id,pin});this.user=r.user;sessionStorage.setItem(TOKEN_KEY,this.token);this.state='ready';return r.user}catch(e){this.token=old;throw e}
+ async login(id){
+  if(!/^[ABC]\d{2}$/.test(id||''))throw Error('Escolha seu nome na lista.');
+  if(this.user?.id===id&&this.token)return this.user;
+  const old=this.token,previous=this.user;this.token=randomId();this.user=null;
+  try{
+    const r=await this.post('login',{}, {id});
+    this.user=r.user;sessionStorage.setItem(TOKEN_KEY,this.token);this.state='ready';
+    localStorage.setItem('cm_arco_nome',id);
+    return r.user;
+  }catch(e){this.token=old;this.user=previous;throw e}
  }
- logout(){this.token='';this.user=null;sessionStorage.removeItem(TOKEN_KEY)}
+ logout(){this.token='';this.user=null;sessionStorage.removeItem(TOKEN_KEY);localStorage.removeItem('cm_arco_nome')}
  async list(){const r=await this.get('roster');if(!r.ok)throw Error(r.error);this.roster=r.players||[];return this.roster}
- async inbox(){if(!this.user)throw Error('Entre com seu PIN.');const r=await this.get('inbox',{token:this.token});if(!r.ok)throw Error(r.error);return r.challenges||[]}
+ async inbox(){if(!this.user)throw Error('Escolha seu nome na lista.');const r=await this.get('inbox',{token:this.token});if(!r.ok)throw Error(r.error);return r.challenges||[]}
  async ranking(){const r=await this.get('ranking');if(!r.ok)throw Error(r.error);return r}
  async create(kind,to){return (await this.post('challenge',{kind,to})).challenge}
  async answer(id,decision){return (await this.post('answer',{id,decision})).challenge}
