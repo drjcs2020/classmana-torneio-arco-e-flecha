@@ -71,6 +71,25 @@ export const arenaAudio={
     if(score>=8){tone(520,780,.23,.07,'sine',.06);tone(660,990,.28,.05,'sine',.16);}
    }
    if(effect==='miss'){noise(.18,.08,650);tone(280,190,.15,.025,'sine');}
+   if(effect==='block'){
+    noise(.30,.20,700);tone(190,70,.34,.14,'sawtooth');
+    tone(970,430,.26,.07,'triangle',.06);
+   }
+   if(effect==='applause'){
+    // Multiple irregular bursts create a short, original applause texture.
+    for(let i=0;i<20;i++){
+     const delay=.03+i*.037+(i%3)*.008;
+     noise(.055,.038+(i%4)*.011,1100+(i%5)*210,delay);
+    }
+    tone(840,1050,.19,.036,'sine',.04);
+    tone(1130,1310,.23,.026,'sine',.29);
+   }
+   if(effect==='boo'){
+    for(let i=0;i<5;i++){
+     tone(195+i*18,120+i*10,.41,.032,'sawtooth',i*.08);
+     noise(.20,.019,420,i*.10);
+    }
+   }
    if(effect==='victory'){[523,659,784,1047].forEach((n,i)=>tone(n,n*1.03,.31,.065,'triangle',i*.12));}
   }catch(error){console.warn('[ClassMana] Falha ao emitir efeito sonoro:',error)}
  }
