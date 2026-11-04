@@ -14,11 +14,16 @@ export const LEVELS=Object.freeze({
 });
 const cap=(x,a,b)=>Math.max(a,Math.min(b,x));
 /** Offset X em fração da largura da cena; Y também é fração da altura. */
+/** Deslocamento medido EM RAIOS DO ALVO, independente do tamanho da tela. */
 export function targetMotion(level,index,seconds){
  const t=cap(Number(seconds)||0,0,120);
- if(level==='avancado')return {x:.145*Math.sin(t*1.28+index*.91),y:0};
- if(level==='lendario')return {x:.175*Math.sin(t*1.48+index*.91),y:.022*Math.sin(t*.83+index*1.14)};
+ if(level==='avancado')return {x:2.05*Math.sin(t*1.35+index*1.11),y:0};
+ if(level==='lendario')return {x:2.60*Math.sin(t*1.61+index*1.11),y:.36*Math.sin(t*.83+index*1.14)};
  return {x:0,y:0};
+}
+/** Mesmo tempo aproximado de voo adotado no servidor e na cena PlayCanvas. */
+export function flightSeconds(distance,power){
+ return .43+.42*Math.pow(Math.max(10,distance)/80,.56)+.13*(1-power);
 }
 /** Posição do escudo, medida em raios do alvo (X e Y). */
 export function obstacleAt(level,index,seconds){

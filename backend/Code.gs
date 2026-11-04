@@ -9,7 +9,7 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 5;
+const CM_V = 6;
 const CM_DISTANCES={iniciante:[10,35,65,100,150],avancado:[20,45,75,110,150],lendario:[30,60,90,120,150]};
 /** Reproduz a mesma proteção dinâmica da arena no navegador; tempo em segundos. */
 function cmObstacle_(level,index,time){
@@ -26,10 +26,10 @@ function cmRules_(challenge){
  return Number.isInteger(stored)&&stored>=4?stored:4;
 }
 function cmTargetMotion_(level,index,time){
- if(level==='iniciante')return 0;
  const t=Math.max(0,Math.min(120,Number(time)||0));
- const amplitude=level==='lendario'?1.75:1.35,frequency=level==='lendario'?1.45:1.08;
- return amplitude*Math.sin(t*frequency+index*1.37);
+ if(level==='avancado')return {x:2.05*Math.sin(t*1.35+index*1.11),y:0};
+ if(level==='lendario')return {x:2.60*Math.sin(t*1.61+index*1.11),y:.36*Math.sin(t*.83+index*1.14)};
+ return {x:0,y:0};
 }
 function cmFlight_(distance,power){
  return .43+.42*Math.pow(Math.max(10,distance)/80,.56)+.13*(1-power);
@@ -78,9 +78,9 @@ function cmScore_(dx,dy,power,wind,distance,level,index,time,rules){
  const difficulty=Math.pow(Math.max(10,distance)/30,.55);
  const flight=cmFlight_(distance,power);
  // Compute movement between release and impact from the same formula as the arena.
- const lead=rules>=5?
-  cmTargetMotion_(level,index,time+flight)-cmTargetMotion_(level,index,time):0;
- const ax=dx+wind*.04*difficulty-lead,ay=dy+(1-power)*.70*difficulty;
+ const before=cmTargetMotion_(level,index,time),after=cmTargetMotion_(level,index,time+flight);
+ const leadX=rules>=5?after.x-before.x:0,leadY=rules>=5?after.y-before.y:0;
+ const ax=dx+wind*.04*difficulty-leadX,ay=dy+(1-power)*.70*difficulty-leadY;
  const obstructionTime=rules>=5?time+flight:time;
  const blocked=cmObstructed_(level,index,obstructionTime,ax,ay),norm=Math.hypot(ax,ay);
  return {score:blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10)),blocked,impactDx:ax,impactDy:ay};
