@@ -1,0 +1,115 @@
+/* ClassMana — Arena V3. Original cards and flows preserved; visual treatment rebuilt. */
+:root{--gold:#ffda78;--amber:#edb752;--parchment:#fff4dc;--text:#fff8e7;--muted:#d7c9b2;--stroke:#e4c48a8c}
+html{background:#1d2115}
+body{background:#171d16 url('assets/images/arte-030.jpg') center top / 100% auto no-repeat fixed;color:#fff6e7;min-height:100vh}
+body:before{content:"";z-index:-1;position:fixed;inset:0;background:linear-gradient(180deg,rgba(11,18,13,.80),rgba(25,20,11,.97) 36%,#171a13 100%);pointer-events:none}
+.sky-sparkles{opacity:.10;background-size:83px 77px}
+.page{max-width:1480px;padding:0 30px}
+.nav-bar{height:82px;background:linear-gradient(95deg,rgba(16,20,12,.82),rgba(52,38,17,.84));padding:0 22px;border:1px solid #e3ba694d;border-top:0;border-radius:0 0 16px 16px;backdrop-filter:blur(10px);box-shadow:0 8px 40px #0009}
+.brand b{color:#ffe29a;text-shadow:0 2px #4d2a0a}
+.nav-link{color:#f2dfc1}
+.nav-link.active,.nav-link:hover{background:rgba(225,158,54,.2);border-color:#edb563;color:#ffdf99}
+.ready{background:linear-gradient(90deg,#294a2999,#14281b99);border-color:#78d48b80}
+.banner{margin-top:23px;min-height:400px;box-shadow:0 14px 45px #000b,0 0 0 2px rgba(255,202,103,.16) inset}
+.banner:before{background:linear-gradient(90deg,rgba(3,9,13,.84) 0%,rgba(12,14,15,.59) 47%,transparent 91%),linear-gradient(0deg,#08110fbc,transparent 38%)}
+.banner:after{display:none}
+.banner h1{color:#fff9e8;text-shadow:0 4px 2px #18231c,0 8px 16px #000a}
+.banner h1 span{color:#ffd070}
+.banner-bottom{background:linear-gradient(90deg,#0d1c18e5,#271c0ce5,#0b2019e5);border-top:1px solid #e6c0724f}
+.section-title h2,.setup-head h2{color:#ffebc4}
+.houses{gap:19px}
+.house{border-color:#bb9965;border-width:3px;box-shadow:0 16px 32px #030603b8;border-radius:16px}
+.house:before{background-image:linear-gradient(180deg,#0000 0%,#02080722 24%,#070d0dbf 77%,#040808ec 100%),var(--house-bg);background-position:center 37%;filter:saturate(1.2) contrast(1.04)}
+.house.selected{border-color:#fbd784;box-shadow:0 0 0 2px #e5b9533b,0 15px 37px #010503}
+.house-b.selected{border-color:#ff9652;box-shadow:0 0 0 2px #d94e2a52,0 15px 37px #010503}
+.house-c.selected{border-color:#6be9a0;box-shadow:0 0 0 2px #16a86647,0 15px 37px #010503}
+.house-name{font-size:26px;text-shadow:0 2px 2px #000,0 5px 9px #000}
+.house-check{background:rgba(14,33,27,.88)}
+.house.selected .house-check{background:linear-gradient(#ffe6a5,#dda649)}
+.setup{background:linear-gradient(128deg,rgba(37,44,28,.97),rgba(23,24,19,.97));border:2px solid #bda071a1;box-shadow:0 16px 45px #0008}
+.setup-fields select{background:#1e2c25;border-color:#947946;color:#ffefd0}
+.primary{background:linear-gradient(#ffe8a3,#f3be5c 47%,#dd8e2f);color:#382510;box-shadow:0 4px 0 #825323,0 9px 18px #0009}
+.primary:hover{filter:brightness(1.1) saturate(1.1)}
+.back,.secondary{background:linear-gradient(#54432a,#2c2e24);border:1px solid #e3b97394}
+.arena-top{margin:13px 0 11px}
+.arena-header small{color:#e7cb8d;font-size:11px}
+.arena-header b{color:#fff4d8;font-size:28px;text-shadow:0 2px 4px #000}
+.arena-status{background:#213d2a;border:1px solid #aad47e;border-radius:30px;padding:6px 11px;color:#ceffc7}
+.battle-hud{background:linear-gradient(100deg,#192b20,#5b4024 50%,#2a3020);box-shadow:0 8px 19px #0005;border:2px solid #deb978;border-bottom:0}
+.battle-hud small{color:#ffdba0}
+.score-display{color:#ffecbd}
+.stage{--scene:url('assets/cenario-aguia.jpg');--castle:url('assets/images/arte-031.jpg');--hue:#8fd0ff;--dark:#183543;background:#2c4d37;border:3px solid #b9945f;min-height:420px;height:min(60vw,645px);max-height:72vh;box-shadow:0 22px 55px #0009,0 0 0 6px #161c16;isolation:isolate}
+.stage.house-b{--scene:url('assets/cenario-leao.jpg');--castle:url('assets/images/arte-032.jpg');--hue:#ffae68;--dark:#633122}
+.stage.house-c{--scene:url('assets/cenario-dragao.jpg');--castle:url('assets/images/arte-033.jpg');--hue:#8cffbd;--dark:#134b36}
+.stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 54%,rgba(10,20,9,.27) 100%),var(--scene);background-position:center 38%,center 45%;background-size:cover,100% 100%;background-repeat:no-repeat;filter:saturate(1.12) contrast(1.06);z-index:0}
+.stage:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;box-shadow:inset 0 0 90px #070e10a8,inset 0 -70px 90px #08130e55}
+#world{position:relative;z-index:2;opacity:1;transition:opacity .35s ease;touch-action:none}
+.world3d{z-index:1 !important}
+.bow-overlay{display:none!important}
+.game-top-left,.game-top-right{z-index:6;gap:7px}
+.hud-pill{background:linear-gradient(125deg,#141e1cED,#3a2c1aEF);border:1px solid #e7c17d;border-radius:10px;box-shadow:0 3px 11px #0009;color:#fff6db;padding:9px 13px;letter-spacing:.2px;text-shadow:0 1px 2px #000}
+.playcross{z-index:7;filter:drop-shadow(0 2px 3px #000);width:38px;height:38px}
+.playcross span{border-color:#fce5a0;box-shadow:0 0 10px #e2c66b}
+.playcross:before,.playcross:after,.playcross span:before,.playcross span:after{background:#fff5d0}
+.stage.aiming .playcross{transform:translate(-50%,-50%) scale(.86)}
+.instruction{z-index:7;background:#14221add;border:1px solid #f5d190;color:#fff0c9;letter-spacing:1px;box-shadow:0 5px 18px #0008}
+.hit{z-index:9;color:#fff4bc;text-shadow:0 2px 0 #4b2e10,0 0 20px #fecd7c}
+.finish{z-index:12;backdrop-filter:blur(8px);background:rgba(16,20,13,.76)}
+.finish-card{background:linear-gradient(145deg,#324027,#251c16);border:3px solid #e2ba6f;box-shadow:0 13px 60px #000c}
+.game-foot{color:#e4d2b0}
+.scene-badge{position:absolute;z-index:6;bottom:20px;left:18px;display:flex;align-items:center;gap:9px;max-width:200px;padding:7px 10px;border-radius:12px;border:1px solid #f4ca76a6;background:linear-gradient(125deg,#192523eb,#2b2319e8);box-shadow:0 6px 22px #000a;pointer-events:none}
+.scene-badge img{width:39px;height:39px;object-fit:contain;filter:drop-shadow(0 2px 6px #000)}
+.scene-badge small{display:block;color:#dabf81;font-weight:900;font-size:9px;letter-spacing:1.1px}
+.scene-badge strong{font-size:12px;color:#fff0cc;line-height:1.12}
+.scene-badge[data-house="B"]{border-color:#ffaf7e}
+.scene-badge[data-house="C"]{border-color:#86e4b8}
+.information-view .page-heading{background:linear-gradient(125deg,#283529,#30271b);border:1px solid #d3ad67;border-radius:22px;padding:20px;margin-top:20px}
+.notice{background:#3b3524;border-color:#b9a56b;color:#f9e5bc}
+.ranking-panel{background:linear-gradient(130deg,#263326,#29221b);border-color:#a98b58}
+.rules-grid article{background:linear-gradient(135deg,#243228,#302516);border-color:#9b825b}
+footer{border-top:1px solid #b9a063;color:#e1d0b2}
+@media(max-width:850px){.page{padding:0 12px}.nav-bar{padding:0 9px}.stage{height:70vh;min-height:470px;max-height:690px}.scene-badge{bottom:51px;left:6px;padding:4px 7px}.scene-badge img{width:25px;height:25px}.scene-badge strong{font-size:10px}.hud-pill{padding:6px;font-size:10px}.game-top-left,.game-top-right{top:7px}}
+@media(max-width:550px){.stage{height:70vh;min-height:420px}.scene-badge{max-width:138px}.scene-badge small{font-size:8px}.scene-badge strong{font-size:9px}.game-top-left .hud-pill,.game-top-right .hud-pill{font-size:9px}.banner-bottom{font-size:9px}.battle-hud{padding:8px 5px}.battle-hud strong{font-size:11px}.ready{font-size:8px}}
+/* Controles: os painéis não devem interceptar o gesto de mira e disparo. */
+#world{touch-action:none;cursor:none;user-select:none;-webkit-user-select:none}
+.game-top-left,.game-top-right,.instruction,.playcross{pointer-events:none}
+.stage.aiming #world{cursor:grabbing}
+
+/* Hide the old independent UI crosshair: the metal bow sight is the only reticle. */
+#playcross{display:none!important}
+
+/* Indicador de vento ampliado. A seta sempre aponta para o lado do DESVIO da flecha.
+   Vento positivo move o impacto para a direita; vento negativo, para a esquerda. */
+#wind.wind-widget{
+ display:flex;flex-direction:column;justify-content:center;
+ gap:7px;min-width:238px;min-height:99px;
+ padding:11px 14px!important;border:2px solid #f9d783!important;
+ background:linear-gradient(145deg,rgba(14,33,38,.97),rgba(28,35,28,.97));
+ box-shadow:0 5px 22px #000a,0 0 16px rgba(244,204,91,.20);
+}
+#wind .wind-caption{display:flex;align-items:center;justify-content:space-between;gap:9px;
+ color:#ffdc8d;font-weight:900;font-size:12px;letter-spacing:.8px}
+#wind .wind-speed{color:#fffbe7;font-size:21px;font-weight:1000;white-space:nowrap;
+ font-variant-numeric:tabular-nums;text-shadow:0 2px 4px #000}
+#wind .wind-main{display:flex;align-items:center;gap:8px;min-height:38px}
+#wind .wind-arrow{display:block;width:81px;height:38px;flex-shrink:0;
+ color:#ffe17a;filter:drop-shadow(0 0 8px #ffd35f);transition:transform .18s ease}
+#wind.wind-left .wind-arrow{transform:rotate(180deg)}
+#wind.wind-right .wind-arrow{transform:rotate(0deg)}
+#wind.wind-calm .wind-arrow{opacity:.23;filter:none}
+#wind .wind-direction-text{font-size:13px;font-weight:1000;line-height:1.1;letter-spacing:.35px;
+ color:#ffebae;text-shadow:0 2px 2px #000;max-width:114px}
+@media(max-width:850px){
+ #wind.wind-widget{min-width:177px;min-height:80px;padding:7px 9px!important;gap:3px}
+ #wind .wind-caption{font-size:10px}
+ #wind .wind-speed{font-size:15px}
+ #wind .wind-main{gap:4px;min-height:29px}
+ #wind .wind-arrow{width:54px;height:27px}
+ #wind .wind-direction-text{font-size:10px;max-width:91px}
+}
+@media(max-width:400px){
+ #wind.wind-widget{min-width:150px;min-height:71px;padding:6px!important}
+ #wind .wind-speed{font-size:13px}
+ #wind .wind-arrow{width:44px;height:24px}
+ #wind .wind-direction-text{font-size:9px;max-width:80px}
+}

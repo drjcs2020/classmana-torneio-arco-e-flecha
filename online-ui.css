@@ -1,0 +1,82 @@
+/* ClassMana Online: clean bright HUD and live challenge interface. */
+.online-account{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+ padding:15px 17px;margin:14px 0 17px;border:2px solid rgba(255,255,255,.85);border-radius:17px;
+ background:linear-gradient(115deg,rgba(238,255,252,.94),rgba(255,242,207,.96));color:#174650;
+ box-shadow:0 8px 28px #5d503335}
+.online-account strong{font-size:17px;font-weight:900;color:#134d55}
+.online-account small{display:block;font-size:12px;color:#476b67}
+.online-account-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.cm-online-btn{border-radius:12px;border:2px solid #9eccca;padding:10px 15px;color:#16435b;
+ background:linear-gradient(180deg,#fffdf5,#caeaf1);font:900 14px Nunito,sans-serif;box-shadow:0 3px 0 #8db2b5;cursor:pointer}
+.cm-online-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.cm-online-btn[disabled]{opacity:.5;cursor:not-allowed}
+.online-unread{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;
+ margin-left:5px;padding:0 5px;color:white;background:#e04c46;border-radius:16px}
+.cm-login-panel{padding:15px;border:2px solid #7dc5d5;border-radius:15px;background:rgba(241,255,251,.96);
+ color:#1c4e61;margin-bottom:18px;box-shadow:0 4px 18px #0001}
+.cm-login-panel h3{font-size:20px;margin:0 0 7px;color:#16516d}
+.cm-login-panel p{margin:6px 0 12px;font-size:13px}
+.cm-login-panel .cm-login-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cm-login-panel input{height:46px;padding:9px 12px;border-radius:9px;border:2px solid #7aaebb;background:#fff;
+ font:bold 18px Nunito,sans-serif;max-width:210px;color:#263744}
+.cm-login-panel .hintline{font-size:12px;color:#3d6a70}
+.cm-inbox{position:fixed;inset:0;z-index:9000;background:rgba(5,28,36,.58);display:grid;
+ place-items:center;padding:18px;backdrop-filter:blur(6px)}
+.cm-inbox-panel{width:min(690px,100%);max-height:84vh;overflow:auto;padding:20px;border:3px solid #ffdb86;
+ border-radius:23px;background:linear-gradient(155deg,#f0fffb,#fff7df 55%,#e5f2ff);color:#204853;
+ box-shadow:0 25px 90px #0006}
+.cm-inbox-head{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.cm-inbox-panel h2{font-size:27px;color:#155c6b;margin:0}
+.cm-inbox-panel p{font-size:14px}
+.cm-challenge{margin:12px 0;padding:14px;border:2px solid #c8e0e1;border-radius:15px;background:#fffefa}
+.cm-challenge strong{display:block;font-size:17px;color:#284a58}
+.cm-challenge small{color:#637d7d}
+.cm-challenge-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.cm-challenge-btn{border:0;border-radius:11px;padding:10px 18px;font-weight:900;cursor:pointer;
+ background:#178c70;color:#fff;box-shadow:0 4px 0 #0e614d}
+.cm-challenge-btn.reject{background:#c8504a;box-shadow:0 4px 0 #8f302d}
+.cm-challenge-btn:disabled{opacity:.5}
+.cm-online-status{text-align:left;font-weight:800}
+.cm-online-status.error{color:#a84233}
+.cm-online-status.ok{color:#126a54}
+.cm-score-mode-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0 15px}
+.cm-score-mode-tabs button{border:2px solid #95b5b2;color:#254454;background:#f3faf7;
+ border-radius:12px;font-weight:900;padding:9px 12px;cursor:pointer}
+.cm-score-mode-tabs button.active{background:#f7c858;border-color:#dd962a;color:#4c3519}
+/* A brighter user-facing surface, keeping the existing kingdom backdrops. */
+body{background:#bfded0!important;color:#233a4a!important;background-image:linear-gradient(180deg,#ebfbfd 0%,#ccf1e6 42%,#c4dff7 100%)!important}
+body:before{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,245,213,.08))!important}
+.nav-bar,.setup,.ranking-panel,.rules-panel{background:linear-gradient(145deg,rgba(242,254,255,.94),rgba(255,244,215,.96))!important;
+ color:#1b4c63!important;border-color:#e5b34c!important;box-shadow:0 10px 30px #42665730!important}
+.nav-bar .brand,.nav-bar a,.nav-bar button{color:#194f68!important;text-shadow:none!important}
+.setup h2,.setup label,.setup small,.setup-head h2,.section-title h2,.page-heading h1{color:#225269!important;text-shadow:none!important}
+.setup select{background:#fffef6!important;border:2px solid #75bfc9!important;color:#21516a!important}
+.setup .hint,.setup-head small,.setup-fields label small{color:#376d75!important}
+@media(max-width:740px){.cm-inbox-panel{padding:13px}.online-account{padding:11px}.online-account strong{font-size:14px}.cm-online-btn{font-size:12px;padding:8px 10px}}
+/* Personagens oficiais, com movimentos sutis em vez de cards sem resposta. */
+.house{position:relative;overflow:hidden!important;transition:transform .22s ease,border-color .25s ease,box-shadow .25s ease}
+.house-figure{position:absolute;z-index:1;right:0;top:3%;width:44%;height:70%;pointer-events:none;
+ opacity:.92;transform:translateY(5px) scale(.94);transition:transform .3s,filter .3s,opacity .3s}
+.house-figure img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 12px #14232ca8);
+ animation:cmHeroBreath 2.8s ease-in-out infinite;object-position:center bottom}
+.house.selected{border:4px solid #ffe892!important;box-shadow:0 0 0 4px #fff6bf80,0 0 32px #ffdb75a6,0 10px 24px #263627a0!important;transform:translateY(-4px)}
+.house.selected .house-figure{transform:translateY(-5px) scale(1.10);opacity:1}
+.house:hover .house-figure{transform:translateY(-8px) scale(1.06)}
+.house.selected .house-figure img{filter:drop-shadow(0 6px 15px #ffe396aa) drop-shadow(0 3px 4px #172028)}
+.house .crest-wrap,.house .house-name,.house .house-check,.house .house-grade{position:relative;z-index:3}
+@keyframes cmHeroBreath{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-7px) rotate(1deg)}}
+.hero-preview{display:flex;align-items:center;justify-content:center;gap:18px;min-height:200px;margin:18px 0;padding:15px 24px;
+ border:3px solid #ffdf7c;border-radius:20px;color:#164d5d;
+ background:linear-gradient(125deg,rgba(226,251,255,.97),rgba(255,246,213,.97));
+ box-shadow:0 10px 32px #425a4f40,inset 0 2px 18px #ffffffa8;
+ animation:cmHeroAppear .42s ease-out both}
+.hero-preview img{width:clamp(120px,21vw,220px);height:200px;object-fit:contain;
+ filter:drop-shadow(0 5px 14px #8a793e50);animation:cmHeroBreath 3.1s ease-in-out infinite}
+.hero-preview>div{flex:1;max-width:630px}
+.hero-preview small{display:block;font-size:13px;letter-spacing:1.2px;color:#9a6b24;font-weight:900}
+.hero-preview strong{display:block;font:900 clamp(24px,3vw,37px)/1.14 'Baloo 2',Nunito,sans-serif;color:#164c66;margin:7px 0}
+.hero-preview p{font-size:16px;font-weight:700;margin:9px 0;color:#33677b}
+.hero-preview span{display:inline-block;font-weight:900;font-size:13px;color:#a26417}
+@keyframes cmHeroAppear{from{opacity:.2;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:750px){.hero-preview{padding:10px;gap:8px}.hero-preview img{width:110px;height:150px}.hero-preview strong{font-size:20px}.hero-preview p{font-size:12px}.hero-preview span{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.house-figure img,.hero-preview img{animation:none!important}}
