@@ -441,9 +441,9 @@ document.querySelector('.archer-choices')?.addEventListener('keydown',e=>{
  }
 });
 $('hero-play').addEventListener('click',()=>{
- $('setup').scrollIntoView({behavior:'smooth',block:'center'});
- $('player').focus();
- toast('Escolha seu nome e o circuito de distância para jogar.');
+ $('hero-preview').scrollIntoView({behavior:'smooth',block:'center'});
+ $('archer-'+(archerGender()==='f'?'female':'male')).focus({preventScroll:true});
+ toast('Escolha seu arqueiro ou arqueira. Depois, selecione seu nome para jogar.');
 });
 $('mode').addEventListener('change',updateMode);
 $('player').addEventListener('change',()=>{fillRivals();if($('player').value!=='guest')loginStudent().catch(console.warn)});
