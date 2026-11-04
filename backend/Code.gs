@@ -9,8 +9,18 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 3;
-const CM_DISTANCES={iniciante:[10,20,30,40,50],avancado:[30,40,50,60,80],lendario:[60,80,100,120,150]};
+const CM_V = 4;
+const CM_DISTANCES={iniciante:[10,35,65,100,150],avancado:[20,45,75,110,150],lendario:[30,60,90,120,150]};
+/** Reproduz a mesma proteção dinâmica da arena no navegador; tempo em segundos. */
+function cmObstacle_(level,index,time){
+ if(level!=='lendario')return null;
+ const t=Math.max(0,Math.min(120,Number(time)||0));
+ return {x:.67*Math.sin(t*2.2+index*1.31),y:.17*Math.cos(t*1.37+index*.71),width:.28,height:.60};
+}
+function cmObstructed_(level,index,time,x,y){
+ const o=cmObstacle_(level,index,time);
+ return !!o&&Math.abs(x-o.x)<o.width&&Math.abs(y-o.y)<o.height;
+}
 function cmLevel_(challenge){const v=String(challenge[14]||'');const level=v.split('|')[1];return CM_DISTANCES[level]?level:'iniciante'}
 const CM_TTL = 7*24*3600*1000;
 const CM_TYPES = ['mesma_turma','entre_equipes','interclasses'];
@@ -51,19 +61,19 @@ function cmRound_(id,index,level='iniciante'){
  return {index,wind:Math.round((-4+8*u(0))*windFactor*10)/10,
    shift:Math.round((-.045+.09*u(7))*1000)/1000,distance};
 }
-function cmScore_(dx,dy,power,wind,distance){
+function cmScore_(dx,dy,power,wind,distance,level,index,time){
  const difficulty=Math.pow(Math.max(10,distance)/30,.55);
  const ax=dx+wind*.04*difficulty,ay=dy+(1-power)*.70*difficulty;
- const norm=Math.hypot(ax,ay);
- return {score:norm>1?0:Math.max(1,10-Math.floor(norm*10)),impactDx:ax,impactDy:ay};
+ const blocked=cmObstructed_(level,index,time,ax,ay),norm=Math.hypot(ax,ay);
+ return {score:blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10)),blocked,impactDx:ax,impactDy:ay};
 }
 function cmShots_(id,shots,level){
  if(!Array.isArray(shots)||shots.length!==5)throw Error('É obrigatório registrar exatamente 5 flechas');
  let sum=0;const rec=shots.map((x,i)=>{
-  const dx=Number(x.dx),dy=Number(x.dy),power=Number(x.power);
-  if(![dx,dy,power].every(Number.isFinite)||Math.abs(dx)>9||Math.abs(dy)>9||power<.28||power>1)throw Error('Disparo inválido: '+(i+1));
-  const cfg=cmRound_(id,i,level),score=cmScore_(dx,dy,power,cfg.wind,cfg.distance);
-  sum+=score.score;return {...cfg,dx,dy,power,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy};
+  const dx=Number(x.dx),dy=Number(x.dy),power=Number(x.power),time=Number(x.time??0);
+  if(![dx,dy,power,time].every(Number.isFinite)||Math.abs(dx)>9||Math.abs(dy)>9||power<.28||power>1||time<0||time>120)throw Error('Disparo inválido: '+(i+1));
+  const cfg=cmRound_(id,i,level),score=cmScore_(dx,dy,power,cfg.wind,cfg.distance,level,i,time);
+  sum+=score.score;return {...cfg,dx,dy,power,time,blocked:score.blocked,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy};
  });return {sum,shots:rec}
 }
 function cmRate_(db,id){let now=new Date(),today=now.toISOString().slice(0,10);const count=cmChallenges_(db).filter(x=>String(x.data[2])===id&&String(x.data[5]).slice(0,10)===today).length;if(count>=10)throw Error('Limite de 10 novos desafios por dia');}
