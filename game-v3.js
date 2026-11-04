@@ -386,7 +386,12 @@ async function startOnlineClient(){
  showOnlineStatus();
  if(!online.enabled)return;
  try{
-  await online.connect();await online.list();showOnlineStatus();const pendentes=await refreshInbox();renderRanking();
+  await online.connect();await online.list();showOnlineStatus();
+  const remembered=localStorage.getItem('cm_arco_nome');
+  if(!online.user&&/^[ABC]\d{2}$/.test(remembered||'')){
+   selectHouse(remembered[0]);$('player').value=remembered;await loginStudent();
+  }
+  const pendentes=await refreshInbox();renderRanking();
    if(online.user&&pendentes.some(c=>c.recipient.id===online.user.id&&c.status==='PENDENTE')){
      toast('🔔 Você foi desafiado! Aceite ou recuse quando quiser.');await openInbox();
    }
@@ -397,23 +402,29 @@ async function startOnlineClient(){
 document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>openView(el.dataset.view)));
 document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>selectHouse(el.dataset.house)));
 $('hero-play').addEventListener('click',()=>{
- if(online.enabled&&!online.user)$('login-panel').classList.remove('hidden');
  $('setup').scrollIntoView({behavior:'smooth',block:'center'});
- toast(online.enabled&&!online.user?'Escolha seu nome e entre com o PIN para jogar online.':'Escolha seu arqueiro e o modo de jogo.');
+ $('player').focus();
+ toast('Escolha seu nome e o circuito de distância para jogar.');
 });
-$('mode').addEventListener('change',updateMode);$('player').addEventListener('change',fillRivals);$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{match.running=false;startMatch()});$('share-result').addEventListener('click',()=>{if(match?.onlineSaveFailed)finishMatch();else if(!match?.online)share()});
+$('mode').addEventListener('change',updateMode);
+$('player').addEventListener('change',()=>{fillRivals();if($('player').value!=='guest')loginStudent().catch(console.warn)});
+$('team-scope').addEventListener('change',updateMode);
+$('opponent-house').addEventListener('change',fillRivals);
+$('opponent-team').addEventListener('change',fillRivals);
+$('my-team').addEventListener('change',()=>{
+ const mate=choices(house).find(p=>TEAMS[p.id]===$('my-team').value);
+ if(mate){$('player').value=mate.id;loginStudent().catch(console.warn)}
+ fillRivals();
+});$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{match.running=false;startMatch()});$('share-result').addEventListener('click',()=>{if(match?.onlineSaveFailed)finishMatch();else if(!match?.online)share()});
 const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.running||match.locked)return;e.preventDefault();world.setPointerCapture(e.pointerId);holding=true;pointerStart=Date.now();aim(e);scene?.setPower(.28);$('stage').classList.add('aiming');$('instruction').textContent='ARRASTE PARA MOVER O ARCO • SOLTE PARA ATIRAR'});world.addEventListener('pointermove',e=>{if(!match?.running||match.locked)return;if(holding||e.pointerType==='mouse')aim(e);if(holding)scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1))});world.addEventListener('pointerup',e=>{if(!holding)return;e.preventDefault();aim(e);holding=false;$('stage').classList.remove('aiming');$('instruction').textContent='MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';const p=clamp((Date.now()-pointerStart)/950,.28,1);scene?.setPower(p);fire(p);uiHud()});world.addEventListener('pointercancel',()=>{holding=false;$('stage').classList.remove('aiming');scene?.setPower(0)});
 document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.1,.9);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.1,.9);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.08,.92);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.08,.92);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
 setInterval(()=>{if(holding){scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1));uiHud()}},90);
-$('open-login').addEventListener('click',()=>{$('login-panel').classList.remove('hidden');$('setup').scrollIntoView({behavior:'smooth',block:'center'})});
-$('cancel-login').addEventListener('click',()=>{$('login-panel').classList.add('hidden');$('login-help').textContent=''});
-$('submit-login').addEventListener('click',loginStudent);
-$('student-pin').addEventListener('keydown',e=>{if(e.code==='Enter'){e.preventDefault();loginStudent()}});
+
 $('open-inbox').addEventListener('click',openInbox);
 $('close-inbox').addEventListener('click',()=>$('online-inbox').classList.add('hidden'));
 $('online-inbox').addEventListener('click',e=>{if(e.target===$('online-inbox'))$('online-inbox').classList.add('hidden')});
 $('inbox-list').addEventListener('click',onInboxAction);
-$('logout').addEventListener('click',()=>{if(match?.running){toast('Termine ou abandone esta rodada antes de sair da conta.');return;}online.logout();onlineInbox=[];showOnlineStatus();$('unread-count').textContent='0';toast('Você saiu da conta.')});
+$('logout').addEventListener('click',()=>{if(match?.running){toast('Termine ou abandone esta rodada antes de sair da conta.');return;}online.logout();onlineInbox=[];$('player').value='guest';fillRivals();showOnlineStatus();$('unread-count').textContent='0';toast('Selecione outro arqueiro na lista.')});
 document.querySelectorAll('[data-rank]').forEach(btn=>btn.addEventListener('click',()=>{
  scoreTab=btn.dataset.rank;document.querySelectorAll('[data-rank]').forEach(x=>x.classList.toggle('active',x===btn));renderRanking();
 }));
