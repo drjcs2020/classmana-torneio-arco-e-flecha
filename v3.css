@@ -38,9 +38,9 @@ body:before{content:"";z-index:-1;position:fixed;inset:0;background:linear-gradi
 .battle-hud{background:linear-gradient(100deg,#192b20,#5b4024 50%,#2a3020);box-shadow:0 8px 19px #0005;border:2px solid #deb978;border-bottom:0}
 .battle-hud small{color:#ffdba0}
 .score-display{color:#ffecbd}
-.stage{--scene:url('assets/cenario-aguia.jpg');--castle:url('assets/images/arte-031.jpg');--hue:#8fd0ff;--dark:#183543;background:#2c4d37;border:3px solid #b9945f;min-height:420px;height:min(60vw,645px);max-height:72vh;box-shadow:0 22px 55px #0009,0 0 0 6px #161c16;isolation:isolate}
-.stage.house-b{--scene:url('assets/cenario-leao.jpg');--castle:url('assets/images/arte-032.jpg');--hue:#ffae68;--dark:#633122}
-.stage.house-c{--scene:url('assets/cenario-dragao.jpg');--castle:url('assets/images/arte-033.jpg');--hue:#8cffbd;--dark:#134b36}
+.stage{--scene:url('assets/images/arte-031.jpg');--castle:url('assets/images/arte-031.jpg');--hue:#8fd0ff;--dark:#183543;background:#2c4d37;border:3px solid #b9945f;min-height:420px;height:min(60vw,645px);max-height:72vh;box-shadow:0 22px 55px #0009,0 0 0 6px #161c16;isolation:isolate}
+.stage.house-b{--scene:url('assets/images/arte-032.jpg');--castle:url('assets/images/arte-032.jpg');--hue:#ffae68;--dark:#633122}
+.stage.house-c{--scene:url('assets/images/arte-033.jpg');--castle:url('assets/images/arte-033.jpg');--hue:#8cffbd;--dark:#134b36}
 .stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(180deg,rgba(0,0,0,.06) 0%,rgba(0,0,0,.02) 54%,rgba(10,20,9,.27) 100%),var(--scene);background-position:center 38%,center 45%;background-size:cover,100% 100%;background-repeat:no-repeat;filter:saturate(1.12) contrast(1.06);z-index:0}
 .stage:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;box-shadow:inset 0 0 90px #070e10a8,inset 0 -70px 90px #08130e55}
 #world{position:relative;z-index:2;opacity:1;transition:opacity .35s ease;touch-action:none}
