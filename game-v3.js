@@ -1,5 +1,5 @@
-import {initScene} from './scene-v3.js?v=7';
-import {online} from './online-client.js?v=1';
+import {initScene} from './scene-v3.js?v=12';
+import {online} from './online-client.js?v=3';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
 const R=window.CLASSMANA_ROSTER||{A:[],B:[],C:[]};
@@ -7,6 +7,7 @@ const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 let house='A',view='inicio',scene=null,match=null,reticle={x:.50,y:.45},pointerStart=0,holding=false,storage=[];
 let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false;
 const TEAMS=window.CLASSMANA_TEAMS||{};
+const CIRCUITS={iniciante:[10,20,30,40,50],avancado:[30,40,50,60,80],lendario:[60,80,100,120,150]};
 const rand=(a,b)=>a+Math.random()*(b-a);
 function safeRead(){try{const a=JSON.parse(localStorage.getItem('classmana-archery-v2'));return Array.isArray(a)?a.filter(x=>x&&typeof x==='object').slice(-150):[]}catch{return []}}
 storage=safeRead();
@@ -16,17 +17,28 @@ function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match
 function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(2,'0'),name}));}
 function fillPlayer(wanted){const sel=$('player');sel.innerHTML='<option value="guest">Arqueiro convidado</option>'+choices(house).map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');if(wanted&&choices(house).some(x=>x.id===wanted))sel.value=wanted;fillRivals()}
 function fillRivals(){
- const sel=$('rival'),prior=sel.value,mode=$('mode').value;
- const same=mode==='challenge_same',teams=mode==='challenge_team',myId=$('player').value;
- const myTeam=online.user?.team&&online.user?.id===myId?online.user.team:TEAMS[myId];
- let players=Object.keys(H).filter(h=>same?h===house:teams?true:h!==house).flatMap(choices)
-   .filter(p=>p.id!==myId&&(!teams||TEAMS[p.id]!==myTeam));
- sel.innerHTML=players.map(p=>`<option value="${p.id}">${H[p.id[0]].grade} · ${p.id} · ${p.name}${teams?' · '+(TEAMS[p.id]||'') :''}</option>`).join('');
- if(players.some(p=>p.id===prior))sel.value=prior;
- const lbl=$('rival-label');if(lbl){
-  lbl.firstChild.textContent=teams?'Arqueiro de outra equipe':same?'Colega da sua turma':'Adversário de outra Casa';
-  lbl.querySelector('small').textContent=teams?'A partida conta para o ranking da equipe.':same?'Duelos individuais dentro da mesma turma.':'Confrontos entre o 4º A, 4º B e 4º C.';
- }
+ const mode=$('mode').value,same=mode==='challenge_same',teams=mode==='challenge_team',myId=$('player').value;
+ const myTeam=TEAMS[myId]||'',all=Object.keys(H),scope=$('team-scope').value;
+ const rivals=all.filter(h=>h!==house),houses=mode==='challenge'?rivals:teams&&scope==='other'?rivals:[house];
+ const houseSelect=$('opponent-house'),priorHouse=houseSelect.value;
+ houseSelect.innerHTML=houses.map(h=>`<option value="${h}">${H[h].grade} · ${H[h].name}</option>`).join('');
+ if(houses.includes(priorHouse))houseSelect.value=priorHouse;
+ const enemyHouse=houseSelect.value||house;
+ const ownTeamField=$('my-team'),ownTeams=[...new Set(choices(house).map(p=>TEAMS[p.id]))].filter(Boolean).sort();
+ ownTeamField.innerHTML=ownTeams.map(t=>`<option value="${t}">${t}</option>`).join('');
+ if(myTeam)ownTeamField.value=myTeam;
+ const opposingTeamField=$('opponent-team'),priorTeam=opposingTeamField.value;
+ const availableTeams=[...new Set(choices(enemyHouse).map(p=>TEAMS[p.id]))].filter(t=>t&&t!==myTeam).sort();
+ opposingTeamField.innerHTML=availableTeams.map(t=>`<option value="${t}">${t}</option>`).join('');
+ if(availableTeams.includes(priorTeam))opposingTeamField.value=priorTeam;
+ const old=$('rival').value;
+ let pool=same?choices(house):teams?choices(enemyHouse).filter(p=>TEAMS[p.id]===opposingTeamField.value):choices(enemyHouse);
+ pool=pool.filter(p=>p.id!==myId);
+ $('rival').innerHTML=pool.map(p=>`<option value="${p.id}">${p.name} · ${H[p.id[0]].grade}</option>`).join('');
+ if(pool.some(p=>p.id===old))$('rival').value=old;
+ const lbl=$('rival-label');
+ lbl.firstChild.textContent=teams?'4 · Representante da equipe adversária':same?'4 · Colega da mesma turma':'4 · Adversário de outra turma';
+ lbl.querySelector('small').textContent='Selecione o nome do colega; não há senha de desafio.';
 }
 
 function selectHouse(k){
@@ -56,7 +68,16 @@ function selectHouse(k){
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
 function duelKind(mode){return mode==='challenge_same'?'mesma_turma':mode==='challenge_team'?'entre_equipes':'interclasses'}
 function duelMode(kind){return kind==='mesma_turma'?'challenge_same':kind==='entre_equipes'?'challenge_team':'challenge'}
-function updateMode(){const v=$('mode').value;$('difficulty-label').classList.toggle('hidden',v!=='bot');$('rival-label').classList.toggle('hidden',!isDuel(v));fillRivals()}
+function updateMode(){
+ const mode=$('mode').value,team=mode==='challenge_team',otherTeam=team&&$('team-scope').value==='other';
+ $('difficulty-label').classList.toggle('hidden',mode!=='bot');
+ $('rival-label').classList.toggle('hidden',!isDuel(mode));
+ $('team-label').classList.toggle('hidden',!team);
+ $('team-scope-label').classList.toggle('hidden',!team);
+ $('opponent-house-label').classList.toggle('hidden',!(mode==='challenge'||otherTeam));
+ $('opponent-team-label').classList.toggle('hidden',!team);
+ fillRivals();
+}
 function byId(id){return choices(id?.[0]||'A').find(x=>x.id===id)?.name||'Arqueiro '+id}
 function nameOf(id){return id==='guest'?'Arqueiro convidado':byId(id)}
 function renderWind(wind){
