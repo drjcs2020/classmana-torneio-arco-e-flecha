@@ -1,0 +1,44 @@
+/* Estúdio de personagem ClassMana — carrossel único e arcos ao lado.
+   Carregar DEPOIS dos estilos antigos. */
+.character-studio{--accent:#e6b34c;display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(335px,.92fr)!important;align-items:stretch!important;gap:20px!important;min-width:0;margin:24px 0;padding:18px;border:3px solid var(--accent);border-radius:24px;background:linear-gradient(115deg,#eafaff,#fff8e4);box-shadow:0 10px 28px #24566a33}
+.character-studio[data-house="B"]{--accent:#e99b67;background:linear-gradient(115deg,#fff0e6,#fff8e3)}
+.character-studio[data-house="C"]{--accent:#7dd4a3;background:linear-gradient(115deg,#e8fff4,#f6fbe8)}
+.character-studio .studio-character{display:flex;flex-direction:column;min-width:0;gap:10px}
+.character-studio .studio-heading{padding:3px 8px}
+.character-studio .studio-heading small{display:block;font:900 13px Nunito,sans-serif;letter-spacing:1px;color:#9a632c}
+.character-studio .studio-heading h2{font:700 clamp(26px,2.7vw,39px)/1.15 Fredoka,'Baloo 2',sans-serif!important;color:#215169;margin:6px 0 0}
+.character-studio .studio-heading p{font:800 15px/1.4 Nunito,sans-serif;color:#50717b;margin:8px 0 0}
+.character-studio .studio-carousel{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:5px;align-items:center;min-width:0;min-height:411px;border:2px solid #b7d5d6;border-radius:21px;overflow:hidden;background:radial-gradient(ellipse at 50% 82%,#fff5cd,transparent 60%),linear-gradient(150deg,#eafaff,#eaf6ee)}
+.character-studio[data-house="B"] .studio-carousel{background:radial-gradient(ellipse at 50% 82%,#ffddaa,transparent 61%),linear-gradient(140deg,#fff3e2,#fff8e5)}
+.character-studio[data-house="C"] .studio-carousel{background:radial-gradient(ellipse at 50% 82%,#c1f7d5,transparent 61%),linear-gradient(140deg,#e9fff4,#e8f2e8)}
+.character-studio .studio-portrait{height:402px;min-width:0;display:flex;align-items:flex-end;justify-content:center}
+.character-studio #hero-preview-img{display:block!important;position:static!important;width:auto!important;height:100%!important;max-height:402px!important;max-width:100%!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 11px 12px #17465b55)!important}
+.character-studio .studio-arrow{z-index:3;display:grid;place-items:center;position:relative;background:linear-gradient(#fffbe9,#f7d586);border:2px solid #d0a451;border-radius:15px;min-width:45px;min-height:61px;font:700 43px/1 Fredoka,sans-serif;color:#75501c;cursor:pointer;box-shadow:0 3px 0 #b3853f}
+.character-studio .studio-arrow:hover{transform:scale(1.06)}
+.character-studio .studio-arrow:focus-visible,.character-studio .gear-choice:focus-visible{outline:4px solid #2188aa!important;outline-offset:3px}
+.character-studio .studio-selected{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;border-radius:13px;background:#ffffffc9}
+.character-studio .studio-selected strong{font:700 20px Fredoka,sans-serif;color:#23546e}
+.character-studio .studio-selected span{font:800 14px/1.35 Nunito,sans-serif;color:#466977;text-align:right;max-width:65%}
+.character-studio.archer-switch-animation #hero-preview-img{animation:studio-enter .25s ease-out}
+@keyframes studio-enter{from{opacity:.3;transform:translateX(9px)}to{opacity:1;transform:translateX(0)}}
+.character-studio .studio-equipment{display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px;border-radius:21px;border:2px solid #e6d1a3;background:linear-gradient(155deg,#fffdfa,#fff8e7)}
+.character-studio .studio-bows{display:grid;gap:10px;flex:1}
+.character-studio .studio-bows .gear-choice{display:grid!important;grid-template-columns:110px minmax(0,1fr) 28px!important;align-items:center!important;justify-items:start!important;gap:11px!important;min-height:106px!important;width:100%!important;padding:9px 11px!important;border:2px solid #bacfd1!important;border-radius:15px!important;background:linear-gradient(140deg,#f6fffd,#ebf4f0)!important;color:#20536c!important;text-align:left!important;box-shadow:0 3px 10px #2c718322!important}
+.character-studio .studio-bows .gear-choice.chosen{border-color:var(--accent)!important;background:linear-gradient(110deg,#fffdf4,#ffefc7)!important;box-shadow:0 0 0 3px #ffe5a2,0 5px 14px #ab884534!important}
+.character-studio .bow-preview{width:105px;height:90px;display:grid;place-items:center}
+.character-studio .bow-preview img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 7px #224b6260)}
+.character-studio .bow-gold img{filter:sepia(.9) saturate(1.7) hue-rotate(337deg) drop-shadow(0 5px 7px #997c5660)}
+.character-studio .bow-silver img{filter:hue-rotate(134deg) saturate(1.5) drop-shadow(0 5px 7px #397d9c60)}
+.character-studio .bow-label{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.character-studio .bow-label strong{font:700 21px Fredoka,sans-serif;color:#23546d}
+.character-studio .bow-label small{font:800 13px/1.35 Nunito,sans-serif;color:#4f6c76;text-align:left!important}
+.character-studio .bow-check{visibility:hidden;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#e6b74d;color:#654419;font:900 17px Nunito,sans-serif}
+.character-studio .gear-choice.chosen .bow-check{visibility:visible}
+.character-studio .official-arrow{display:flex;align-items:center;gap:9px;padding:11px;background:#e7f7f1;border:1px solid #b1decd;border-radius:13px}
+.character-studio .official-arrow>span{font-size:24px}
+.character-studio .official-arrow strong{font:700 17px Fredoka,sans-serif;color:#225f54;display:block}
+.character-studio .official-arrow small{font:800 12px/1.35 Nunito,sans-serif;color:#416d65;display:block}
+.character-studio .equipment-summary{margin:0!important;padding:10px!important;background:#fff0c8!important;font:900 14px Nunito,sans-serif!important;color:#72521c!important}
+@media(max-width:980px){.character-studio{grid-template-columns:1fr!important}.character-studio .studio-bows{grid-template-columns:repeat(3,minmax(0,1fr))}.character-studio .studio-bows .gear-choice{display:flex!important;flex-direction:column!important;justify-content:center!important;text-align:center!important;min-height:164px!important;padding:8px!important}.character-studio .bow-label{align-items:center}.character-studio .bow-label small{text-align:center!important}.character-studio .bow-check{display:none}}
+@media(max-width:540px){.character-studio{padding:10px!important;gap:12px!important}.character-studio .studio-carousel{grid-template-columns:37px minmax(0,1fr) 37px;min-height:310px}.character-studio .studio-portrait{height:296px}.character-studio #hero-preview-img{max-height:296px!important}.character-studio .studio-arrow{min-width:34px;min-height:51px;font-size:34px}.character-studio .studio-selected{flex-direction:column;text-align:center}.character-studio .studio-selected span{max-width:none;text-align:center}.character-studio .studio-bows{grid-template-columns:1fr!important}.character-studio .studio-bows .gear-choice{display:grid!important;grid-template-columns:82px minmax(0,1fr) 27px!important;min-height:90px!important;text-align:left!important}.character-studio .bow-preview{width:80px;height:78px}.character-studio .bow-label{align-items:flex-start}.character-studio .bow-label small{text-align:left!important}}
+@media(prefers-reduced-motion:reduce){.character-studio.archer-switch-animation #hero-preview-img{animation:none}}
