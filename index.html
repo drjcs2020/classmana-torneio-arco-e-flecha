@@ -6,9 +6,9 @@
 <meta name="description" content="Torneio de Arco e Flecha das três Casas ClassMana: Águia Dourada, Leão de Fogo e Dragão de Esmeralda.">
 <title>ClassMana — Torneio de Arco e Flecha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
-<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b">
+<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104a">
 </head>
 <body>
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -16,26 +16,15 @@
 <header class="nav-bar">
  <a class="brand" href="./" title="Início do Torneio">
   <img src="assets/images/arte-002.webp" alt="Logo ClassMana">
-  <span><b>CLASSMANA</b><small>TORNEIO DE ARCO E FLECHA</small></span>
+  <span><b>ClassMana</b><small>ARENA DE ARCO E FLECHA</small></span>
  </a>
- <div class="nav-links"><button class="nav-link active" data-view="inicio">🏰 Início</button><button class="nav-link" data-view="ranking">🏆 Ranking</button><button class="nav-link" data-view="regras">📜 Regras</button></div>
+ <nav class="nav-links" aria-label="Navegação principal"><button type="button" class="nav-link active" data-view="inicio">🏰 Reinos e arqueiros</button><button type="button" class="nav-link" data-view="ranking">🏆 Placar</button><button type="button" class="nav-link" data-view="regras">📜 Como jogar</button></nav>
  <span class="ready" id="online-banner"><span class="ready-dot"></span> TREINO DISPONÍVEL</span>
 </header>
 
 <main>
 <section id="view-inicio" class="view active">
- <div class="banner">
-  <div class="banner-light"></div>
-  <div class="banner-inner">
-   <div class="season">⚔️ &nbsp; CAMPEONATO ENTRE CASAS &nbsp; ⚔️</div>
-   <h1>O GRANDE <span>TORNEIO</span><br>DE ARCO E FLECHA</h1>
-   <p>Três Casas. Um castelo. Cada flecha pode mudar o destino da batalha!</p>
-   <button class="primary giant" id="hero-play">🏹 ESCOLHER MEU ARQUEIRO <span>➜</span></button>
-  </div>
-  <div class="banner-bottom"><span>✦ 4º A · ÁGUIA DOURADA</span><span>✦ 4º B · LEÃO DE FOGO</span><span>✦ 4º C · DRAGÃO DE ESMERALDA</span></div>
- </div>
-
- <div class="section-title"><div><small>01 · ESCOLHA SEU ESTANDARTE</small><h2>Qual Casa você vai defender?</h2></div><span class="hint">Selecione uma Casa para começar</span></div>
+ <div class="section-title kingdom-title"><div><small>OS TRÊS REINOS DO CLASSMANA</small><h1>Qual Casa você vai defender?</h1></div><p>Escolha seu castelo, personalize o arqueiro e entre no torneio.</p></div>
  <div class="houses" id="houses" aria-label="Escolha sua Casa">
   <button class="house house-a selected" data-house="A" aria-pressed="true" style="--house-bg:url('assets/kingdoms/aguia-card.webp')">
    <span class="house-shine" aria-hidden="true"></span><span class="house-name">ÁGUIA DOURADA</span>
@@ -55,7 +44,7 @@
     <small>🏹 CASA SELECIONADA · ESCOLHA SEU PERSONAGEM</small>
     <strong id="hero-preview-name">Águia Dourada · 4º A</strong>
     <p id="hero-preview-desc">Armadura azul e dourada, precisão do vento. Mascote: Águia Dourada.</p>
-    <div class="archer-selection-hint">Escolha sua aparência. Arqueiro e arqueira têm a mesma precisão, pontuação e habilidades.</div>
+    
   </div>
   <div class="archer-choices" role="group" aria-label="Escolha entre arqueiro e arqueira">
     <button type="button" class="archer-gender archer-character-card selected" id="archer-male" data-archer-gender="m" aria-pressed="true">
@@ -68,6 +57,26 @@
     </button>
   </div>
  </section>
+ <section class="loadout" id="loadout" aria-label="Personalização de arco e flecha">
+  <div class="loadout-intro"><div><small>PERSONALIZE SEU EQUIPAMENTO</small><h2>Seu arco. Sua flecha. Seu estilo.</h2></div><p>Escolha uma combinação para o seu personagem. <strong>Os itens são visuais e não alteram os pontos da competição.</strong></p></div>
+  <div class="loadout-columns">
+   <fieldset class="loadout-group"><legend>01 · ESCOLHA O ARCO</legend>
+    <div class="loadout-options" aria-label="Tipo de arco">
+     <button type="button" class="gear-choice chosen" data-equip-bow="classico" aria-pressed="true"><span class="gear-illustration"><img src="assets/equipment/bow.png" alt="" loading="lazy"></span><strong>Arco Clássico</strong><small>Equilíbrio e tradição</small></button>
+     <button type="button" class="gear-choice" data-equip-bow="real" aria-pressed="false"><span class="gear-illustration gear-real"><img src="assets/equipment/bow.png" alt="" loading="lazy"></span><strong>Arco Real</strong><small>Acabamento dourado</small></button>
+     <button type="button" class="gear-choice" data-equip-bow="vento" aria-pressed="false"><span class="gear-illustration gear-wind"><img src="assets/equipment/bow.png" alt="" loading="lazy"></span><strong>Arco dos Ventos</strong><small>Estrutura leve prateada</small></button>
+    </div>
+   </fieldset>
+   <fieldset class="loadout-group"><legend>02 · ESCOLHA A FLECHA</legend>
+    <div class="loadout-options" aria-label="Tipo de flecha">
+     <button type="button" class="gear-choice chosen" data-equip-arrow="rubi" aria-pressed="true"><span class="gear-arrow ruby" aria-hidden="true"><i></i></span><strong>Pena Rubra</strong><small>Vermelha e branca</small></button>
+     <button type="button" class="gear-choice" data-equip-arrow="esmeralda" aria-pressed="false"><span class="gear-arrow emerald" aria-hidden="true"><i></i></span><strong>Esmeralda</strong><small>Verde cintilante</small></button>
+     <button type="button" class="gear-choice" data-equip-arrow="solar" aria-pressed="false"><span class="gear-arrow solar" aria-hidden="true"><i></i></span><strong>Flecha Solar</strong><small>Dourada e luminosa</small></button>
+    </div>
+   </fieldset>
+  </div>
+  <p class="equipment-summary" id="equipment-summary" aria-live="polite">Equipamento: Arco Clássico + Pena Rubra</p>
+ </section>
  <div class="setup" id="setup">
   <div class="online-account" id="online-account">
     <div><strong id="online-account-name">🏹 Escolha seu arqueiro</strong>
@@ -78,7 +87,7 @@
       <button class="cm-online-btn hidden" id="logout" type="button">🔄 Trocar arqueiro</button>
     </div>
   </div>
-  <div class="setup-head"><div><small>02 · PREPARE SUA FLECHA</small><h2>Preparar batalha</h2></div><span class="stamp">🏹 5 FLECHAS POR RODADA</span></div>
+  <div class="setup-head"><div><small>ÚLTIMA ETAPA</small><h2>Prepare a partida</h2></div><span class="stamp">🎯 5 FLECHAS POR RODADA</span></div>
   <div class="setup-fields cm-easy-setup">
    <label>1 · Seu nome<select id="player"><option value="guest">Escolha seu nome</option></select><small>Selecione seu arqueiro da lista da turma — sem cadastro e sem senha.</small></label>
    <label>2 · Como você quer jogar?<select id="mode">
@@ -168,6 +177,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=20261104c"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=20261104d"></script>
 </body>
 </html>
