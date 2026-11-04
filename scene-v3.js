@@ -24,16 +24,20 @@ export function initScene(canvas, getSettings) {
   const root=()=>app.root;
   const canvasSize=()=>({w:parent.clientWidth||1050,h:parent.clientHeight||540});
 
+  function targetScale(distance){
+    return clamp(Math.pow(30/Math.max(10,distance||30),.65),.31,1.75);
+  }
   function getTargetMetrics(){
     const {w,h}=canvasSize(),s=getSettings()||{},distance=s.distance||25,shift=s.shift||0;
     if(ready&&camera?.camera&&targetRoot&&gl){
-      const center=targetRoot.getPosition().clone().add(new pc.Vec3(0,0,.052));
+      const scaled=targetRoot.getLocalScale().x;
+      const center=targetRoot.getPosition().clone().add(new pc.Vec3(0,0,.052*scaled));
       const a=camera.camera.worldToScreen(center);
-      const b=camera.camera.worldToScreen(center.clone().add(new pc.Vec3(1.34,0,0)));
+      const b=camera.camera.worldToScreen(center.clone().add(new pc.Vec3(1.34*scaled,0,0)));
       const kx=w/(gl.clientWidth||w),ky=h/(gl.clientHeight||h),r=Math.abs(b.x-a.x)*kx;
       if(Number.isFinite(a.x)&&Number.isFinite(a.y)&&r>0)return {x:a.x*kx,y:a.y*ky,r};
     }
-    const r=Math.min(h*.105,w*.082)*Math.pow(25/distance,.35);
+    const r=Math.min(h*.105,w*.082)*targetScale(distance);
     return {x:w*(.50+shift),y:h*.45,r};
   }
   function fallbackSightGeometry(){
@@ -198,8 +202,14 @@ export function initScene(canvas, getSettings) {
     if(!targetRoot)return;const p=palettes[currentHouse],m=material(p.beam,{metal:.08,rough:.84});
     targetRoot.findComponents('render').forEach(e=>{if(e.entity.name.includes('wood')){e.material=m;for(const mesh of e.meshInstances)mesh.material=m;}});
   }
-  function moveTarget(){if(!targetRoot)return;const camZ=7, targetZ=-9, h=canvasSize().h;
-    const units=h/(2*Math.tan(41*Math.PI/360)*(camZ-targetZ));const x=((getSettings()?.shift||0)*canvasSize().w)/units;
+  function moveTarget(){
+    if(!targetRoot)return;
+    const setting=getSettings()||{},camZ=7,targetZ=-9,{w,h}=canvasSize();
+    const units=h/(2*Math.tan(41*Math.PI/360)*(camZ-targetZ));
+    const x=((setting.shift||0)*w)/units;
+    // Real mesh scale changes with the displayed distance (not just an HUD label).
+    const scale=targetScale(setting.distance);
+    targetRoot.setLocalScale(scale,scale,scale);
     targetRoot.setLocalPosition(x,2.05,-9);
   }
   function buildWorld(){
@@ -296,7 +306,9 @@ export function initScene(canvas, getSettings) {
     }
     if(projectile&&pendingShot){const s=pendingShot;s.elapsed+=dt;const t=clamp(s.elapsed/s.duration,0,1);
       const eased=t*t*(3-2*t);const pos=new pc.Vec3().lerp(s.start,s.end,eased);
-      pos.y+=.18*Math.sin(t*Math.PI)-.10*t*t;
+      const meters=getSettings()?.distance||30;
+       const trajectory=Math.pow(Math.max(10,meters)/30,.45);
+       pos.y+=.18*trajectory*Math.sin(t*Math.PI)-.10*trajectory*t*t;
       projectile.setPosition(pos);
       if(t>=1){projectile.enabled=false;pendingShot=null;if(arrowLoaded)arrowLoaded.enabled=true;s.done?.();}}
   }
@@ -329,9 +341,10 @@ export function initScene(canvas, getSettings) {
     if(!projectile) projectile=createArrowProjectile();
     const {w,h}=canvasSize(),target=targetRoot.getPosition(),m=getTargetMetrics();
     const ppu=m.r/1.34;
-    const toX=target.x+((x*w-m.x)/ppu),toY=target.y-((y*h-m.y)/ppu);
+    const scale=targetRoot.getLocalScale().x;
+    const toX=target.x+((x*w-m.x)/ppu)*scale,toY=target.y-((y*h-m.y)/ppu)*scale;
     const start=arrowLoaded?.getPosition().clone()||new pc.Vec3(.52,1.64,5.05);
-    const end=new pc.Vec3(toX,toY,-8.58);
+    const end=new pc.Vec3(toX,toY,target.z+.42*scale);
     if(arrowLoaded)arrowLoaded.enabled=false;
     projectile.enabled=true;projectile.setPosition(start);projectile.setEulerAngles(0,0,0);
     return new Promise(resolve=>{pendingShot={start,end,elapsed:0,duration: .47+(.15*(1-shotPower)),done:resolve};});
