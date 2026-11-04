@@ -1,0 +1,71 @@
+/* ClassMana: identidade das Casas e personagens arqueiros — 04/11/2026 */
+.house{isolation:isolate;overflow:hidden!important;min-height:270px;border-radius:19px!important}
+.house:before{
+ background-image:linear-gradient(180deg,rgba(5,15,18,.01) 0%,rgba(5,15,18,.05) 49%,rgba(5,15,18,.83) 85%,rgba(5,15,18,.95) 100%),var(--house-bg)!important;
+ background-position:center 44%!important;
+ filter:saturate(1.18) brightness(1.09)!important;
+ transition:transform .45s ease,filter .3s ease!important
+}
+.house:hover:before,.house.selected:before{transform:scale(1.045)}
+.house .house-figure,.house .crest-wrap{display:none!important}
+.house-name{z-index:2;position:relative;font-size:clamp(20px,2.1vw,27px)!important;text-shadow:0 2px 6px #06121c,0 5px 16px #06121c!important}
+.house-grade{z-index:2;position:relative;color:#fff4dc!important;font-size:11px!important;letter-spacing:.8px!important;text-shadow:0 2px 7px #06121c}
+.house-check{z-index:2;position:relative;min-width:160px;padding:8px 16px!important}
+.house-shine{opacity:.33}
+.house.castle-selection-animation{animation:castlePick .5s cubic-bezier(.2,.9,.2,1)}
+@keyframes castlePick{0%{transform:translateY(0) scale(.97)}60%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(-4px) scale(1)}}
+.hero-preview{
+ display:grid!important;grid-template-columns:minmax(220px,32%) minmax(0,1fr);
+ align-items:center!important;justify-content:initial!important;
+ gap:24px!important;min-height:350px!important;padding:16px 30px!important;
+ overflow:hidden!important;border-radius:24px!important;
+ background:linear-gradient(112deg,rgba(224,243,255,.94),rgba(255,251,225,.95))!important;
+ box-shadow:0 14px 34px #20566524!important
+}
+.hero-preview[data-house="B"]{background:linear-gradient(112deg,#fff0e4f2,#fff9e0f2)!important;border-color:#ffb478!important}
+.hero-preview[data-house="C"]{background:linear-gradient(112deg,#e1fbeaf2,#f2ffedf2)!important;border-color:#83dda8!important}
+.archer-portrait-frame{height:320px;position:relative;display:grid;place-items:center}
+.archer-portrait-frame img#hero-preview-img{display:block!important;position:relative;z-index:2;width:100%!important;max-width:325px!important;height:100%!important;object-fit:contain!important;filter:drop-shadow(0 14px 15px #305d6a45)}
+.archer-portrait-glow{position:absolute;inset:12% 4%;border-radius:50%;background:radial-gradient(ellipse,#ffdd7c6e,transparent 68%);pointer-events:none}
+.hero-preview[data-house="B"] .archer-portrait-glow{background:radial-gradient(ellipse,#ff9a6480,transparent 69%)}
+.hero-preview[data-house="C"] .archer-portrait-glow{background:radial-gradient(ellipse,#68dda382,transparent 69%)}
+.archer-description{min-width:0;max-width:800px}
+.archer-description>strong{font-size:clamp(23px,3vw,37px)!important;line-height:1.12!important}
+.archer-description>p{font-size:15px!important;line-height:1.5!important}
+.archer-appearance-label{font-size:14px;font-weight:900;color:#385f71;margin:18px 0 8px}
+.archer-appearance{display:flex;flex-wrap:wrap;gap:12px}
+.archer-gender{appearance:none;background:#fff;border:2px solid #8eb9c3;border-radius:13px;color:#27566a;padding:10px 22px;font:900 15px Nunito,sans-serif;min-width:150px;box-shadow:0 3px 0 #98b2b7;transition:transform .17s,border-color .17s}
+.archer-gender:hover{transform:translateY(-2px);border-color:#378ba2}
+.archer-gender.selected{background:linear-gradient(180deg,#fff3c7,#ffc66c);border-color:#d7a044;color:#543414;box-shadow:0 4px 0 #be873c,0 7px 18px #f6c16c70}
+.archer-appearance:focus-within .archer-gender:focus-visible{outline:3px solid #276ba6;outline-offset:3px}
+.archer-selection-hint{font-size:12px;font-weight:700;color:#577889;line-height:1.5;margin-top:15px}
+.hero-preview.archer-switch-animation .archer-portrait-frame img{animation:archerReveal .4s ease-out}
+@keyframes archerReveal{from{opacity:.35;transform:translateY(15px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.hud-archer{display:flex;align-items:center;gap:10px;min-width:0}
+.hud-archer img{height:52px;width:45px;object-fit:contain;filter:drop-shadow(0 2px 6px #0008)}
+.hud-archer strong{display:block;max-width:25vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stage{--scene:url('assets/images/arte-031.jpg');--castle:url('assets/images/arte-031.jpg')}
+.stage.house-b{--scene:url('assets/images/arte-032.jpg');--castle:url('assets/images/arte-032.jpg')}
+.stage.house-c{--scene:url('assets/images/arte-033.jpg');--castle:url('assets/images/arte-033.jpg')}
+.stage:before{filter:saturate(1.12) brightness(1.05)!important}
+@media(max-width:850px){
+ .hero-preview{grid-template-columns:minmax(145px,31%) minmax(0,1fr);min-height:290px!important;gap:12px!important;padding:12px!important}
+ .archer-portrait-frame{height:270px}
+ .archer-gender{min-width:115px;padding:9px 14px;font-size:13px}
+ .house{min-height:230px}
+}
+@media(max-width:600px){
+ .house{min-height:195px;align-items:center!important;justify-content:end!important;padding:12px!important}
+ .house .house-name,.house .house-grade,.house .house-check{width:auto!important;text-align:center!important}
+ .house .house-name{font-size:22px!important}
+ .hero-preview{grid-template-columns:1fr;gap:0!important;text-align:center}
+ .archer-portrait-frame{height:250px}
+ .archer-portrait-frame img#hero-preview-img{max-width:225px!important}
+ .archer-description{padding:0 10px 16px}
+ .archer-appearance{justify-content:center}
+ .hud-archer img{height:38px;width:30px}
+ .hud-archer strong{max-width:105px;font-size:12px;white-space:normal}
+}
+@media(prefers-reduced-motion:reduce){
+ .house.castle-selection-animation,.hero-preview.archer-switch-animation .archer-portrait-frame img{animation:none!important}
+}
