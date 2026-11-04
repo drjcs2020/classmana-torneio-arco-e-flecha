@@ -72,7 +72,8 @@ function drawCourse(){
  const el=$('lobby-course');if(!el)return;
  const level=$('challenge-level')?.value||'iniciante';
  const path=CIRCUITS[level]||CIRCUITS.iniciante;
- el.innerHTML=path.map((d,i)=>'<span class="course-node '+(i===0?'chosen':'')+'">'+(i===4?'🏆':'🎯')+' <b>'+d+'m</b></span>').join('');
+ el.innerHTML='<svg class="course-route" viewBox="0 0 900 90" preserveAspectRatio="none" aria-hidden="true"><path d="M36 67 C 140 67 148 18 260 30 S 445 79 515 52 S 705 10 860 50" fill="none" stroke="#764f27" stroke-width="15" stroke-linecap="round"/><path d="M36 67 C 140 67 148 18 260 30 S 445 79 515 52 S 705 10 860 50" fill="none" stroke="#fbe8b0" stroke-width="10" stroke-linecap="round"/></svg>'+
+  path.map((d,i)=>'<span class="course-node '+(i===0?'chosen':'')+'">'+(i===4?'🏆':'🎯')+' <b>'+d+'m</b></span>').join('');
  el.setAttribute('aria-label',LEVELS[level].title+': '+path.join(', ')+' metros');
 }
 
@@ -133,6 +134,7 @@ function chooseArcher(g){
 function selectHouse(k){
  if(!H[k])return;
  house=k;arenaAudio.setHouse(k);atmosphere?.setHouse(k);
+ const lobby=$('view-inicio');if(lobby)lobby.dataset.house=k;
  document.querySelectorAll('.house').forEach(el=>{
   const active=el.dataset.house===k;
   el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));
