@@ -38,7 +38,7 @@ export function initScene(canvas, getSettings) {
       if(Number.isFinite(a.x)&&Number.isFinite(a.y)&&r>0)return {x:a.x*kx,y:a.y*ky,r};
     }
     const r=Math.min(h*.105,w*.082)*targetScale(distance);
-    return {x:w*(.50+shift),y:h*.45,r};
+    return {x:w*(.50+shift),y:h*(.45+(s.verticalShift||0)),r};
   }
   function fallbackSightGeometry(){
     const {w,h}=canvasSize(),size=h*.89;
@@ -210,7 +210,8 @@ export function initScene(canvas, getSettings) {
     // Real mesh scale changes with the displayed distance (not just an HUD label).
     const scale=targetScale(setting.distance);
     targetRoot.setLocalScale(scale,scale,scale);
-    targetRoot.setLocalPosition(x,2.05,-9);
+    const y=2.05-(setting.verticalShift||0)*h/units;
+    targetRoot.setLocalPosition(x,y,-9);
   }
   function buildWorld(){
     const metals={wood:material('#634124',{rough:.8}),woodlight:material('#a2703f',{rough:.8}),rope:material('#d5ae64',{rough:.89}),iron:material('#1d2329',{metal:.73,rough:.31}),silver:material('#c8d2d7',{metal:.82,rough:.19}),red:material('#da332d'),white:material('#f4f2e7')};
@@ -339,7 +340,7 @@ export function initScene(canvas, getSettings) {
     if(!ready) return new Promise(resolve=>setTimeout(resolve,370));
     if(pendingShot)return;
     if(!projectile) projectile=createArrowProjectile();
-    const {w,h}=canvasSize(),target=targetRoot.getPosition(),m=getTargetMetrics();
+    const {w,h}=canvasSize(),target=targetRoot.getPosition().clone(),m=getTargetMetrics();
     const ppu=m.r/1.34;
     const scale=targetRoot.getLocalScale().x;
     const toX=target.x+((x*w-m.x)/ppu)*scale,toY=target.y-((y*h-m.y)/ppu)*scale;
