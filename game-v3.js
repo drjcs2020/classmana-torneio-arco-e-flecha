@@ -1,12 +1,13 @@
 import {initScene} from './scene-v3.js?v=21';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=4';
+import {arenaAudio} from './arena-audio.js?v=5';
+import {initAtmosphere} from './arena-atmosphere.js?v=1';
 import {online} from './online-client.js?v=3';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
 const R=window.CLASSMANA_ROSTER||{A:[],B:[],C:[]};
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
-let house='A',view='inicio',scene=null,match=null,reticle={x:.50,y:.45},pointerStart=0,holding=false,storage=[];
+let house='A',view='inicio',scene=null,atmosphere=null,match=null,reticle={x:.50,y:.45},pointerStart=0,holding=false,storage=[];
 const EQUIPMENT={
  bows:{classico:'Arco Clássico',real:'Arco Real',vento:'Arco dos Ventos'},
  arrows:{rubi:'Pena Rubra',esmeralda:'Esmeralda',solar:'Flecha Solar'}
@@ -42,7 +43,7 @@ function safeRead(){try{const a=JSON.parse(localStorage.getItem('classmana-arche
 storage=safeRead();
 function persist(row){storage.push({...row,at:new Date().toISOString()});storage=storage.slice(-150);try{localStorage.setItem('classmana-archery-v2',JSON.stringify(storage))}catch{}renderRanking()}
 function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),3100)}
-function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}arenaAudio.setActive(name==='arena');view=name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'instant'});if(name==='ranking')renderRanking()}
+function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}arenaAudio.setActive(name==='arena');atmosphere?.setActive(name==='arena');view=name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'instant'});if(name==='ranking')renderRanking()}
 function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(2,'0'),name}));}
 function fillPlayer(wanted){const sel=$('player');sel.innerHTML='<option value="guest">Arqueiro convidado</option>'+choices(house).map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');if(wanted&&choices(house).some(x=>x.id===wanted))sel.value=wanted;fillRivals()}
 function fillRivals(){
@@ -103,7 +104,7 @@ function chooseArcher(g){
 }
 function selectHouse(k){
  if(!H[k])return;
- house=k;arenaAudio.setHouse(k);
+ house=k;arenaAudio.setHouse(k);atmosphere?.setHouse(k);
  document.querySelectorAll('.house').forEach(el=>{
   const active=el.dataset.house===k;
   el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));
@@ -170,7 +171,18 @@ function worldSettings(){
   verticalShift:rules>=5?motion.y*radius/h:0,
   level,shotIndex:index,seconds,house:match?.house||house};
 }
-function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house);scene?.setEquipment?.(equipment)}
+function ensureScene(){
+ if(!scene)scene=initScene($('world'),worldSettings);
+ scene.setHouse(house);scene?.setEquipment?.(equipment);
+ if(!atmosphere){
+  atmosphere=initAtmosphere($('stage'),()=>({
+   level:match?.level||'iniciante',index:Math.min(4,match?.scores?.length||0),
+   seconds:stageSeconds(),metrics:scene?.getTargetMetrics?.()
+  }));
+ }
+ atmosphere.setHouse(house);
+ atmosphere.setActive(view==='arena');
+}
 function changeTarget(){
  if(!match)return;
  const cfg=match.online?.settings?.[match.scores.length];
