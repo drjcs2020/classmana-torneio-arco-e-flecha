@@ -91,3 +91,23 @@ footer{margin-top:25px!important;padding-top:15px!important;font-size:13px!impor
 @media(max-width:850px){.houses{grid-template-columns:1fr!important}.house{height:245px!important}.hero-preview{grid-template-columns:1fr!important}.hero-preview .archer-description{max-width:none!important;padding:0 8px!important;text-align:center!important}.archer-choices .archer-character-card{min-height:355px!important}.archer-choices .archer-character-card>img{height:270px!important}.nav-link{font-size:15px!important;padding:10px 12px!important}.brand img{width:75px!important}}
 @media(max-width:500px){.page{padding:0 8px!important}.nav-bar{padding:12px!important}.brand b{font-size:29px!important}.brand small{font-size:11px!important}.nav-links{gap:5px!important}.nav-link{font-size:14px!important;padding:9px!important}.hero-preview,.loadout,.setup{padding:12px!important}.archer-choices{gap:9px!important}.archer-choices .archer-character-card{min-height:275px!important;padding:7px 4px!important}.archer-choices .archer-character-card>img{height:195px!important}.archer-choices .archer-card-name{font-size:16px!important}.archer-choices .archer-card-selected{font-size:11px!important;padding:5px 7px!important}.loadout-options{gap:5px}.gear-choice{min-height:132px;padding:7px 2px}.gear-illustration,.gear-illustration img{height:70px}.gear-arrow{transform:scale(.7) rotate(-26deg);height:67px}.gear-choice strong{font-size:13px!important}.gear-choice small{font-size:10px!important}.loadout-group{padding:9px 5px}.setup-fields label{font-size:16px!important}}
 @media(prefers-reduced-motion:reduce){.gear-choice,.archer-character-card,.house:before{transition:none!important;animation:none!important}}
+
+/* Arena visual: reinos oficiais em lugar de territórios reciclados de monstros */
+.stage.house-a{--scene:url('assets/kingdoms/aguia-castelo-mascote.webp')!important;--castle:var(--scene)!important}
+.stage.house-b{--scene:url('assets/kingdoms/leao-castelo-mascote.webp')!important;--castle:var(--scene)!important}
+.stage.house-c{--scene:url('assets/kingdoms/dragao-castelo-mascote.webp')!important;--castle:var(--scene)!important}
+.stage:before{background-position:center 40%,center 40%!important;background-size:cover,cover!important;filter:saturate(1.22) contrast(1.04)!important}
+.stage:after{box-shadow:inset 0 -35px 55px #102b223d,inset 0 0 32px #0e271932!important}
+.stage{border:4px solid #e4c884!important;box-shadow:0 12px 38px #194b5680!important}
+.arena-top{display:flex!important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.arena-sound-toggle{padding:10px 15px;font:900 15px 'Nunito',sans-serif;color:#254d5d;background:linear-gradient(180deg,#faffff,#d8f4ef);border:2px solid #b7d5d5;border-radius:13px;box-shadow:0 3px 0 #88b2b0;cursor:pointer;min-height:45px}
+.arena-sound-toggle:hover{transform:translateY(-2px)}
+.arena-sound-toggle:focus-visible{outline:3px solid #ffe286;outline-offset:3px}
+.sky-birds{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.sky-birds .bird{position:absolute;left:-140px;top:17%;width:64px;height:28px;color:#233e4a;opacity:.65;filter:drop-shadow(0 1px 1px #fffc);animation:bird-cross 15s linear infinite,bird-wing 1.1s ease-in-out infinite alternate}
+.sky-birds .bird-two{width:35px;height:19px;top:25%;animation-delay:-8s,-.5s;animation-duration:19s,1.4s;opacity:.55}
+.sky-birds .bird-three{width:46px;height:22px;top:12%;animation-delay:-14s,-.3s;animation-duration:23s,.95s;opacity:.65}
+@keyframes bird-cross{0%{left:-10%;transform:translateY(0) scale(1)}50%{transform:translateY(-16px) scale(.88)}100%{left:110%;transform:translateY(8px) scale(.72)}}
+@keyframes bird-wing{0%{opacity:.4}100%{opacity:.8}}
+@media(prefers-reduced-motion:reduce){.sky-birds .bird{animation:none!important;display:none}}
+@media(max-width:600px){.arena-sound-toggle{font-size:13px;padding:8px}.sky-birds .bird{width:39px}}

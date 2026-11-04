@@ -1,6 +1,6 @@
-import {initScene} from './scene-v3.js?v=18';
+import {initScene} from './scene-v3.js?v=21';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=2';
+import {arenaAudio} from './arena-audio.js?v=4';
 import {online} from './online-client.js?v=3';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
@@ -506,6 +506,16 @@ document.querySelector('.archer-choices')?.addEventListener('keydown',e=>{
   $(next==='m'?'archer-male':'archer-female').focus();
  }
 });
+const soundButton=$('arena-sound');
+function updateSoundButton(){
+ if(!soundButton)return;
+ const on=arenaAudio.enabled;
+ soundButton.textContent=on?'🔊 Som ligado':'🔇 Som desligado';
+ soundButton.setAttribute('aria-pressed',String(on));
+ soundButton.setAttribute('aria-label',on?'Desativar sons da arena':'Ativar sons da arena');
+}
+soundButton?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton()});
+updateSoundButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
 document.querySelectorAll('[data-equip-arrow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('arrow',el.dataset.equipArrow)));
 applyEquipment();
