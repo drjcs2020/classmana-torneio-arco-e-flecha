@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
-<link rel="stylesheet" href="v3.css?v=8"><link rel="stylesheet" href="online-ui.css?v=2">
+<link rel="stylesheet" href="v3.css?v=10"><link rel="stylesheet" href="online-ui.css?v=4">
 </head>
 <body>
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -58,30 +58,37 @@
  </div>
  <div class="setup" id="setup">
   <div class="online-account" id="online-account">
-   <div><strong id="online-account-name">🔐 Identifique-se para disputar o torneio</strong>
-    <small id="online-status" class="cm-online-status">Conferindo o placar compartilhado...</small></div>
-   <div class="online-account-actions">
-    <button class="cm-online-btn" id="open-login" type="button">🔑 Entrar com PIN</button>
-    <button class="cm-online-btn" id="open-inbox" type="button">🔔 Meus desafios <span class="online-unread" id="unread-count">0</span></button>
-    <button class="cm-online-btn hidden" id="logout" type="button">Sair da conta</button>
-   </div>
-  </div>
-  <div class="cm-login-panel hidden" id="login-panel">
-   <h3>🔐 Entrar no Torneio ClassMana</h3>
-   <p>Escolha seu nome abaixo e digite o PIN individual fornecido pelo professor. Seu PIN nunca deve ser compartilhado.</p>
-   <div class="cm-login-row">
-    <input id="student-pin" type="password" autocomplete="off" maxlength="12" placeholder="Código individual" aria-label="PIN do aluno">
-    <button class="primary" id="submit-login" type="button">ENTRAR</button>
-    <button class="cm-online-btn" id="cancel-login" type="button">Cancelar</button>
-   </div>
-   <p class="hintline" id="login-help"></p>
+    <div><strong id="online-account-name">🏹 Escolha seu arqueiro</strong>
+      <small id="online-status" class="cm-online-status">Sem senha e sem PIN. Escolha sua Casa e seu nome na lista.</small>
+      <small class="cm-identity-warning">Os nomes são selecionáveis por todos: o professor deve supervisionar os resultados oficiais.</small></div>
+    <div class="online-account-actions">
+      <button class="cm-online-btn" id="open-inbox" type="button">🔔 Meus desafios <span class="online-unread" id="unread-count">0</span></button>
+      <button class="cm-online-btn hidden" id="logout" type="button">🔄 Trocar arqueiro</button>
+    </div>
   </div>
   <div class="setup-head"><div><small>02 · PREPARE SUA FLECHA</small><h2>Preparar batalha</h2></div><span class="stamp">🏹 5 FLECHAS POR RODADA</span></div>
-  <div class="setup-fields">
-   <label>Seu arqueiro<select id="player"><option value="guest">Arqueiro convidado</option></select><small>Você pode treinar sem cadastro.</small></label>
-   <label>Modo de jogo<select id="mode"><option value="bot">🤖 Desafiar o robô</option><option value="challenge_same">⚔️ Desafiar colega da mesma turma</option><option value="challenge_team">🛡️ Desafiar outra equipe</option><option value="challenge">🏰 Desafiar estudante de outra Casa</option><option value="practice">🎯 Treinamento livre</option></select><small>Desafios online chegam à conta do colega, que pode aceitar ou recusar quando entrar.</small></label>
-   <label id="difficulty-label">Dificuldade do robô<select id="difficulty"><option value="easy">🟢 Fácil</option><option value="medium" selected>🟡 Médio</option><option value="hard">🔴 Difícil</option></select><small>O robô ajusta a mira conforme o desempenho.</small></label>
-   <label class="hidden" id="rival-label">Adversário de outra Casa<select id="rival"></select><small>Escolha um estudante da turma rival.</small></label>
+  <div class="setup-fields cm-easy-setup">
+   <label>1 · Seu nome<select id="player"><option value="guest">Escolha seu nome</option></select><small>Selecione seu arqueiro da lista da turma — sem cadastro e sem senha.</small></label>
+   <label>2 · Como você quer jogar?<select id="mode">
+    <option value="bot">🤖 Treinar contra o robô</option>
+    <option value="practice">🎯 Treino livre</option>
+    <option value="challenge_same">🏹 Desafiar colega da mesma turma</option>
+    <option value="challenge_team">🛡️ Desafiar outra equipe</option>
+    <option value="challenge">🏰 Desafiar outra turma</option>
+   </select><small>Os convites ficam salvos na planilha e chegam ao colega pelo nome.</small></label>
+   <label>3 · Nível de distância<select id="challenge-level">
+     <option value="iniciante">🌱 Aprendiz · 10, 20, 30, 40 e 50 metros</option>
+     <option value="avancado">🏹 Aventureiro · 30, 40, 50, 60 e 80 metros</option>
+     <option value="lendario">🏆 Lendário · 60, 80, 100, 120 e 150 metros</option>
+   </select><small>Uma distância maior a cada flecha; no desafio, ambos jogam no mesmo nível.</small></label>
+   <label id="difficulty-label">Dificuldade do robô<select id="difficulty"><option value="easy">🟢 Fácil</option><option value="medium" selected>🟡 Médio</option><option value="hard">🔴 Difícil</option></select></label>
+   <label id="team-label" class="hidden">Sua equipe<select id="my-team"></select><small>Selecione sua equipe; o jogo ajustará a lista de alunos.</small></label>
+   <label id="team-scope-label" class="hidden">Onde está a equipe adversária?<select id="team-scope">
+      <option value="same">Na minha turma</option><option value="other">Em outra turma</option>
+   </select></label>
+   <label id="opponent-house-label" class="hidden">Turma adversária<select id="opponent-house"></select></label>
+   <label id="opponent-team-label" class="hidden">Equipe adversária<select id="opponent-team"></select></label>
+   <label id="rival-label" class="hidden">4 · Colega que vai receber o desafio<select id="rival"></select><small>Escolha o nome do adversário.</small></label>
   </div>
   <button class="primary start" id="start-game">🏹 INICIAR PARTIDA <span>➜</span></button>
  </div>
@@ -108,7 +115,7 @@
         <span class="wind-direction-text">SEM VENTO</span>
       </div>
     </div>
-    <div class="hud-pill" id="distance">🎯 25 METROS</div>
+    <div class="hud-pill" id="distance">🎯 NÍVEL 1 · 10 METROS</div>
   </div>
   <div class="game-top-right"><div class="hud-pill" id="shots">🏹 FLECHA 1 / 5</div><div class="hud-pill" id="power">⚡ FORÇA 0%</div></div>
   <div class="instruction" id="instruction">MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR</div>
@@ -134,7 +141,7 @@
 
 <section id="view-regras" class="view information-view">
   <div class="page-heading"><small>📜 CÓDIGO DOS ARQUEIROS</small><h1>Regras do Castelo</h1></div>
-  <div class="rules-grid"><article><b>🎯 1. Mire com precisão</b><p>Arraste a mira com o mouse ou o dedo. O vento altera o ponto de impacto. Solte para atirar.</p></article><article><b>🏹 2. Cinco flechas</b><p>Cada arqueiro tem cinco tentativas. Acerte o centro para ganhar até 10 pontos por flecha.</p></article><article><b>🤖 3. Robô adaptativo</b><p>Escolha Fácil, Médio ou Difícil. O robô ajusta seus disparos ao desempenho recente.</p></article><article><b>⚔️ 4. Duelos entre Casas</b><p>Entre com seu PIN. Desafie um colega da turma, de outra equipe ou de outra Casa. O destinatário poderá aceitar ou recusar ao entrar.</p></article><article><b>🏆 5. Ranking justo</b><p>O torneio mede a pontuação das flechas; o XP e HP pedagógicos não são afetados.</p></article><article><b>🔐 6. Privacidade</b><p>O jogo usa PINs individuais e apelidos abreviados. O professor administra os acessos e o torneio não altera XP e HP.</p></article></div>
+  <div class="rules-grid"><article><b>🎯 1. Mire com precisão</b><p>Arraste a mira com o mouse ou o dedo. O vento altera o ponto de impacto. Solte para atirar.</p></article><article><b>🏹 2. Cinco flechas</b><p>Cada arqueiro tem cinco tentativas. Acerte o centro para ganhar até 10 pontos por flecha.</p></article><article><b>🤖 3. Robô adaptativo</b><p>Escolha Fácil, Médio ou Difícil. O robô ajusta seus disparos ao desempenho recente.</p></article><article><b>⚔️ 4. Duelos entre Casas</b><p>Escolha seu nome na lista. Desafie um colega da turma, de outra equipe ou de outra Casa. O destinatário poderá aceitar ou recusar ao entrar.</p></article><article><b>🏆 5. Ranking justo</b><p>O torneio mede a pontuação das flechas; o XP e HP pedagógicos não são afetados.</p></article><article><b>🔐 6. Privacidade</b><p>O jogo usa nomes da lista e apelidos abreviados. O professor administra os acessos e o torneio não altera XP e HP.</p></article></div>
   <button class="primary" id="rules-play">🏹 EXPERIMENTAR A ARENA</button>
 </section>
 <section class="cm-inbox hidden" id="online-inbox" role="dialog" aria-modal="true" aria-labelledby="inbox-title">
@@ -148,6 +155,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=9"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=11"></script>
 </body>
 </html>
