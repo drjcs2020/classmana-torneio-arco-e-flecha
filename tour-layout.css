@@ -318,7 +318,6 @@ footer{display:none!important}
 }
 
 /* Final identity: official logo ABOVE the module title, no brand duplication. */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap');
 .nav-bar{height:99px!important;max-height:99px!important;min-height:99px!important}
 .nav-bar .brand{flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;padding:0!important}
 .nav-bar .brand img{width:165px!important;height:57px!important;margin:0!important;object-fit:contain!important}
