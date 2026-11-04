@@ -30,6 +30,7 @@ export function initScene(canvas, getSettings) {
   }
   function getTargetMetrics(){
     const {w,h}=canvasSize(),s=getSettings()||{},distance=s.distance||25,shift=s.shift||0;
+    if(ready&&targetRoot)moveTarget();
     if(ready&&camera?.camera&&targetRoot&&gl){
       const scaled=targetRoot.getLocalScale().x;
       const center=targetRoot.getPosition().clone().add(new pc.Vec3(0,0,.052*scaled));
@@ -49,6 +50,7 @@ export function initScene(canvas, getSettings) {
   function getAimPoint(){
     const {w,h}=canvasSize();
     if(ready&&camera?.camera&&sightAnchor&&gl){
+      updateBowAim();
       // This is the visible, physical sight attached to the bow.
       const p=camera.camera.worldToScreen(sightAnchor.getPosition());
       const x=p.x/(gl.clientWidth||w),y=p.y/(gl.clientHeight||h);
@@ -82,7 +84,12 @@ export function initScene(canvas, getSettings) {
   function setHouse(k){currentHouse=palettes[k]?k:'A';parent.classList.remove('house-a','house-b','house-c');parent.classList.add('house-'+currentHouse.toLowerCase());
     if(ready){colorBow();colorTarget();}}
   function setTargetShift(){if(ready){moveTarget();for(const old of impactMarks)old.destroy();impactMarks=[];}}
-  function setAim(x=.5,y=.46){aimX=clamp(x,.08,.94);aimY=clamp(y,.08,.91);}
+  // Keep the bow, arrow and the bow's own sight fully inside the camera.
+  // Moving the mouse to the edge must not push the bow out of the viewport.
+  function setAim(x=.5,y=.46){
+    aimX=clamp(x,.16,.73);aimY=clamp(y,.17,.82);
+    updateBowAim();
+  }
   function setPower(value){power=clamp(value,0,1);}
   function destroy(){destroyed=true;if(app){app.destroy();app=null;}gl?.remove();}
 
@@ -316,19 +323,22 @@ export function initScene(canvas, getSettings) {
     bowString=tube('tensioned carbon cord',[[0,-1.51,.03],[-.11,0,.45],[0,1.51,.03]],[.004,.004,.004],dark,bowRoot,7);
   }
 
-  function update3D(dt){if(!ready)return;animT+=dt;const p=getSettings()||{};
+  function updateBowAim(){
+    if(!ready||!camera?.camera||!bowRoot)return;
+    const {w,h}=canvasSize(),dx=aimX-.5,dy=aimY-.45,t=performance.now()*.001;
+    // The sight and the aiming point share the same camera-space coordinate.
+    // This is updated synchronously on pointerup, not one animation frame late.
+    const depth=2.16,halfH=depth*Math.tan(camera.camera.fov*Math.PI/360);
+    const sightInCamera=new pc.Vec3((2*aimX-1)*halfH*w/h,(1-2*aimY)*halfH,-depth);
+    bowRoot.setLocalEulerAngles(-dy*2,dx*2,Math.sin(t*1.7)*.1);
+    const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55,.25,-.08));
+    bowRoot.setLocalPosition(sightInCamera.sub(offset));
+    if(arrowLoaded)arrowLoaded.setLocalPosition(.02,-.03,-.40+.36*power);
+    if(bowString)bowString.setLocalPosition(0,0,.19*power);
+  }
+  function update3D(dt){if(!ready)return;animT+=dt;
     if(targetRoot)moveTarget();
-    if(bowRoot){
-      const {w,h}=canvasSize(),dx=aimX-.5,dy=aimY-.45,t=performance.now()*.001;
-      // Inverse perspective: the mouse moves the actual sight, which is the only reticle.
-      const depth=2.16,halfH=depth*Math.tan(camera.camera.fov*Math.PI/360);
-      const sightInCamera=new pc.Vec3((2*aimX-1)*halfH*w/h,(1-2*aimY)*halfH,-depth);
-      bowRoot.setLocalEulerAngles(-dy*2,dx*2,Math.sin(t*1.7)*.1);
-      const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55,.25,-.08));
-      bowRoot.setLocalPosition(sightInCamera.sub(offset));
-      if(arrowLoaded)arrowLoaded.setLocalPosition(.02,-.03,-.40+.36*power);
-      if(bowString)bowString.setLocalPosition(0,0,.19*power);
-    }
+    updateBowAim();
     if(projectile&&pendingShot){const s=pendingShot;s.elapsed+=dt;const t=clamp(s.elapsed/s.duration,0,1);
       const eased=t*t*(3-2*t);const pos=new pc.Vec3().lerp(s.start,s.end,eased);
       const meters=getSettings()?.distance||30;
