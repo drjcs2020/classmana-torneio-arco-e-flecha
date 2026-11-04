@@ -93,3 +93,20 @@
  .archer-carousel-viewport .archer-portrait-frame{height:250px}
  .archer-carousel-arrow{width:32px;min-height:48px;font-size:29px}}
 @media(prefers-reduced-motion:reduce){.archer-carousel-arrow{transition:none!important}}
+
+/* Seleção visual dos 6 personagens aprovados. Duas opções visíveis por Casa. */
+.hero-preview{grid-template-columns:minmax(240px,.8fr) minmax(0,1.65fr)!important;gap:22px!important;padding:22px!important;min-height:425px!important}
+.hero-preview .archer-description{padding:12px 6px!important;max-width:450px;text-align:left}
+.archer-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;width:100%;min-width:0}
+.archer-choices .archer-character-card{display:flex!important;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;min-height:385px;min-width:0!important;overflow:hidden;padding:12px 8px 15px!important;border:3px solid #c8aa73!important;border-radius:21px!important;position:relative;background:linear-gradient(165deg,#eefaff,#d5ebf9 65%,#fff1ca)!important;box-shadow:0 7px 19px #33617b33!important;color:#234664!important;transition:transform .18s ease,box-shadow .18s ease}
+.archer-choices .archer-character-card>img{width:100%;height:290px;max-width:270px;display:block;object-fit:contain;object-position:center bottom;pointer-events:none;filter:drop-shadow(0 9px 10px #183c5850);transition:transform .2s ease}
+.archer-choices .archer-character-card:hover{transform:translateY(-5px)!important;box-shadow:0 11px 28px #28738c69!important}
+.archer-choices .archer-character-card.selected{border-color:#f0ac2c!important;box-shadow:0 0 0 3px #ffe49e,0 9px 24px #d9ad6190!important;background:linear-gradient(160deg,#f8ffff,#ffeab3)!important}
+.archer-choices .archer-card-name{font:900 clamp(17px,1.6vw,23px)/1.15 'Baloo 2',Nunito,sans-serif;letter-spacing:.4px}
+.archer-choices .archer-card-selected{display:block;min-width:135px;padding:5px 16px;border-radius:15px;background:#e1f2f3;color:#1d536b;font:900 11px Nunito,sans-serif;letter-spacing:.6px}
+.archer-choices .archer-character-card.selected .archer-card-selected{background:linear-gradient(180deg,#ffe994,#eec36e);color:#533c18}
+.hero-preview[data-house="B"] .archer-choices .archer-character-card{background:linear-gradient(160deg,#fff7ef,#ffd8ba)!important}
+.hero-preview[data-house="C"] .archer-choices .archer-character-card{background:linear-gradient(160deg,#f1fff4,#d0f1dc)!important}
+.archer-choices .archer-character-card:focus-visible{outline:4px solid #2874aa!important;outline-offset:3px}
+@media(max-width:850px){.hero-preview{grid-template-columns:1fr!important}.hero-preview .archer-description{text-align:center;max-width:none}.archer-choices .archer-character-card{min-height:315px}.archer-choices .archer-character-card>img{height:240px}}
+@media(max-width:500px){.hero-preview{gap:12px!important;padding:12px!important}.archer-choices{gap:8px}.archer-choices .archer-character-card{min-height:255px;padding:8px 4px 10px!important;border-radius:14px!important}.archer-choices .archer-character-card>img{height:195px}.archer-choices .archer-card-name{font-size:15px}.archer-choices .archer-card-selected{min-width:0;padding:4px 7px;font-size:9px}}

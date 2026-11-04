@@ -52,17 +52,18 @@ function archerGender(){return selectedSkins[house]==="f"?"f":"m"}
 function archerImage(){return "assets/archers/"+ARCHER_SKINS[house][archerGender()]}
 function refreshArcher(){
  const female=archerGender()==="f",title=(female?"Arqueira":"Arqueiro")+" da "+H[house].name;
- const img=$('hero-preview-img'),name=$('hero-preview-name'),desc=$('hero-preview-desc');
- if(img){img.src=archerImage();img.alt=title+" com arco e aljava"}
- if(name)name.textContent=title+" · "+H[house].grade;
+ const name=$('hero-preview-name'),desc=$('hero-preview-desc');
+ if(name)name.textContent=H[house].name+" · "+H[house].grade;
  if(desc)desc.textContent=ARCHER_SKINS[house].desc+" Mascote da Casa: "+ARCHER_SKINS[house].mascot+".";
- const carouselIndicator=$('archer-carousel-indicator');
- if(carouselIndicator)carouselIndicator.textContent=female?'2 / 2 · ARQUEIRA':'1 / 2 · ARQUEIRO';
+ for(const [gender,id] of [['m','archer-male-image'],['f','archer-female-image']]){
+  const el=$(id);if(el){el.src='assets/archers/'+ARCHER_SKINS[house][gender];el.alt=(gender==='m'?'Arqueiro':'Arqueira')+' da '+H[house].name+' com arco e aljava';}
+ }
  const panel=$('hero-preview');if(panel)panel.dataset.house=house;
  const hud=$('hud-archer-image');if(hud){hud.src=archerImage();hud.alt=title;}
  document.querySelectorAll('[data-archer-gender]').forEach(btn=>{
   const active=btn.dataset.archerGender===archerGender();
   btn.classList.toggle('selected',active);btn.setAttribute('aria-pressed',String(active));
+  const status=btn.querySelector('.archer-card-selected');if(status)status.textContent=active?'✓ SELECIONADO':'ESCOLHER';
  });
 }
 function chooseArcher(g){
@@ -432,21 +433,13 @@ document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>
  el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
 }));
 document.querySelectorAll('[data-archer-gender]').forEach(el=>el.addEventListener('click',()=>chooseArcher(el.dataset.archerGender)));
-const rotateArcher=()=>chooseArcher(archerGender()==='m'?'f':'m');
-$('archer-prev').addEventListener('click',rotateArcher);
-$('archer-next').addEventListener('click',rotateArcher);
-const archerCarousel=$('archer-carousel-viewport');
-archerCarousel.addEventListener('keydown',e=>{
- if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();rotateArcher()}
+document.querySelector('.archer-choices')?.addEventListener('keydown',e=>{
+ if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+  e.preventDefault();
+  const next=archerGender()==='m'?'f':'m';chooseArcher(next);
+  $(next==='m'?'archer-male':'archer-female').focus();
+ }
 });
-let archerSwipeX=null;
-archerCarousel.addEventListener('touchstart',e=>{archerSwipeX=e.touches[0]?.clientX??null},{passive:true});
-archerCarousel.addEventListener('touchend',e=>{
- if(archerSwipeX===null)return;
- const delta=(e.changedTouches[0]?.clientX??archerSwipeX)-archerSwipeX;
- archerSwipeX=null;
- if(Math.abs(delta)>40)rotateArcher();
-},{passive:true});
 $('hero-play').addEventListener('click',()=>{
  $('setup').scrollIntoView({behavior:'smooth',block:'center'});
  $('player').focus();
