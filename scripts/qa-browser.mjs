@@ -23,6 +23,7 @@ try{
  assert.match(await page.locator('#hero-preview-img').getAttribute('src'),/leao-feminino\.webp$/);
  await page.locator('[data-equip-bow="real"]').click();
  assert.equal(await page.locator('[data-equip-bow="real"]').getAttribute('aria-pressed'),'true');
+ await page.locator('#confirm-archer').click();
  await page.locator('#mode').selectOption('practice');
  await page.locator('#challenge-level').selectOption('lendario');
  assert.match(await page.locator('#lobby-course').getAttribute('aria-label'),/150/);

@@ -239,3 +239,80 @@ footer{display:none!important}
  #view-inicio .houses,#view-inicio .character-studio,#view-inicio .setup{grid-row:2}
 }
 @media(prefers-reduced-motion:reduce){.house,.studio-arrow,.gear-choice{transition:none!important}}
+
+/* Stage-based menu: only ONE large choice displayed per step, on all screens. */
+#view-inicio.active{grid-template-columns:1fr!important;grid-template-rows:auto auto minmax(0,1fr)!important;gap:10px!important;padding:11px 0 14px!important}
+#view-inicio .kingdom-title{grid-column:1!important;grid-row:1!important}
+#view-inicio .lobby-steps{display:flex!important;grid-column:1!important;grid-row:2!important;gap:9px!important;min-height:53px;align-items:stretch}
+#view-inicio .lobby-step{flex:1;min-width:0;font:700 19px Fredoka,sans-serif!important;background:linear-gradient(#fffdfa,#e9f6ef);border:2px solid #afd0bd!important;border-radius:14px!important;color:#215268!important;min-height:48px;padding:7px 12px!important;box-shadow:0 3px 0 #74978d4d!important;cursor:pointer}
+#view-inicio .lobby-step.chosen{background:linear-gradient(#ffeebc,#efc671)!important;border-color:#c99c40!important;color:#67420e!important}
+#view-inicio .houses,#view-inicio .character-studio,#view-inicio .setup{grid-column:1!important;grid-row:3!important;display:none!important;min-height:0!important;overflow:hidden!important}
+#view-inicio[data-step="reino"] .houses{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:1fr!important;gap:16px!important;max-height:480px;height:100%!important;align-self:center}
+#view-inicio[data-step="reino"] .house{height:100%!important;max-height:480px!important;padding:20px 12px!important;border:4px solid #d6af60!important;border-radius:24px!important;box-shadow:0 14px 30px #16475b52!important}
+#view-inicio[data-step="reino"] .house:before{background-position:center 44%!important}
+#view-inicio[data-step="reino"] .house .house-name{font:700 clamp(24px,2.4vw,36px)/1.08 Fredoka,sans-serif!important;text-shadow:0 3px 9px #051720bb!important}
+#view-inicio[data-step="reino"] .house .house-grade{font:900 15px Nunito,sans-serif!important;letter-spacing:.3px}
+#view-inicio[data-step="reino"] .house .house-check{font-size:14px!important;padding:8px 20px!important;margin-top:10px!important}
+#view-inicio[data-step="heroi"] .character-studio{display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr)!important;gap:19px!important;padding:18px!important;max-width:1250px;width:100%;margin:0 auto!important;align-self:stretch}
+#view-inicio[data-step="heroi"] .studio-heading h2{font-size:clamp(26px,2.5vw,37px)!important}
+#view-inicio[data-step="heroi"] .studio-carousel{grid-template-columns:55px minmax(0,1fr) 55px!important}
+#view-inicio[data-step="heroi"] .studio-arrow{min-width:45px!important;min-height:66px!important;font-size:44px!important}
+#view-inicio[data-step="heroi"] .studio-selected strong{font-size:20px!important}
+#view-inicio[data-step="heroi"] .studio-equipment{gap:10px!important;padding:16px!important}
+#view-inicio[data-step="heroi"] .studio-bows{gap:10px!important}
+#view-inicio[data-step="heroi"] .studio-bows .gear-choice{grid-template-columns:100px minmax(0,1fr) 28px!important;gap:13px!important;padding:10px!important}
+#view-inicio[data-step="heroi"] .bow-preview{max-width:105px!important}
+#view-inicio[data-step="heroi"] .bow-label strong{font-size:22px!important}
+#view-inicio[data-step="heroi"] .bow-label small{font-size:14px!important}
+#view-inicio[data-step="heroi"] .equipment-summary{display:none!important}
+#view-inicio[data-step="heroi"] .studio-continue{flex:none;display:flex;align-items:center;justify-content:center;gap:13px;padding:11px 12px;border:2px solid #b58436;border-radius:14px;background:linear-gradient(180deg,#ffe995,#efba50 64%,#d98d2b);box-shadow:0 4px 0 #986021;font:700 clamp(16px,1.7vw,22px) Fredoka,sans-serif;color:#493016;cursor:pointer;min-height:53px}
+#view-inicio[data-step="heroi"] .studio-continue:hover{filter:brightness(1.05)}
+#view-inicio[data-step="partida"] .setup{display:flex!important;max-width:1050px!important;width:100%!important;height:100%!important;margin:0 auto!important;padding:clamp(14px,2vw,25px)!important;gap:14px!important}
+#view-inicio[data-step="partida"] .online-account{max-height:70px;min-height:60px!important;padding:11px 17px!important}
+#view-inicio[data-step="partida"] .online-account strong{font-size:20px!important}
+#view-inicio[data-step="partida"] .online-account small{font-size:13px!important}
+#view-inicio[data-step="partida"] .setup-head h2{font-size:clamp(28px,3vw,38px)!important}
+#view-inicio[data-step="partida"] .setup-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:15px!important;grid-auto-rows:minmax(64px,auto)}
+#view-inicio[data-step="partida"] .setup-fields>label{font:900 17px Nunito,sans-serif!important;gap:7px!important}
+#view-inicio[data-step="partida"] .setup-fields select{min-height:48px!important;padding:10px 13px!important;font-size:16px!important;border-radius:12px!important}
+#view-inicio[data-step="partida"] .course-preview{padding:10px 15px!important;gap:6px!important}
+#view-inicio[data-step="partida"] .course-label{font-size:13px!important}
+#view-inicio[data-step="partida"] .course-node{font-size:14px!important;min-height:38px}
+#view-inicio[data-step="partida"] .start{font-size:clamp(23px,2.4vw,32px)!important;min-height:65px!important}
+@media(max-width:1060px){
+ #view-inicio[data-step="reino"] .houses{grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;max-height:none}
+ #view-inicio[data-step="reino"] .house{max-height:none!important;padding:8px!important;border-radius:16px!important}
+ #view-inicio[data-step="reino"] .house .house-name{font-size:clamp(22px,3vw,31px)!important}
+ #view-inicio[data-step="reino"] .house .house-grade{font-size:12px!important}
+ #view-inicio[data-step="reino"] .house .house-check{font-size:11px!important;padding:5px 12px!important;margin-top:4px!important}
+ #view-inicio[data-step="heroi"] .character-studio{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;padding:10px!important;gap:8px!important}
+ #view-inicio[data-step="heroi"] .studio-heading h2{font-size:24px!important}
+ #view-inicio[data-step="heroi"] .studio-carousel{grid-template-columns:34px minmax(0,1fr) 34px!important}
+ #view-inicio[data-step="heroi"] .studio-arrow{min-height:45px!important;min-width:31px!important;font-size:35px!important}
+ #view-inicio[data-step="heroi"] .studio-bows .gear-choice{grid-template-columns:64px minmax(0,1fr) 23px!important;gap:5px!important;padding:6px!important}
+ #view-inicio[data-step="heroi"] .bow-label strong{font-size:16px!important}
+ #view-inicio[data-step="heroi"] .bow-label small{font-size:11px!important}
+ #view-inicio[data-step="heroi"] .studio-equipment{padding:8px!important;gap:6px!important}
+ #view-inicio[data-step="heroi"] .studio-continue{font-size:15px!important;min-height:45px!important;padding:8px!important}
+ #view-inicio[data-step="partida"] .setup{padding:12px!important;gap:10px!important}
+ #view-inicio[data-step="partida"] .setup-fields{gap:10px!important}
+ #view-inicio[data-step="partida"] .setup-fields>label{font-size:15px!important}
+ #view-inicio[data-step="partida"] .setup-fields select{font-size:14px!important;min-height:43px!important}
+ #view-inicio[data-step="partida"] .start{font-size:24px!important;min-height:58px!important}
+}
+@media(max-width:540px){
+ #view-inicio .lobby-step{font-size:14px!important;min-height:38px!important;padding:5px!important}
+ #view-inicio[data-step="reino"] .house .house-name{font-size:23px!important}
+ #view-inicio[data-step="heroi"] .character-studio{gap:5px!important;padding:6px!important}
+ #view-inicio[data-step="heroi"] .studio-heading h2{font-size:18px!important}
+ #view-inicio[data-step="heroi"] .studio-carousel{grid-template-columns:27px minmax(0,1fr) 27px!important}
+ #view-inicio[data-step="heroi"] .studio-arrow{min-height:42px!important;min-width:27px!important;font-size:29px!important}
+ #view-inicio[data-step="heroi"] .studio-bows .gear-choice{grid-template-columns:42px minmax(0,1fr) 14px!important;gap:2px!important;padding:4px!important}
+ #view-inicio[data-step="heroi"] .bow-label strong{font-size:12px!important}
+ #view-inicio[data-step="heroi"] .bow-label small{font-size:10px!important}
+ #view-inicio[data-step="heroi"] .studio-continue{font-size:12px!important;min-height:44px!important;line-height:1.1}
+ #view-inicio[data-step="partida"] .setup-fields{grid-template-columns:1fr!important;gap:7px!important}
+ #view-inicio[data-step="partida"] .setup-fields>label{font-size:14px!important}
+ #view-inicio[data-step="partida"] .course-node{font-size:10px!important;min-height:25px!important}
+ #view-inicio[data-step="partida"] .start{font-size:20px!important;min-height:52px!important}
+}

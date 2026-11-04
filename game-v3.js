@@ -143,7 +143,7 @@ function selectHouse(k){
  refreshArcher();
  scene?.setHouse(k);
  fillPlayer(incoming?.rivalId?.[0]===k?incoming.rivalId:null);
- if(window.matchMedia('(max-width:1060px)').matches&&view==='inicio')setLobbyStep('heroi');
+ if(view==='inicio')setLobbyStep('heroi');
 }
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
 function duelKind(mode){return mode==='challenge_same'?'mesma_turma':mode==='challenge_team'?'entre_equipes':'interclasses'}
@@ -549,6 +549,7 @@ async function startOnlineClient(){
 // Interações do jogo.
 document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.view==='inicio'&&view==='inicio')setLobbyStep('reino');else openView(el.dataset.view)}));
 document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>setLobbyStep(button.dataset.lobbyStep)));
+$('confirm-archer').addEventListener('click',()=>setLobbyStep('partida'));
 $('challenge-level').addEventListener('change',drawCourse);
 document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>{
  selectHouse(el.dataset.house);
