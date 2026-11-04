@@ -9,7 +9,9 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 2;
+const CM_V = 3;
+const CM_DISTANCES={iniciante:[10,20,30,40,50],avancado:[30,40,50,60,80],lendario:[60,80,100,120,150]};
+function cmLevel_(challenge){const v=String(challenge[14]||'');const level=v.split('|')[1];return CM_DISTANCES[level]?level:'iniciante'}
 const CM_TTL = 7*24*3600*1000;
 const CM_TYPES = ['mesma_turma','entre_equipes','interclasses'];
 const CM_STATUS = {CRIADOR:'CRIADOR_JOGANDO',PENDENTE:'PENDENTE',ACEITO:'ACEITO',RECUSADO:'RECUSADO',CONCLUIDO:'CONCLUIDO'};
@@ -41,10 +43,29 @@ function cmFindChallenge_(db,id){const c=cmChallenges_(db).find(x=>String(x.data
 function cmPerson_(db,id){return cmPublicStudent_(cmStudent_(db,id).data)}
 function cmVisible_(db,item,id){const c=item.data; if(c[2]!==id&&c[3]!==id)throw Error('Sem acesso ao desafio');return cmSummary_(db,c,id)}
 function cmSummary_(db,c,viewer){let a=cmPerson_(db,String(c[2])),b=cmPerson_(db,String(c[3]));let p=c[11]?JSON.parse(String(c[11])):[],q=c[12]?JSON.parse(String(c[12])):[];
-return {id:String(c[0]),kind:String(c[1]),creator:a,recipient:b,status:String(c[4]),created:String(c[5]),accepted:c[6]?String(c[6]):null,finished:c[8]?String(c[8]):null,creatorScore:c[9]===''?null:Number(c[9]),recipientScore:c[10]===''?null:Number(c[10]),creatorShots:p,recipientShots:q,winner:c[13]?String(c[13]):null,settings:[0,1,2,3,4].map(i=>cmRound_(String(c[0]),i))}}
-function cmRound_(id,index){const seed=cmDigest_(id+':'+index);const u=k=>parseInt(seed.slice(k,k+7),16)/0xfffffff;return {index,wind:Math.round((-4+8*u(0))*10)/10,shift:Math.round((-.075+.15*u(7))*1000)/1000,distance:Math.round((24+index*2.3)*10)/10}}
-function cmScore_(dx,dy,power,wind){const ax=dx+wind*.04,ay=dy+(1-power)*.70;const norm=Math.hypot(ax,ay);return {score:norm>1?0:Math.max(1,10-Math.floor(norm*10)),impactDx:ax,impactDy:ay}}
-function cmShots_(id,shots){if(!Array.isArray(shots)||shots.length!==5)throw Error('É obrigatório registrar exatamente 5 flechas');let sum=0;const rec=shots.map((x,i)=>{const dx=Number(x.dx),dy=Number(x.dy),power=Number(x.power);if(![dx,dy,power].every(Number.isFinite)||Math.abs(dx)>9||Math.abs(dy)>9||power<.28||power>1)throw Error('Disparo inválido: '+(i+1));const cfg=cmRound_(id,i),score=cmScore_(dx,dy,power,cfg.wind);sum+=score.score;return {...cfg,dx,dy,power,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy}});return {sum,shots:rec}}
+return {id:String(c[0]),kind:String(c[1]),creator:a,recipient:b,status:String(c[4]),created:String(c[5]),accepted:c[6]?String(c[6]):null,finished:c[8]?String(c[8]):null,creatorScore:c[9]===''?null:Number(c[9]),recipientScore:c[10]===''?null:Number(c[10]),creatorShots:p,recipientShots:q,winner:c[13]?String(c[13]):null,level:cmLevel_(c),settings:[0,1,2,3,4].map(i=>cmRound_(String(c[0]),i,cmLevel_(c)))}}
+function cmRound_(id,index,level='iniciante'){
+ const seed=cmDigest_(id+':'+index),u=k=>parseInt(seed.slice(k,k+7),16)/0xfffffff;
+ const distance=CM_DISTANCES[level]?.[index]||CM_DISTANCES.iniciante[index];
+ const windFactor=.65+Math.pow(distance/70,.45)*.55;
+ return {index,wind:Math.round((-4+8*u(0))*windFactor*10)/10,
+   shift:Math.round((-.045+.09*u(7))*1000)/1000,distance};
+}
+function cmScore_(dx,dy,power,wind,distance){
+ const difficulty=Math.pow(Math.max(10,distance)/30,.55);
+ const ax=dx+wind*.04*difficulty,ay=dy+(1-power)*.70*difficulty;
+ const norm=Math.hypot(ax,ay);
+ return {score:norm>1?0:Math.max(1,10-Math.floor(norm*10)),impactDx:ax,impactDy:ay};
+}
+function cmShots_(id,shots,level){
+ if(!Array.isArray(shots)||shots.length!==5)throw Error('É obrigatório registrar exatamente 5 flechas');
+ let sum=0;const rec=shots.map((x,i)=>{
+  const dx=Number(x.dx),dy=Number(x.dy),power=Number(x.power);
+  if(![dx,dy,power].every(Number.isFinite)||Math.abs(dx)>9||Math.abs(dy)>9||power<.28||power>1)throw Error('Disparo inválido: '+(i+1));
+  const cfg=cmRound_(id,i,level),score=cmScore_(dx,dy,power,cfg.wind,cfg.distance);
+  sum+=score.score;return {...cfg,dx,dy,power,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy};
+ });return {sum,shots:rec}
+}
 function cmRate_(db,id){let now=new Date(),today=now.toISOString().slice(0,10);const count=cmChallenges_(db).filter(x=>String(x.data[2])===id&&String(x.data[5]).slice(0,10)===today).length;if(count>=10)throw Error('Limite de 10 novos desafios por dia');}
 function cmLog_(db,id,action,details){cmSheet_(db,'Eventos').appendRow([cmUuid_(),cmNow_(),id,action,JSON.stringify(details||{}).slice(0,1000)])}
 function cmOp_(db,id,token,result){const body=JSON.stringify(result);cmSheet_(db,'Operacoes').appendRow([id,cmDigest_(token||''),result.ok?'OK':'ERRO',body,cmNow_()]);return result}
@@ -62,11 +83,11 @@ try{
  } else {
   const actor=cmPublicStudent_(cmSession_(db,token).data),id=actor.id;
   if(action==='challenge'){
-   const data=JSON.parse(String(p.payload||'{}')),kind=String(data.kind||''),to=String(data.to||'');if(!CM_TYPES.includes(kind))throw Error('Modo de desafio inválido');if(id===to)throw Error('Não é possível desafiar a si mesmo');const opponent=cmPerson_(db,to);
+   const data=JSON.parse(String(p.payload||'{}')),kind=String(data.kind||''),to=String(data.to||''),level=String(data.level||'iniciante');if(!CM_DISTANCES[level])throw Error('Nível inválido');if(!CM_TYPES.includes(kind))throw Error('Modo de desafio inválido');if(id===to)throw Error('Não é possível desafiar a si mesmo');const opponent=cmPerson_(db,to);
    if(kind==='mesma_turma'&&actor.house!==opponent.house)throw Error('Escolha um aluno da mesma turma');
    if(kind==='interclasses'&&actor.house===opponent.house)throw Error('Escolha uma Casa rival');
    if(kind==='entre_equipes'&&actor.team===opponent.team)throw Error('Escolha uma equipe adversária');
-   cmRate_(db,id);const challengeId=cmUuid_();cmSheet_(db,'Desafios').appendRow([challengeId,kind,id,to,CM_STATUS.CRIADOR,cmNow_(),'','','','','','','','',CM_V]);cmLog_(db,id,'challenge',{challengeId,to,kind});
+   cmRate_(db,id);const challengeId=cmUuid_();cmSheet_(db,'Desafios').appendRow([challengeId,kind,id,to,CM_STATUS.CRIADOR,cmNow_(),'','','','','','','','',CM_V+'|'+level]);cmLog_(db,id,'challenge',{challengeId,to,kind});
    result={ok:true,challenge:cmSummary_(db,cmFindChallenge_(db,challengeId).data,id)};
   }else if(action==='answer'){
    const data=JSON.parse(String(p.payload||'{}')),item=cmFindChallenge_(db,String(data.id||'')),c=item.data; if(c[3]!==id)throw Error('Apenas o destinatário pode responder');if(c[4]!==CM_STATUS.PENDENTE)throw Error('Desafio não está pendente');const yes=String(data.decision||'')==='accept';if(!yes&&String(data.decision||'')!=='decline')throw Error('Decisão inválida');
@@ -76,7 +97,7 @@ try{
   }else if(action==='submit'){
    const data=JSON.parse(String(p.payload||'{}')),item=cmFindChallenge_(db,String(data.id||'')),c=item.data;
    const isCreator=c[2]===id,asReply=c[3]===id;if(!isCreator&&!asReply)throw Error('Desafio de outro aluno');if(isCreator&&c[4]!==CM_STATUS.CRIADOR)throw Error('A primeira rodada já foi registrada');if(asReply&&c[4]!==CM_STATUS.ACEITO)throw Error('Aceite primeiro o desafio');
-   const scored=cmShots_(String(c[0]),data.shots),sh=cmSheet_(db,'Desafios');
+   const scored=cmShots_(String(c[0]),data.shots,cmLevel_(c)),sh=cmSheet_(db,'Desafios');
    sh.getRange(item.row,isCreator?10:11).setValue(scored.sum);
    sh.getRange(item.row,isCreator?12:13).setValue(JSON.stringify(scored.shots));
    if(isCreator){sh.getRange(item.row,5).setValue(CM_STATUS.PENDENTE)}
