@@ -1,4 +1,6 @@
-import {initScene} from './scene-v3.js?v=12';
+import {initScene} from './scene-v3.js?v=18';
+import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty} from './arena-difficulty.js?v=1';
+import {arenaAudio} from './arena-audio.js?v=2';
 import {online} from './online-client.js?v=3';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
@@ -7,13 +9,13 @@ const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 let house='A',view='inicio',scene=null,match=null,reticle={x:.50,y:.45},pointerStart=0,holding=false,storage=[];
 let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false;
 const TEAMS=window.CLASSMANA_TEAMS||{};
-const CIRCUITS={iniciante:[10,20,30,40,50],avancado:[30,40,50,60,80],lendario:[60,80,100,120,150]};
+
 const rand=(a,b)=>a+Math.random()*(b-a);
 function safeRead(){try{const a=JSON.parse(localStorage.getItem('classmana-archery-v2'));return Array.isArray(a)?a.filter(x=>x&&typeof x==='object').slice(-150):[]}catch{return []}}
 storage=safeRead();
 function persist(row){storage.push({...row,at:new Date().toISOString()});storage=storage.slice(-150);try{localStorage.setItem('classmana-archery-v2',JSON.stringify(storage))}catch{}renderRanking()}
 function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),3100)}
-function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}view=name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'instant'});if(name==='ranking')renderRanking()}
+function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}arenaAudio.setActive(name==='arena');view=name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'instant'});if(name==='ranking')renderRanking()}
 function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(2,'0'),name}));}
 function fillPlayer(wanted){const sel=$('player');sel.innerHTML='<option value="guest">Arqueiro convidado</option>'+choices(house).map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');if(wanted&&choices(house).some(x=>x.id===wanted))sel.value=wanted;fillRivals()}
 function fillRivals(){
@@ -74,7 +76,7 @@ function chooseArcher(g){
 }
 function selectHouse(k){
  if(!H[k])return;
- house=k;
+ house=k;arenaAudio.setHouse(k);
  document.querySelectorAll('.house').forEach(el=>{
   const active=el.dataset.house===k;
   el.classList.toggle('selected',active);el.setAttribute('aria-pressed',String(active));
@@ -114,13 +116,29 @@ function renderWind(wind){
 }
 function uiHud(){if(!match)return;
  const progress=$('range-progress'),key=match.level+':'+match.scores.length;
+ const title=$('range-trail-title'),info=$('range-mode'),badge=$('arena-mode-badge');
+ const levelInfo=LEVELS[match.level]||LEVELS.iniciante;
+ if(title)title.textContent=levelInfo.icon+' '+levelInfo.title;
+ if(info)info.textContent=levelInfo.feature;
+ if(badge){badge.textContent=match.level==='iniciante'?'🎯 ALVO FIXO':match.level==='avancado'?'↔ ALVO EM MOVIMENTO':'🛡️ ALVO MÓVEL + ESCUDOS';badge.dataset.level=match.level;}
+ $('stage').dataset.level=match.level;
  if(progress&&progress.dataset.current!==key){
    const distances=CIRCUITS[match.level]||CIRCUITS.iniciante;
    progress.innerHTML=distances.map((meters,i)=>`<span class="range-step ${i<match.scores.length?'done':i===match.scores.length?'current':''}" aria-label="Etapa ${i+1}: ${meters} metros">${i<match.scores.length?'✓':'🎯'} ${meters}m</span>`).join('');
    progress.dataset.current=key;
  }
 $('hud-player').textContent=match.player+' · '+H[match.house].grade;$('hud-bot').textContent=match.mode==='bot'?'🤖 Robô · '+({easy:'Fácil',medium:'Médio',hard:'Difícil'}[match.difficulty]):match.mode==='practice'?'🎯 Treinamento':match.incoming?'⚔️ '+byId(match.incoming.playerId):'⚔️ '+byId(match.rivalId);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);$('hud-rival').textContent=match.onlineReplay?.length?(match.onlineReplayPoints||0):match.incoming?match.incoming.score:match.mode==='bot'?'?':'—';renderWind(match.wind);$('distance').textContent='🎯 ETAPA '+Math.min(match.scores.length+1,5)+'/5 · '+Math.round(match.distance)+' METROS';$('shots').textContent='🏹 FLECHA '+Math.min(match.scores.length+1,5)+' / 5';$('power').textContent='⚡ FORÇA '+(holding?Math.round(clamp((Date.now()-pointerStart)/950,.2,1)*100):0)+'%';}
-function worldSettings(){return {distance:match?.distance||10,shift:match?.shift||0,house:match?.house||house}}
+function stageSeconds(){
+ if(!match)return 0;
+ if(Number.isFinite(match.freezeTime))return match.freezeTime;
+ return Math.min(120,Math.max(0,(performance.now()-(match.stageStartedAt||performance.now()))/1000));
+}
+function worldSettings(){
+ const level=match?.level||'iniciante',index=match?.scores?.length||0,seconds=stageSeconds();
+ const motion=targetMotion(level,index,seconds);
+ return {distance:match?.distance||10,shift:(match?.shift||0)+motion.x,verticalShift:motion.y,
+  level,shotIndex:index,seconds,house:match?.house||house};
+}
 function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house)}
 function changeTarget(){
  if(!match)return;
@@ -131,6 +149,7 @@ function changeTarget(){
  match.shift=Math.round(rand(-5,5))/100;
  match.wind=Math.round(rand(-4,4)*(.65+Math.pow(match.distance/70,.45)*.55)*10)/10;
 }
+ match.stageStartedAt=performance.now();match.freezeTime=null;
  scene?.setTargetShift(match.shift);uiHud();
 }
 async function startMatch(accepted=null){
@@ -162,7 +181,7 @@ async function startMatch(accepted=null){
  if(match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}
  if(online.user&&isDuel(mode)){userId=online.user.id;selectHouse(userId[0]);$('player').value=userId;}
  match={house:userId==='guest'?house:userId[0],playerId:userId,player:nameOf(userId),mode,difficulty:$('difficulty').value,
-  rivalId,scores:[],running:true,locked:false,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,incoming:null,
+  rivalId,scores:[],running:true,locked:false,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,freezeTime:null,stageStartedAt:performance.now(),incoming:null,
   online:challenge,onlineShots:[],onlineReplay:challenge?.recipient.id===userId?challenge.creatorShots:[],
   onlineReplayPoints:0,seed:Math.floor(rand(100000,999999))};
  reticle={x:.50,y:.45};$('finish').classList.add('hidden');
@@ -179,29 +198,36 @@ function levelScore(x,y,r){const norm=Math.hypot(x,y)/r;return norm>1?0:Math.max
 async function fire(power){
  if(!match?.running||match.locked||match.scores.length>=5)return;
  const currentMatch=match,shotIndex=match.scores.length;
+ match.freezeTime=stageSeconds();
  match.locked=true;holding=false;$('stage').classList.remove('aiming');
+ arenaAudio.play('release');
  const w=$('stage').clientWidth,h=$('stage').clientHeight;
  const t=scene?.getTargetMetrics?.()||{x:w*(.5+match.shift),y:h*.45,r:Math.min(h*.105,w*.082)};
  const sight=scene?.getAimPoint?.();
  if(!sight||!Number.isFinite(sight.x)||!Number.isFinite(sight.y)){match.locked=false;return toast('A mira ainda não está pronta.');}
  const dx=(sight.x*w-t.x)/t.r,dy=(sight.y*h-t.y)/t.r;
  // Round scores online are calculated again by Apps Script using these normalized offsets.
- if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power});
- const distanceFactor=Math.pow(Math.max(10,match.distance)/30,.55);
+ if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power,time:match.freezeTime});
+ const distanceFactor=distanceDifficulty(match.distance);
  const drift=match.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
  const jitter=match.online?0:(1-power)*t.r*.14*Math.min(2,distanceFactor);
  const ix=sight.x*w+drift+rand(-.08,.08)*jitter;
  const iy=sight.y*h+fall+rand(-.06,.06)*jitter;
- const score=levelScore(ix-t.x,iy-t.y,t.r);
- $('stage').classList.add('firing');
+ const impactDx=(ix-t.x)/t.r,impactDy=(iy-t.y)/t.r;
+ const blocked=obstacleBlocks(match.level,shotIndex,match.freezeTime,impactDx,impactDy);
+ const score=blocked?0:levelScore(ix-t.x,iy-t.y,t.r);
+ $('stage').classList.add('firing');arenaAudio.play('fly');
  try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
  catch(e){console.warn('Animação da flecha:',e)}
  $('stage').classList.remove('firing');
  if(match!==currentMatch||!currentMatch.running)return;
- scene?.impact?.({x:ix/w,y:iy/h,score});
+ scene?.impact?.({x:ix/w,y:iy/h,score,blocked});
  match.scores.push(score);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);
- showHit(score,ix/w,iy/h);
- if(score===10)toast('🎯 ACERTO PERFEITO! +10 pontos');
+ showHit(score,ix/w,iy/h,blocked);
+ if(blocked){arenaAudio.play('block');toast('🛡️ O ESCUDO DEFENDEU O ALVO!');}
+ else if(score>=8){arenaAudio.play('applause');toast(score===10?'🎯 ACERTO PERFEITO! +10 pontos':'👏 A TORCIDA VIBROU!');}
+ else if(score===0){arenaAudio.play('boo');toast('📣 A TORCIDA REAGIU! Tente novamente.');}
+ else arenaAudio.play('hit',score);
  // Opponent does not need to be present: replay their 5 recorded arrows now.
  const ghost=match.onlineReplay?.[shotIndex];
  if(ghost&&match.online){
@@ -219,7 +245,7 @@ async function fire(power){
  else{setTimeout(()=>{if(match===currentMatch&&currentMatch.running){changeTarget();match.locked=false;}},520);}
 }
 
-function showHit(score,x,y){const el=$('hit');el.textContent=score?'+'+score+' PONTOS':'FORA DO ALVO';el.style.left=(x*100)+'%';el.style.top=clamp(y*100-12,18,64)+'%';el.classList.remove('show');void el.offsetWidth;el.classList.add('show')}
+function showHit(score,x,y,blocked=false){const el=$('hit');el.textContent=blocked?'🛡️ ESCUDO!':score?'+'+score+' PONTOS':'FORA DO ALVO';el.style.left=(x*100)+'%';el.style.top=clamp(y*100-12,18,64)+'%';el.classList.remove('show');void el.offsetWidth;el.classList.add('show')}
 function chooseRobotScore(difficulty,playerAverage){const base={easy:5.1,medium:6.7,hard:8.15}[difficulty],adjust=clamp((playerAverage-5.5)*.17,-.7,.7);let result=clamp(base+adjust+rand(-3.3,3.3),0,10);return result>=9.25?10:result>=7?8:result>=5?6:result>=3?4:result>=1.5?2:0;}
 async function finishMatch(){
  if(!match||match.scores.length<5)return;
@@ -255,6 +281,7 @@ async function finishMatch(){
     desc='Resultado salvo: '+total+' pontos contra '+rival+' pontos de '+(isCreator?ch.recipient.name:ch.creator.name)+'.';
    }
    $('finish-title').textContent=title;$('finish-desc').textContent=desc;
+   if(title.includes('VITÓRIA'))arenaAudio.play('victory');
    $('finish-results').textContent='🎯 VOCÊ '+total+' PTS   ⚔️ ADVERSÁRIO '+(rival===null?'AGUARDANDO':rival+' PTS');
    $('share-help').textContent='✅ Resultado persistido na planilha online. Nenhum link manual é necessário.';
    $('hud-score').textContent=total;$('hud-rival').textContent=rival===null?'—':rival;
@@ -455,7 +482,7 @@ $('my-team').addEventListener('change',()=>{
  if(mate){$('player').value=mate.id;loginStudent().catch(console.warn)}
  fillRivals();
 });$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{match.running=false;startMatch()});$('share-result').addEventListener('click',()=>{if(match?.onlineSaveFailed)finishMatch();else if(!match?.online)share()});
-const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.running||match.locked)return;e.preventDefault();world.setPointerCapture(e.pointerId);holding=true;pointerStart=Date.now();aim(e);scene?.setPower(.28);$('stage').classList.add('aiming');$('instruction').textContent='ARRASTE PARA MOVER O ARCO • SOLTE PARA ATIRAR'});world.addEventListener('pointermove',e=>{if(!match?.running||match.locked)return;if(holding||e.pointerType==='mouse')aim(e);if(holding)scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1))});world.addEventListener('pointerup',e=>{if(!holding)return;e.preventDefault();aim(e);holding=false;$('stage').classList.remove('aiming');$('instruction').textContent='MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';const p=clamp((Date.now()-pointerStart)/950,.28,1);scene?.setPower(p);fire(p);uiHud()});world.addEventListener('pointercancel',()=>{holding=false;$('stage').classList.remove('aiming');scene?.setPower(0)});
+const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.running||match.locked)return;e.preventDefault();world.setPointerCapture(e.pointerId);holding=true;pointerStart=Date.now();aim(e);scene?.setPower(.28);$('stage').classList.add('aiming');arenaAudio.play('draw');$('instruction').textContent='ARRASTE PARA MOVER O ARCO • SOLTE PARA ATIRAR'});world.addEventListener('pointermove',e=>{if(!match?.running||match.locked)return;if(holding||e.pointerType==='mouse')aim(e);if(holding)scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1))});world.addEventListener('pointerup',e=>{if(!holding)return;e.preventDefault();aim(e);holding=false;$('stage').classList.remove('aiming');$('instruction').textContent='MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';const p=clamp((Date.now()-pointerStart)/950,.28,1);scene?.setPower(p);fire(p);uiHud()});world.addEventListener('pointercancel',()=>{holding=false;$('stage').classList.remove('aiming');scene?.setPower(0)});
 document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.1,.9);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.1,.9);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.08,.92);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.08,.92);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
 setInterval(()=>{if(holding){scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1));uiHud()}},90);
 
