@@ -1,0 +1,35 @@
+name: Importar brasões oficiais para o próprio repositório
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-crests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  copiar-brasoes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copiar os três brasões sem alterar o Painel das Casas
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/images
+          src="https://raw.githubusercontent.com/drjcs2020/Painel-das-Casas-Classmana/main/assets/images"
+          for file in brasao-4a-transparente.png arte-028.png arte-029.png; do
+            if [ ! -s "assets/images/$file" ]; then
+              curl --fail --location --retry 3 --silent --show-error "$src/$file" -o "assets/images/$file"
+            fi
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/images/brasao-4a-transparente.png assets/images/arte-028.png assets/images/arte-029.png
+          if ! git diff --cached --quiet; then
+            git commit -m "assets: guardar brasões oficiais no repositório independente"
+            git push
+          fi
