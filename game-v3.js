@@ -91,14 +91,18 @@ function renderWind(wind){
  widget.querySelector('.wind-direction-text').textContent=direction;
  widget.setAttribute('aria-label','Vento: '+speed.toFixed(1).replace('.',',')+' quilômetros por hora. '+direction.toLowerCase()+'.');
 }
-function uiHud(){if(!match)return;$('hud-player').textContent=match.player+' · '+H[match.house].grade;$('hud-bot').textContent=match.mode==='bot'?'🤖 Robô · '+({easy:'Fácil',medium:'Médio',hard:'Difícil'}[match.difficulty]):match.mode==='practice'?'🎯 Treinamento':match.incoming?'⚔️ '+byId(match.incoming.playerId):'⚔️ '+byId(match.rivalId);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);$('hud-rival').textContent=match.onlineReplay?.length?(match.onlineReplayPoints||0):match.incoming?match.incoming.score:match.mode==='bot'?'?':'—';renderWind(match.wind);$('distance').textContent='🎯 '+Math.round(match.distance)+' METROS';$('shots').textContent='🏹 FLECHA '+Math.min(match.scores.length+1,5)+' / 5';$('power').textContent='⚡ FORÇA '+(holding?Math.round(clamp((Date.now()-pointerStart)/950,.2,1)*100):0)+'%';}
-function worldSettings(){return {distance:match?.distance||25,shift:match?.shift||0,house:match?.house||house}}
+function uiHud(){if(!match)return;$('hud-player').textContent=match.player+' · '+H[match.house].grade;$('hud-bot').textContent=match.mode==='bot'?'🤖 Robô · '+({easy:'Fácil',medium:'Médio',hard:'Difícil'}[match.difficulty]):match.mode==='practice'?'🎯 Treinamento':match.incoming?'⚔️ '+byId(match.incoming.playerId):'⚔️ '+byId(match.rivalId);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);$('hud-rival').textContent=match.onlineReplay?.length?(match.onlineReplayPoints||0):match.incoming?match.incoming.score:match.mode==='bot'?'?':'—';renderWind(match.wind);$('distance').textContent='🎯 ETAPA '+Math.min(match.scores.length+1,5)+'/5 · '+Math.round(match.distance)+' METROS';$('shots').textContent='🏹 FLECHA '+Math.min(match.scores.length+1,5)+' / 5';$('power').textContent='⚡ FORÇA '+(holding?Math.round(clamp((Date.now()-pointerStart)/950,.2,1)*100):0)+'%';}
+function worldSettings(){return {distance:match?.distance||10,shift:match?.shift||0,house:match?.house||house}}
 function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house)}
 function changeTarget(){
  if(!match)return;
  const cfg=match.online?.settings?.[match.scores.length];
  if(cfg){match.distance=cfg.distance;match.shift=cfg.shift;match.wind=cfg.wind;}
- else{match.distance=24+match.scores.length*2.3;match.shift=Math.round(rand(-8,8))/100;match.wind=Math.round(rand(-4,4)*10)/10;}
+ else{
+ match.distance=CIRCUITS[match.level]?.[match.scores.length]||CIRCUITS.iniciante[match.scores.length];
+ match.shift=Math.round(rand(-5,5))/100;
+ match.wind=Math.round(rand(-4,4)*(.65+Math.pow(match.distance/70,.45)*.55)*10)/10;
+}
  scene?.setTargetShift(match.shift);uiHud();
 }
 async function startMatch(accepted=null){
@@ -120,14 +124,14 @@ async function startMatch(accepted=null){
   }else if(fromInbox.recipient.id!==userId&&fromInbox.creator.id!==userId){toast('Esse desafio não pertence à sua conta.');return;}
   try{
    onlineLoading=true;$('start-game').disabled=true;$('start-game').textContent='⏳ PREPARANDO DESAFIO ONLINE...';
-   challenge=fromInbox||await online.create(duelKind(mode),rivalId);
+   challenge=fromInbox||await online.create(duelKind(mode),rivalId,$('challenge-level').value);
   }catch(error){toast('Não foi possível criar o desafio: '+error.message);return}
   finally{onlineLoading=false;$('start-game').disabled=false;$('start-game').innerHTML='🏹 INICIAR PARTIDA <span>➜</span>'}
  }
  if(match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}
  if(online.user&&isDuel(mode)){userId=online.user.id;selectHouse(userId[0]);$('player').value=userId;}
  match={house:userId==='guest'?house:userId[0],playerId:userId,player:nameOf(userId),mode,difficulty:$('difficulty').value,
-  rivalId,scores:[],running:true,locked:false,wind:0,distance:25,shift:0,incoming:null,
+  rivalId,scores:[],running:true,locked:false,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,incoming:null,
   online:challenge,onlineShots:[],onlineReplay:challenge?.recipient.id===userId?challenge.creatorShots:[],
   onlineReplayPoints:0,seed:Math.floor(rand(100000,999999))};
  reticle={x:.50,y:.45};$('finish').classList.add('hidden');
@@ -152,8 +156,9 @@ async function fire(power){
  const dx=(sight.x*w-t.x)/t.r,dy=(sight.y*h-t.y)/t.r;
  // Round scores online are calculated again by Apps Script using these normalized offsets.
  if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power});
- const drift=match.wind*t.r*.040,fall=(1-power)*t.r*.70;
- const jitter=match.online?0:(1-power)*t.r*.14;
+ const distanceFactor=Math.pow(Math.max(10,match.distance)/30,.55);
+ const drift=match.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
+ const jitter=match.online?0:(1-power)*t.r*.14*Math.min(2,distanceFactor);
  const ix=sight.x*w+drift+rand(-.08,.08)*jitter;
  const iy=sight.y*h+fall+rand(-.06,.06)*jitter;
  const score=levelScore(ix-t.x,iy-t.y,t.r);
