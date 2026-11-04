@@ -1,4 +1,4 @@
-import {initScene} from './scene-v3.js?v=21';
+import {initScene} from './scene-v3.js?v=22';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
@@ -236,7 +236,12 @@ function updateReticle(){
   // Mouse/touch drives the bow. There is no second, independent crosshair.
   scene?.setAim(reticle.x,reticle.y);
 }
-function aim(e){const rect=$('stage').getBoundingClientRect();reticle.x=clamp((e.clientX-rect.left)/rect.width,.08,.95);reticle.y=clamp((e.clientY-rect.top)/rect.height,.11,.91);updateReticle()}
+function aim(e){
+ const rect=$('stage').getBoundingClientRect();
+ reticle.x=clamp((e.clientX-rect.left)/rect.width,.16,.73);
+ reticle.y=clamp((e.clientY-rect.top)/rect.height,.17,.82);
+ updateReticle();
+}
 function levelScore(x,y,r){const norm=Math.hypot(x,y)/r;return norm>1?0:Math.max(1,10-Math.floor(norm*10))}
 async function fire(power){
  if(!match?.running||match.locked||match.scores.length>=5)return;
@@ -542,7 +547,7 @@ $('my-team').addEventListener('change',()=>{
  fillRivals();
 });$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{match.running=false;startMatch()});$('share-result').addEventListener('click',()=>{if(match?.onlineSaveFailed)finishMatch();else if(!match?.online)share()});
 const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.running||match.locked)return;e.preventDefault();world.setPointerCapture(e.pointerId);holding=true;pointerStart=Date.now();aim(e);scene?.setPower(.28);$('stage').classList.add('aiming');arenaAudio.play('draw');$('instruction').textContent='ARRASTE PARA MOVER O ARCO • SOLTE PARA ATIRAR'});world.addEventListener('pointermove',e=>{if(!match?.running||match.locked)return;if(holding||e.pointerType==='mouse')aim(e);if(holding)scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1))});world.addEventListener('pointerup',e=>{if(!holding)return;e.preventDefault();aim(e);holding=false;$('stage').classList.remove('aiming');$('instruction').textContent='MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';const p=clamp((Date.now()-pointerStart)/950,.28,1);scene?.setPower(p);fire(p);uiHud()});world.addEventListener('pointercancel',()=>{holding=false;$('stage').classList.remove('aiming');scene?.setPower(0)});
-document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.1,.9);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.1,.9);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.08,.92);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.08,.92);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
+document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.17,.82);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.17,.82);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.16,.73);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.16,.73);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
 setInterval(()=>{if(holding){scene?.setPower(clamp((Date.now()-pointerStart)/950,.28,1));uiHud()}},90);
 
 $('open-inbox').addEventListener('click',openInbox);
