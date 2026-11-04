@@ -91,7 +91,14 @@ function renderWind(wind){
  widget.querySelector('.wind-direction-text').textContent=direction;
  widget.setAttribute('aria-label','Vento: '+speed.toFixed(1).replace('.',',')+' quilômetros por hora. '+direction.toLowerCase()+'.');
 }
-function uiHud(){if(!match)return;$('hud-player').textContent=match.player+' · '+H[match.house].grade;$('hud-bot').textContent=match.mode==='bot'?'🤖 Robô · '+({easy:'Fácil',medium:'Médio',hard:'Difícil'}[match.difficulty]):match.mode==='practice'?'🎯 Treinamento':match.incoming?'⚔️ '+byId(match.incoming.playerId):'⚔️ '+byId(match.rivalId);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);$('hud-rival').textContent=match.onlineReplay?.length?(match.onlineReplayPoints||0):match.incoming?match.incoming.score:match.mode==='bot'?'?':'—';renderWind(match.wind);$('distance').textContent='🎯 ETAPA '+Math.min(match.scores.length+1,5)+'/5 · '+Math.round(match.distance)+' METROS';$('shots').textContent='🏹 FLECHA '+Math.min(match.scores.length+1,5)+' / 5';$('power').textContent='⚡ FORÇA '+(holding?Math.round(clamp((Date.now()-pointerStart)/950,.2,1)*100):0)+'%';}
+function uiHud(){if(!match)return;
+ const progress=$('range-progress'),key=match.level+':'+match.scores.length;
+ if(progress&&progress.dataset.current!==key){
+   const distances=CIRCUITS[match.level]||CIRCUITS.iniciante;
+   progress.innerHTML=distances.map((meters,i)=>`<span class="range-step ${i<match.scores.length?'done':i===match.scores.length?'current':''}" aria-label="Etapa ${i+1}: ${meters} metros">${i<match.scores.length?'✓':'🎯'} ${meters}m</span>`).join('');
+   progress.dataset.current=key;
+ }
+$('hud-player').textContent=match.player+' · '+H[match.house].grade;$('hud-bot').textContent=match.mode==='bot'?'🤖 Robô · '+({easy:'Fácil',medium:'Médio',hard:'Difícil'}[match.difficulty]):match.mode==='practice'?'🎯 Treinamento':match.incoming?'⚔️ '+byId(match.incoming.playerId):'⚔️ '+byId(match.rivalId);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);$('hud-rival').textContent=match.onlineReplay?.length?(match.onlineReplayPoints||0):match.incoming?match.incoming.score:match.mode==='bot'?'?':'—';renderWind(match.wind);$('distance').textContent='🎯 ETAPA '+Math.min(match.scores.length+1,5)+'/5 · '+Math.round(match.distance)+' METROS';$('shots').textContent='🏹 FLECHA '+Math.min(match.scores.length+1,5)+' / 5';$('power').textContent='⚡ FORÇA '+(holding?Math.round(clamp((Date.now()-pointerStart)/950,.2,1)*100):0)+'%';}
 function worldSettings(){return {distance:match?.distance||10,shift:match?.shift||0,house:match?.house||house}}
 function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house)}
 function changeTarget(){

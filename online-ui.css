@@ -80,3 +80,17 @@ body:before{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,245
 @keyframes cmHeroAppear{from{opacity:.2;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:750px){.hero-preview{padding:10px;gap:8px}.hero-preview img{width:110px;height:150px}.hero-preview strong{font-size:20px}.hero-preview p{font-size:12px}.hero-preview span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.house-figure img,.hero-preview img{animation:none!important}}
+
+/* Progresso real da rodada: o aluno enxerga a distância de cada flecha. */
+.range-progress{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+.range-step{min-width:96px;text-align:center;padding:7px 10px;border-radius:30px;border:2px solid #95c6cd;
+ background:linear-gradient(180deg,rgba(255,255,255,.93),rgba(213,244,255,.89));color:#286078;
+ box-shadow:0 3px 8px #12566b18;font-weight:1000;font-size:14px}
+.range-step.current{background:linear-gradient(180deg,#ffeaa0,#ffb84f);border-color:#ffb342;color:#573714;
+ transform:scale(1.06);box-shadow:0 0 18px #ffd573cc}
+.range-step.done{background:linear-gradient(180deg,#a4f2cc,#60d6a3);color:#115b40;border-color:#30b681}
+.cm-identity-warning{font-size:11px!important;color:#705729!important;opacity:.83}
+.cm-easy-setup{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.cm-easy-setup>label{min-width:0}
+.cm-easy-setup select{width:100%;max-width:100%;font-size:14px!important;min-height:47px}
+@media(max-width:720px){.range-step{min-width:55px;font-size:11px;padding:6px 7px}.range-progress{gap:4px}}
