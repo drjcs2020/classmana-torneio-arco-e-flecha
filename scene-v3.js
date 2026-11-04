@@ -17,9 +17,10 @@ export function initScene(canvas, getSettings) {
   const parent=canvas.parentElement;
   let pc=null, app=null, gl=null, camera=null, bowRoot=null, bowHandle=null, bowString=null, sightAnchor=null,
       arrowLoaded=null, targetRoot=null, impactMarks=[], currentHouse='A', ready=false, destroyed=false,
-      aimX=.5, aimY=.46, power=.3, projectile=null, pendingShot=null, animT=0;
+      aimX=.5, aimY=.46, power=.3, projectile=null, pendingShot=null, animT=0,
+      equipment={bow:'classico',arrow:'rubi'};
   const ctx=canvas.getContext('2d', {alpha:true});
-  const state={kind:'Cenário ilustrado',setHouse, setTargetShift, setAim, setPower,
+  const state={kind:'Cenário ilustrado',setHouse, setEquipment, setTargetShift, setAim, setPower,
     getTargetMetrics, getAimPoint, fire, impact, destroy};
   const root=()=>app.root;
   const canvasSize=()=>({w:parent.clientWidth||1050,h:parent.clientHeight||540});
@@ -56,6 +57,28 @@ export function initScene(canvas, getSettings) {
     const sight=fallbackSightGeometry();
     return {x:sight.sightX/w,y:sight.sightY/h};
   }
+  function bowPalette(){
+    const base=palettes[currentHouse];
+    if(equipment.bow==='real')return {...base,body:'#543527',trim:'#f6c14f'};
+    if(equipment.bow==='vento')return {...base,body:'#4d899c',trim:'#d7edf2'};
+    return base;
+  }
+  function arrowPalette(){
+    if(equipment.arrow==='esmeralda')return {feather:'#22b78c',secondary:'#b5f9d8'};
+    if(equipment.arrow==='solar')return {feather:'#e2a720',secondary:'#fff2a1'};
+    return {feather:'#e44037',secondary:'#faf0db'};
+  }
+  function setEquipment(next={}){
+    const bow=['classico','real','vento'].includes(next.bow)?next.bow:'classico',
+      arrow=['rubi','esmeralda','solar'].includes(next.arrow)?next.arrow:'rubi';
+    if(bow===equipment.bow&&arrow===equipment.arrow)return;
+    const rebuild=bow!==equipment.bow;equipment={bow,arrow};
+    if(ready&&rebuild&&bowRoot){
+      bowRoot.destroy();bowRoot=null;bowString=null;arrowLoaded=null;sightAnchor=null;
+      buildBow();
+    }
+    if(ready)colorBow();
+  }
   function setHouse(k){currentHouse=palettes[k]?k:'A';parent.classList.remove('house-a','house-b','house-c');parent.classList.add('house-'+currentHouse.toLowerCase());
     if(ready){colorBow();colorTarget();}}
   function setTargetShift(){if(ready){moveTarget();for(const old of impactMarks)old.destroy();impactMarks=[];}}
@@ -70,7 +93,7 @@ export function initScene(canvas, getSettings) {
     const {w,h}=canvasSize(),dpr=Math.min(2,devicePixelRatio||1),dw=Math.round(w*dpr),dh=Math.round(h*dpr);
     if(canvas.width!==dw||canvas.height!==dh){canvas.width=dw;canvas.height=dh;}
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-    const p=palettes[currentHouse],m=getTargetMetrics();
+    const p=bowPalette(),m=getTargetMetrics();
     // A perspective firing lane, scenic image stays visible around it.
     const grass=ctx.createLinearGradient(0,h*.59,0,h);
     grass.addColorStop(0,'rgba(25,88,45,.10)');grass.addColorStop(.6,'rgba(23,70,35,.29)');grass.addColorStop(1,'rgba(12,46,25,.62)');
@@ -109,8 +132,8 @@ export function initScene(canvas, getSettings) {
     // Shared black arrow, white/red feathers. Drawn from nocking point toward the target.
     ctx.strokeStyle='#11151d';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(bx+pull+140,by+110);ctx.lineTo(bx-48,by-38);ctx.stroke();
     ctx.strokeStyle='#9baab4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bx+pull+135,by+109);ctx.lineTo(bx-48,by-38);ctx.stroke();
-    ctx.fillStyle='#c12e28';ctx.beginPath();ctx.moveTo(bx+pull+140,by+110);ctx.lineTo(bx+pull+118,by+66);ctx.lineTo(bx+pull+100,by+82);ctx.closePath();ctx.fill();
-    ctx.fillStyle='#f7efe1';ctx.beginPath();ctx.moveTo(bx+pull+140,by+110);ctx.lineTo(bx+pull+96,by+91);ctx.lineTo(bx+pull+100,by+112);ctx.closePath();ctx.fill();
+    ctx.fillStyle=arrowPalette().feather;ctx.beginPath();ctx.moveTo(bx+pull+140,by+110);ctx.lineTo(bx+pull+118,by+66);ctx.lineTo(bx+pull+100,by+82);ctx.closePath();ctx.fill();
+    ctx.fillStyle=arrowPalette().secondary;ctx.beginPath();ctx.moveTo(bx+pull+140,by+110);ctx.lineTo(bx+pull+96,by+91);ctx.lineTo(bx+pull+100,by+112);ctx.closePath();ctx.fill();
     ctx.restore();
     requestAnimationFrame(renderFallback);
   }
@@ -191,10 +214,11 @@ export function initScene(canvas, getSettings) {
     const t=new pc.Texture(app.graphicsDevice,{width:512,height:512,format:pc.PIXELFORMAT_RGBA8,mipmaps:true});t.setSource(c);return t;
   }
   function colorBow(){if(!bowRoot)return;
-    const p=palettes[currentHouse];const body=material(p.body,{metal:.72,rough:.20}),trim=material(p.trim,{metal:.83,rough:.20});
+    const p=bowPalette();const body=material(p.body,{metal:.72,rough:.20}),trim=material(p.trim,{metal:.83,rough:.20}),vane=arrowPalette();
+    const arrowPrimary=material(vane.feather,{metal:.07,rough:.38}),arrowSecondary=material(vane.secondary,{metal:.07,rough:.38});
     for(const e of bowRoot.findComponents('render')){
       const name=e.entity.name.toLowerCase();
-      const replacement=name.includes('bow-limb')||name.includes('bow-riser')?body:name.includes('bow-trim')||name.includes('bow-crystal')?trim:null;
+      const replacement=name.includes('bow-limb')||name.includes('bow-riser')?body:name.includes('bow-trim')||name.includes('bow-crystal')?trim:name.includes('shared arrow vane')?(name.endsWith('1')?arrowSecondary:arrowPrimary):null;
       if(replacement){e.material=replacement;for(const mesh of e.meshInstances)mesh.material=replacement;}
     }
   }
@@ -264,10 +288,10 @@ export function initScene(canvas, getSettings) {
   function buildBow(){
     bowRoot=new pc.Entity('Modern competition recurve bow');
     camera.addChild(bowRoot);bowRoot.setLocalPosition(.61,-.28,-2.08);
-    const pp=palettes[currentHouse],body=material(pp.body,{metal:.79,rough:.19}),gold=material(pp.trim,{metal:.9,rough:.18}),
+    const pp=bowPalette(),body=material(pp.body,{metal:.79,rough:.19}),gold=material(pp.trim,{metal:.9,rough:.18}),
       dark=material('#1b1c20',{metal:.46,rough:.35}),silver=material('#d5e0e7',{metal:.88,rough:.23}),red=material('#dc342a'),ivory=material('#faf0db');
     const p=[[0,-1.52,0],[.045,-1.35,0],[.12,-.99,.035],[.105,-.55,.02],[.055,-.16,0],[.018,.18,0],[.075,.62,.02],[.09,1,.02],[.02,1.37,.02],[0,1.52,0]];
-    tube('bow-limb curved compound',p,p.map((_,i)=>i===4||i===5?.07:.038),body,bowRoot,16);
+    tube('bow-limb curved compound',p,p.map((_,i)=>(i===4||i===5?.07:.038)*(equipment.bow==='real'?1.32:equipment.bow==='vento'?.73:1)),body,bowRoot,16);
     tube('bow-trim upper line',[[.062,.25,-.028],[.115,.88,-.021],[.05,1.39,.025]],[.01,.011,.007],gold,bowRoot);
     tube('bow-trim lower line',[[.062,-.2,-.028],[.118,-.90,-.021],[.04,-1.36,.025]],[.01,.011,.007],gold,bowRoot);
     const grip=primitive('cylinder','ergonomic dark handgrip',[.03,-.12,-.08],[.17,.43,.13],dark,bowRoot,[0,0,90]);
@@ -283,10 +307,10 @@ export function initScene(canvas, getSettings) {
     arrowLoaded=new pc.Entity('Shared red-and-white arrow');bowRoot.addChild(arrowLoaded);arrowLoaded.setLocalPosition(.02,-.03,-.40);
     tube('black arrow shaft',[[0,0,.53],[0,0,.18],[0,0,-.65]],[.012,.012,.011],dark,arrowLoaded,12);
     primitive('cone','machined arrow point',[0,0,-.70],[.036,.09,.036],silver,arrowLoaded,[90,0,0]);
-    const fin=[[.0,.0,.47],[.076,.042,.26],[0,0,.16]];
+    const fin=[[.0,.0,.47],[.076,.042,.26],[0,0,.16]],vanes=arrowPalette(),primary=material(vanes.feather),secondary=material(vanes.secondary);
     for(let i=0;i<3;i++){
       const a=i*Math.PI*2/3;
-      tube('shared arrow vane '+i,fin.map(([x,y,z])=>[x*Math.cos(a)-y*Math.sin(a),x*Math.sin(a)+y*Math.cos(a),z]),[.023,.038,.014],i===1?ivory:red,arrowLoaded,6);
+      tube('shared arrow vane '+i,fin.map(([x,y,z])=>[x*Math.cos(a)-y*Math.sin(a),x*Math.sin(a)+y*Math.cos(a),z]),[.023,.038,.014],i===1?secondary:primary,arrowLoaded,6);
     }
     // String gets physical tension by shifting central guide while aiming.
     bowString=tube('tensioned carbon cord',[[0,-1.51,.03],[-.11,0,.45],[0,1.51,.03]],[.004,.004,.004],dark,bowRoot,7);
