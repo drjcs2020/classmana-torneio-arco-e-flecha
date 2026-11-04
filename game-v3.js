@@ -14,24 +14,24 @@ const EQUIPMENT={
 };
 function readEquipment(){
  try{const x=JSON.parse(localStorage.getItem('classmana-archery-equipment-v1')||'{}');
-  return {bow:EQUIPMENT.bows[x.bow]?x.bow:'classico',arrow:EQUIPMENT.arrows[x.arrow]?x.arrow:'rubi'};}
+  return {bow:EQUIPMENT.bows[x.bow]?x.bow:'classico',arrow:'rubi'};}
  catch{return {bow:'classico',arrow:'rubi'}}
 }
 let equipment=readEquipment();
 function applyEquipment(){
- for(const el of document.querySelectorAll('[data-equip-bow],[data-equip-arrow]')){
+ for(const el of document.querySelectorAll('[data-equip-bow]')){
   const choice=el.dataset.equipBow??el.dataset.equipArrow;
   const active=el.dataset.equipBow?choice===equipment.bow:choice===equipment.arrow;
   el.classList.toggle('chosen',active);el.setAttribute('aria-pressed',String(active));
  }
  const status=$('equipment-summary');
- if(status)status.textContent='Seu equipamento: '+EQUIPMENT.bows[equipment.bow]+' + '+EQUIPMENT.arrows[equipment.arrow]+' · personalização visual, sem vantagem no placar.';
+ if(status)status.textContent='✓ '+EQUIPMENT.bows[equipment.bow]+' · flecha oficial igual para todos.';
  scene?.setEquipment?.(equipment);
 }
 function chooseEquipment(key,value){
  if(match?.running&&view==='arena'){toast('Personalize o equipamento antes de iniciar a próxima rodada.');return}
- if((key==='bow'&&!EQUIPMENT.bows[value])||(key==='arrow'&&!EQUIPMENT.arrows[value]))return;
- equipment={...equipment,[key]:value};
+ if(key!=='bow'||!EQUIPMENT.bows[value])return;
+ equipment={bow:value,arrow:'rubi'};
  try{localStorage.setItem('classmana-archery-equipment-v1',JSON.stringify(equipment))}catch{}
  applyEquipment();
 }
@@ -81,21 +81,17 @@ try{selectedSkins=JSON.parse(localStorage.getItem("classmana-archer-skins-v1")||
 function archerGender(){return selectedSkins[house]==="f"?"f":"m"}
 function archerImage(){return "assets/archers/"+ARCHER_SKINS[house][archerGender()]}
 function refreshArcher(){
- const female=archerGender()==="f",title=(female?"Arqueira":"Arqueiro")+" da "+H[house].name;
- const name=$('hero-preview-name'),desc=$('hero-preview-desc');
- if(name)name.textContent=H[house].name+" · "+H[house].grade;
- if(desc)desc.textContent=ARCHER_SKINS[house].desc+" Mascote da Casa: "+ARCHER_SKINS[house].mascot+".";
- for(const [gender,id] of [['m','archer-male-image'],['f','archer-female-image']]){
-  const el=$(id);if(el){el.src='assets/archers/'+ARCHER_SKINS[house][gender];el.alt=(gender==='m'?'Arqueiro':'Arqueira')+' da '+H[house].name+' com arco e aljava';}
- }
- const panel=$('hero-preview');if(panel)panel.dataset.house=house;
+ const female=archerGender()==='f',title=(female?'Arqueira':'Arqueiro')+' da '+H[house].name;
+ const titleEl=$('hero-preview-name'),desc=$('hero-preview-desc'),img=$('hero-preview-img');
+ if(titleEl)titleEl.textContent=H[house].name+' · '+H[house].grade;
+ if(desc)desc.textContent=ARCHER_SKINS[house].desc+' Mascote: '+ARCHER_SKINS[house].mascot+'.';
+ if(img){const file=archerImage();if(!img.src.endsWith(file))img.src=file;img.alt=title+' de corpo inteiro, segurando o arco';}
+ const indicator=$('archer-carousel-indicator');
+ if(indicator)indicator.textContent=female?'Arqueira · 2 de 2':'Arqueiro · 1 de 2';
+ const frame=$('hero-preview');if(frame)frame.dataset.house=house;
  const hud=$('hud-archer-image');if(hud){hud.src=archerImage();hud.alt=title;}
- document.querySelectorAll('[data-archer-gender]').forEach(btn=>{
-  const active=btn.dataset.archerGender===archerGender();
-  btn.classList.toggle('selected',active);btn.setAttribute('aria-pressed',String(active));
-  const status=btn.querySelector('.archer-card-selected');if(status)status.textContent=active?'✓ SELECIONADO':'ESCOLHER';
- });
 }
+
 function chooseArcher(g){
  if(g!=="m"&&g!=="f")return;
  selectedSkins[house]=g;try{localStorage.setItem("classmana-archer-skins-v1",JSON.stringify(selectedSkins))}catch{}
@@ -407,7 +403,7 @@ function showOnlineStatus(){
  $('online-status').classList.toggle('error',!active);
  $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🏹 Escolha seu nome na lista';
  $('online-banner').textContent=active?'🟢 PLACAR ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
- $('online-status').textContent=!online.enabled?'⚠️ Servidor de resultados não configurado.':
+ $('online-status').textContent=!online.enabled?'⚠️ Desafios online aguardam a URL /exec real do Apps Script. Treino offline disponível.':
   !active?'⏳ Consultando o placar...':user?'✅ Você pode ver seus desafios. Não há senha ou PIN.':'✅ Placar conectado. Escolha seu nome para receber desafios, sem PIN.';
  $('logout').classList.toggle('hidden',!user);
  $('open-inbox').disabled=!active;
@@ -418,7 +414,7 @@ function showOnlineStatus(){
 async function loginStudent(){
  const id=$('player').value;
  if(!id||id==='guest'){toast('Escolha seu nome na lista.');return null;}
- if(!online.enabled){toast('O placar online ainda não está configurado.');return null;}
+ if(!online.enabled){toast('Informe a URL real do Apps Script no arquivo online-config.js.');return null;}
  if(online.user?.id===id)return online.user;
  try{
   const user=await online.login(id);
@@ -515,12 +511,13 @@ document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>
  selectHouse(el.dataset.house);
  el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
 }));
-document.querySelectorAll('[data-archer-gender]').forEach(el=>el.addEventListener('click',()=>chooseArcher(el.dataset.archerGender)));
-document.querySelector('.archer-choices')?.addEventListener('keydown',e=>{
- if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
-  e.preventDefault();
-  const next=archerGender()==='m'?'f':'m';chooseArcher(next);
-  $(next==='m'?'archer-male':'archer-female').focus();
+function rotateArcher(){chooseArcher(archerGender()==='m'?'f':'m')}
+$('archer-prev').addEventListener('click',rotateArcher);
+$('archer-next').addEventListener('click',rotateArcher);
+document.querySelector('.studio-carousel')?.addEventListener('keydown',event=>{
+ if(event.key==='ArrowLeft'||event.key==='ArrowRight'){
+  event.preventDefault();rotateArcher();
+  $(event.key==='ArrowLeft'?'archer-prev':'archer-next').focus();
  }
 });
 const soundButton=$('arena-sound');
@@ -534,7 +531,6 @@ function updateSoundButton(){
 soundButton?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton()});
 updateSoundButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
-document.querySelectorAll('[data-equip-arrow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('arrow',el.dataset.equipArrow)));
 applyEquipment();
 $('mode').addEventListener('change',updateMode);
 $('player').addEventListener('change',()=>{fillRivals();if($('player').value!=='guest')loginStudent().catch(console.warn)});
