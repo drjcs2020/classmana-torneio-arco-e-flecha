@@ -111,3 +111,12 @@ footer{margin-top:25px!important;padding-top:15px!important;font-size:13px!impor
 @keyframes bird-wing{0%{opacity:.4}100%{opacity:.8}}
 @media(prefers-reduced-motion:reduce){.sky-birds .bird{animation:none!important;display:none}}
 @media(max-width:600px){.arena-sound-toggle{font-size:13px;padding:8px}.sky-birds .bird{width:39px}}
+
+.range-intro{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:12px 17px;margin:10px 0 0;border:2px solid #d9c58f;border-radius:16px;background:linear-gradient(105deg,#fffffff0,#fff8e8ec);color:#1a5368}
+.range-intro>div{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.range-intro strong{font:700 22px 'Fredoka',sans-serif}
+.range-intro span{font:800 15px 'Nunito',sans-serif}
+.range-intro .mode-badge{padding:8px 12px;font:900 14px 'Nunito',sans-serif;border:2px solid #d6bc75;border-radius:13px;background:#ffefb7;color:#664820}
+.range-intro .mode-badge[data-level="avancado"]{background:#c5e9ff;border-color:#70b7df;color:#12517b}
+.range-intro .mode-badge[data-level="lendario"]{background:#ffe0c5;border-color:#d68b63;color:#88421e}
+@media(max-width:600px){.range-intro{padding:9px}.range-intro strong{font-size:19px}.range-intro span{font-size:14px}}
