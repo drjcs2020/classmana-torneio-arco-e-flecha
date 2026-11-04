@@ -1,5 +1,5 @@
 import {initScene} from './scene-v3.js?v=18';
-import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty} from './arena-difficulty.js?v=1';
+import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=2';
 import {online} from './online-client.js?v=3';
 const $=id=>document.getElementById(id);
@@ -136,7 +136,11 @@ function stageSeconds(){
 function worldSettings(){
  const level=match?.level||'iniciante',index=match?.scores?.length||0,seconds=stageSeconds();
  const motion=targetMotion(level,index,seconds);
- return {distance:match?.distance||10,shift:(match?.shift||0)+motion.x,verticalShift:motion.y,
+ const stage=$('stage'),w=stage?.clientWidth||1050,h=stage?.clientHeight||540;
+ const distance=match?.distance||10,scale=clamp(Math.pow(30/Math.max(10,distance),.65),.31,1.75);
+ const radius=Math.min(h*.105,w*.082)*scale,rules=match?.online?.rules??6;
+ return {distance,shift:(match?.shift||0)+(rules>=5?motion.x*radius/w:0),
+  verticalShift:rules>=5?motion.y*radius/h:0,
   level,shotIndex:index,seconds,house:match?.house||house};
 }
 function ensureScene(){if(!scene)scene=initScene($('world'),worldSettings);scene.setHouse(house)}
@@ -214,8 +218,16 @@ async function fire(power){
  const ix=sight.x*w+drift+rand(-.08,.08)*jitter;
  const iy=sight.y*h+fall+rand(-.06,.06)*jitter;
  const impactDx=(ix-t.x)/t.r,impactDy=(iy-t.y)/t.r;
- const blocked=obstacleBlocks(match.level,shotIndex,match.freezeTime,impactDx,impactDy);
- const score=blocked?0:levelScore(ix-t.x,iy-t.y,t.r);
+ const flight=flightSeconds(match.distance,power);
+ const before=targetMotion(match.level,shotIndex,match.freezeTime);
+ const after=targetMotion(match.level,shotIndex,match.freezeTime+flight);
+ const rules=match.online?.rules??6;
+ const landingX=impactDx-(rules>=5?after.x-before.x:0);
+ const landingY=impactDy-(rules>=5?after.y-before.y:0);
+ const blocked=obstacleBlocks(match.level,shotIndex,match.freezeTime+flight,landingX,landingY);
+ const norm=Math.hypot(landingX,landingY);
+ const score=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
+ match.freezeTime=null; // The target keeps moving while the arrow flies.
  $('stage').classList.add('firing');arenaAudio.play('fly');
  try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
  catch(e){console.warn('Animação da flecha:',e)}
