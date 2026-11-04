@@ -1,0 +1,38 @@
+name: QA visual ClassMana
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax and file references
+        run: |
+          node --check game-v3.js
+          node --check scene-v3.js
+          node --check online-client.js
+          node --check backend/Code.gs
+          node scripts/qa-static.mjs
+      - name: Install browser test runner
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Check desktop and mobile layout + game navigation
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/classmana-http.log 2>&1 &
+          node scripts/qa-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: classmana-ui-screenshots
+          path: qa-screenshots/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -1,0 +1,34 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const read=p=>fs.readFileSync(p,'utf8');
+const index=read('index.html'),arena=read('arena.html'),game=read('game-v3.js');
+const required=['index.html','arena.html','tour-layout.css','studio.css','game-v3.js','scene-v3.js','arena-audio.js','backend/Code.gs'];
+for(const p of required)assert(fs.existsSync(p), 'Missing file: '+p);
+for(const [page,s] of [['index.html',index],['arena.html',arena]]){
+ const ids=[...s.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+ assert.equal(ids.length,new Set(ids).size,'Duplicate IDs in '+page);
+ assert(s.includes('href="tour-layout.css?v=1"'),'Viewport CSS missing in '+page);
+ assert(s.includes('id="world"'),'Arena canvas missing in '+page);
+ assert(s.includes('id="hero-preview-img"'),'Full-body archer missing in '+page);
+ assert(s.includes('id="lobby-steps"'),'Mobile steps missing in '+page);
+ assert(!s.includes('class="gear-arrow"'),'Old CSS arrow present');
+ const assetRefs=[...s.matchAll(/(?:src|href)="(assets\/[^"]+)"/g)].map(m=>m[1]);
+ for(const p of assetRefs)assert(fs.existsSync(p),'Missing asset '+p+' in '+page);
+}
+assert(index.includes('data-page="lobby"'),'Homepage marker missing');
+assert(arena.includes('data-page="arena"'),'Arena page marker missing');
+assert(!index.includes('<b>ClassMana</b>'),'Duplicate brand text');
+assert.equal((index.match(/data-house="[ABC]"/g)||[]).length>=3,true,'Three houses missing');
+assert.equal((index.match(/data-equip-bow=/g)||[]).length,3,'Three bows missing');
+const ids=[...index.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+const missing=[...game.matchAll(/\$\('([^']+)'\)/g)].map(m=>m[1]).filter(id=>!ids.includes(id));
+assert.deepEqual([...new Set(missing)],[],'Broken game DOM selectors');
+for(const imp of [...game.matchAll(/from '\.\/(.*?)'/g)])assert(fs.existsSync(imp[1].split('?')[0]),'Missing JS module '+imp[1]);
+assert(game.includes("window.location.assign('./arena.html')"),'Arena navigation missing');
+assert(game.includes('cm_active_archery_match_v1'),'Match handoff missing');
+assert(read('arena-difficulty.js').includes('obstacleBlocks'),'Hard obstacle logic missing');
+assert(read('online-client.js').includes('Number(ping.api)<6'),'Server version validation missing');
+const config=read('online-config.js');
+console.log('✅ UI structure, asset refs, modules and IDs: passed');
+if(config.includes('macros/s/.../exec'))console.warn('⚠️ Online tournament not connected: missing real Apps Script /exec URL');

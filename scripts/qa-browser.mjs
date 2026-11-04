@@ -1,0 +1,58 @@
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const base='http://127.0.0.1:8765/';
+fs.mkdirSync('qa-screenshots',{recursive:true});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-gpu']});
+const errors=[];
+async function record(page,label){
+ const overflow=await page.evaluate(()=>Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)-window.innerHeight);
+ assert(overflow<=3, label+' has vertical page scrolling: '+overflow+'px');
+ await page.screenshot({path:'qa-screenshots/'+label+'.png',fullPage:false});
+}
+try{
+ const page=await browser.newPage({viewport:{width:1366,height:768},deviceScaleFactor:1});
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base,{waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(1100);
+ assert.equal(await page.locator('body').getAttribute('data-page'),'lobby');
+ await record(page,'lobby-desktop');
+ await page.locator('[data-house="B"]').click();
+ assert.equal(await page.locator('[data-house="B"]').getAttribute('aria-pressed'),'true');
+ await page.locator('#archer-next').click();
+ assert.match(await page.locator('#hero-preview-img').getAttribute('src'),/leao-feminino\.webp$/);
+ await page.locator('[data-equip-bow="real"]').click();
+ assert.equal(await page.locator('[data-equip-bow="real"]').getAttribute('aria-pressed'),'true');
+ await page.locator('#mode').selectOption('practice');
+ await page.locator('#challenge-level').selectOption('lendario');
+ assert.match(await page.locator('#lobby-course').getAttribute('aria-label'),/150/);
+ await page.locator('#start-game').click();
+ await page.waitForURL('**/arena.html',{timeout:18000});
+ await page.locator('#view-arena.active').waitFor({timeout:12000});
+ await page.waitForTimeout(700);
+ await record(page,'arena-desktop');
+ assert.equal(await page.locator('body').getAttribute('data-page'),'arena');
+ assert(await page.locator('#world').isVisible());
+ assert.equal(await page.locator('#stage').getAttribute('data-level'),'lendario');
+ await page.locator('#leave-arena').click();
+ await page.waitForURL(base,{timeout:12000});
+ await page.close();
+ const phone=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
+ phone.on('pageerror',e=>errors.push(e.message));
+ await phone.goto(base,{waitUntil:'domcontentloaded'});await phone.waitForTimeout(850);
+ await record(phone,'lobby-mobile-realm');
+ await phone.locator('[data-house="C"]').click();
+ assert.equal(await phone.locator('#view-inicio').getAttribute('data-step'),'heroi');
+ await record(phone,'lobby-mobile-character');
+ await phone.locator('[data-lobby-step="partida"]').click();
+ await record(phone,'lobby-mobile-match');
+ await phone.locator('#mode').selectOption('practice');
+ await phone.locator('#start-game').click();
+ await phone.waitForURL('**/arena.html',{timeout:18000});
+ await phone.locator('#view-arena.active').waitFor({timeout:12000});
+ await record(phone,'arena-mobile');
+ await phone.close();
+ assert.deepEqual(errors,[],'Browser JavaScript exceptions');
+ console.log('✅ Desktop and phone: two pages, no page scroll, archer carousel, bows, gameplay navigation.');
+}catch(error){console.error('❌ Browser QA failed:',error);console.error('Page exceptions',errors);process.exitCode=1}
+finally{await browser.close()}
