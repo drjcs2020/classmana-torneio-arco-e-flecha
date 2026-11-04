@@ -45,7 +45,7 @@ class ArcheryOnline {
   throw Error('O servidor não confirmou a gravação. Consulte seus desafios antes de tentar novamente.');
  }
  async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
-  if(Number(ping.api)<3)throw Error('Apps Script antigo: atualize o Code.gs e publique uma nova versão (sem PIN e com circuitos até 150m).');
+  if(Number(ping.api)<6)throw Error('Apps Script desatualizado: publique a versão 6 do backend/Code.gs na implantação existente.');
   this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
  }
