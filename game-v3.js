@@ -173,7 +173,7 @@ async function fire(power){
  const iy=sight.y*h+fall+rand(-.06,.06)*jitter;
  const score=levelScore(ix-t.x,iy-t.y,t.r);
  $('stage').classList.add('firing');
- try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1050))]);}
+ try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
  catch(e){console.warn('Animação da flecha:',e)}
  $('stage').classList.remove('firing');
  if(match!==currentMatch||!currentMatch.running)return;
@@ -186,7 +186,7 @@ async function fire(power){
  if(ghost&&match.online){
   $('instruction').textContent='🏹 DISPARO DO ADVERSÁRIO • RECONSTITUIÇÃO DA RODADA SALVA';
   const px=(t.x+ghost.impactDx*t.r)/w,py=(t.y+ghost.impactDy*t.r)/h;
-  try{await Promise.race([scene?.fire?.({x:px,y:py,power:ghost.power||1}),new Promise(resolve=>setTimeout(resolve,950))]);}catch(e){console.warn('Replay:',e)}
+  try{await Promise.race([scene?.fire?.({x:px,y:py,power:ghost.power||1}),new Promise(resolve=>setTimeout(resolve,1700))]);}catch(e){console.warn('Replay:',e)}
   if(match!==currentMatch||!currentMatch.running)return;
   scene?.impact?.({x:px,y:py,score:ghost.score});
   match.onlineReplayPoints+=Number(ghost.score)||0;

@@ -347,7 +347,9 @@ export function initScene(canvas, getSettings) {
     const end=new pc.Vec3(toX,toY,target.z+.42*scale);
     if(arrowLoaded)arrowLoaded.enabled=false;
     projectile.enabled=true;projectile.setPosition(start);projectile.setEulerAngles(0,0,0);
-    return new Promise(resolve=>{pendingShot={start,end,elapsed:0,duration: .47+(.15*(1-shotPower)),done:resolve};});
+    const meters=getSettings()?.distance||30;
+    const duration=.43+.42*Math.pow(Math.max(10,meters)/80,.56)+.13*(1-shotPower);
+    return new Promise(resolve=>{pendingShot={start,end,elapsed:0,duration,done:resolve};});
   }
 
   (async()=>{
