@@ -5,6 +5,15 @@
 const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
 let ctx=null,bus=null,active=false,timer=null,house='A';
 let enabled=localStorage.getItem('cm_arena_sound')!=='off';
+const clips={};
+function soundClip(name){
+ if(!enabled)return;
+ try{
+  const audio=clips[name]||(clips[name]=new Audio('assets/sounds/'+name+'.mp3'));
+  audio.pause();audio.currentTime=0;audio.volume=name==='vitoria'?.25:.18;
+  audio.play().catch(()=>{});
+ }catch{}
+}
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function init(){
  if(!enabled||!AudioContextCtor)return null;
@@ -56,7 +65,7 @@ export const arenaAudio={
  setActive(value){active=!!value;ambience()},
  toggle(){
   enabled=!enabled;localStorage.setItem('cm_arena_sound',enabled?'on':'off');
-  if(!enabled){clearInterval(timer);timer=null;if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);}
+  if(!enabled){clearInterval(timer);timer=null;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);}
   else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.20,ctx.currentTime,.05);ambience()}
   return enabled;
  },
@@ -67,10 +76,22 @@ export const arenaAudio={
    if(effect==='release'){noise(.26,.16,2500);tone(410,150,.20,.07,'triangle');}
    if(effect==='fly'){noise(.35,.055,3400);tone(760,360,.24,.018,'sine');}
    if(effect==='hit'){
-    noise(.13,.15,340);tone(120,73,.18,.12,'triangle');
+    soundClip('acerto');noise(.13,.15,340);tone(120,73,.18,.12,'triangle');
     if(score>=8){tone(520,780,.23,.07,'sine',.06);tone(660,990,.28,.05,'sine',.16);}
    }
-   if(effect==='miss'){noise(.18,.08,650);tone(280,190,.15,.025,'sine');}
+   if(effect==='miss'){soundClip('erro');noise(.18,.08,650);tone(280,190,.15,.025,'sine');}
+   if(effect==='applause'){
+    soundClip('acerto');
+    for(let i=0;i<9;i++)noise(.075,.036+(i%3)*.007,1400,.02+i*.073);
+    [500,580,650].forEach((f,i)=>tone(f,f*1.17,.29,.032,'sine',i*.13));
+   }
+   if(effect==='boo'){
+    soundClip('erro');
+    for(let i=0;i<4;i++)tone(165+i*15,90+i*7,.31,.040,'sawtooth',i*.11);
+   }
+   if(effect==='block'){
+    noise(.23,.12,1400);tone(710,240,.32,.075,'triangle');tone(1180,650,.20,.035,'sine',.035);
+   }
    if(effect==='block'){
     noise(.30,.20,700);tone(190,70,.34,.14,'sawtooth');
     tone(970,430,.26,.07,'triangle',.06);
@@ -90,7 +111,7 @@ export const arenaAudio={
      noise(.20,.019,420,i*.10);
     }
    }
-   if(effect==='victory'){[523,659,784,1047].forEach((n,i)=>tone(n,n*1.03,.31,.065,'triangle',i*.12));}
+   if(effect==='victory'){soundClip('vitoria');[523,659,784,1047].forEach((n,i)=>tone(n,n*1.03,.31,.065,'triangle',i*.12));}
   }catch(error){console.warn('[ClassMana] Falha ao emitir efeito sonoro:',error)}
  }
 };
