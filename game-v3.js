@@ -330,7 +330,7 @@ function renderInbox(){
  const list=$('inbox-list');list.innerHTML='';
  $('inbox-status').textContent=online.user?
   'Os desafios ficam gravados. Você pode aceitar hoje ou em outra data; os cinco disparos do adversário serão reproduzidos.':
-  'Entre com seu PIN para ver convites de outros alunos.';
+  'Selecione seu nome na lista para consultar os desafios recebidos.';
  if(!onlineInbox.length){list.innerHTML='<div class="empty">Nenhum desafio para esta conta.</div>';return;}
  for(const ch of onlineInbox){
   const opponent=ch.creator.id===online.user?.id?ch.recipient:ch.creator;
