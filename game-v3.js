@@ -43,7 +43,35 @@ function safeRead(){try{const a=JSON.parse(localStorage.getItem('classmana-arche
 storage=safeRead();
 function persist(row){storage.push({...row,at:new Date().toISOString()});storage=storage.slice(-150);try{localStorage.setItem('classmana-archery-v2',JSON.stringify(storage))}catch{}renderRanking()}
 function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),3100)}
-function openView(name){if(name!=='arena'&&view==='arena'&&match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}arenaAudio.setActive(name==='arena');atmosphere?.setActive(name==='arena');view=name;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));window.scrollTo({top:0,behavior:'instant'});if(name==='ranking')renderRanking()}
+function openView(name){
+ // Two actual game screens: lobby and arena. Ranking and rules are temporary overlays.
+ if(name!=='arena'&&view==='arena'&&match?.running){
+  match.running=false;match.locked=false;holding=false;
+  $('stage').classList.remove('aiming','firing');scene?.setPower(0);
+ }
+ arenaAudio.setActive(name==='arena');atmosphere?.setActive(name==='arena');
+ view=name;
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
+ document.querySelectorAll('.nav-link').forEach(x=>x.classList.toggle('active',x.dataset.view===name));
+ if(name==='ranking')renderRanking();
+}
+function setLobbyStep(step){
+ if(!['reino','heroi','partida'].includes(step))return;
+ const el=$('view-inicio');if(!el)return;
+ el.dataset.step=step;
+ document.querySelectorAll('[data-lobby-step]').forEach(button=>{
+  const active=button.dataset.lobbyStep===step;
+  button.classList.toggle('chosen',active);button.setAttribute('aria-selected',String(active));
+ });
+}
+function drawCourse(){
+ const el=$('lobby-course');if(!el)return;
+ const level=$('challenge-level')?.value||'iniciante';
+ const path=CIRCUITS[level]||CIRCUITS.iniciante;
+ el.innerHTML=path.map((d,i)=>'<span class="course-node '+(i===0?'chosen':'')+'">'+(i===4?'🏆':'🎯')+' <b>'+d+'m</b></span>').join('');
+ el.setAttribute('aria-label',LEVELS[level].title+': '+path.join(', ')+' metros');
+}
+
 function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(2,'0'),name}));}
 function fillPlayer(wanted){const sel=$('player');sel.innerHTML='<option value="guest">Arqueiro convidado</option>'+choices(house).map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');if(wanted&&choices(house).some(x=>x.id===wanted))sel.value=wanted;fillRivals()}
 function fillRivals(){
@@ -111,6 +139,7 @@ function selectHouse(k){
  refreshArcher();
  scene?.setHouse(k);
  fillPlayer(incoming?.rivalId?.[0]===k?incoming.rivalId:null);
+ if(window.matchMedia('(max-width:1060px)').matches&&view==='inicio')setLobbyStep('heroi');
 }
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
 function duelKind(mode){return mode==='challenge_same'?'mesma_turma':mode==='challenge_team'?'entre_equipes':'interclasses'}
@@ -123,7 +152,7 @@ function updateMode(){
  $('team-scope-label').classList.toggle('hidden',!team);
  $('opponent-house-label').classList.toggle('hidden',!(mode==='challenge'||otherTeam));
  $('opponent-team-label').classList.toggle('hidden',!team);
- fillRivals();
+ fillRivals();drawCourse();
 }
 function byId(id){return choices(id?.[0]||'A').find(x=>x.id===id)?.name||'Arqueiro '+id}
 function nameOf(id){return id==='guest'?'Arqueiro convidado':byId(id)}
@@ -197,7 +226,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.enabled){toast('Para desafios oficiais, o servidor Google Sheets precisa ser ativado.');return}
+  if(!online.enabled){toast('Desafios oficiais precisam da URL real do Apps Script no online-config.js. Treine com o Robô por enquanto.');return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
     if(!selected)return;
@@ -506,7 +535,9 @@ async function startOnlineClient(){
 }
 
 // Interações do jogo.
-document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>openView(el.dataset.view)));
+document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.view==='inicio'&&view==='inicio')setLobbyStep('reino');else openView(el.dataset.view)}));
+document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>setLobbyStep(button.dataset.lobbyStep)));
+$('challenge-level').addEventListener('change',drawCourse);
 document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>{
  selectHouse(el.dataset.house);
  el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
@@ -554,6 +585,6 @@ $('logout').addEventListener('click',()=>{if(match?.running){toast('Termine ou a
 document.querySelectorAll('[data-rank]').forEach(btn=>btn.addEventListener('click',()=>{
  scoreTab=btn.dataset.rank;document.querySelectorAll('[data-rank]').forEach(x=>x.classList.toggle('active',x===btn));renderRanking();
 }));
-selectHouse('A');updateMode();processLink();renderRanking();
+selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');processLink();renderRanking();
 startOnlineClient();
 setInterval(async()=>{if(!online.user)return;try{const prev=Number($('unread-count').textContent)||0;const rows=await refreshInbox();const unread=rows.filter(c=>c.recipient.id===online.user.id&&c.status==='PENDENTE').length;if(unread>prev){toast('🔔 Novo desafio recebido!');await openInbox()}}catch(error){console.warn('Convites online:',error)}},120000);
