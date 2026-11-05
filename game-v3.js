@@ -254,7 +254,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.enabled){toast('Desafios oficiais precisam da URL real do Apps Script no online-config.js. Treine com o Robô por enquanto.');return}
+  if(!online.enabled||online.state!=='ready'){toast('⚠️ Desafios online aguardam a atualização do Apps Script pelo professor. Treine com o robô enquanto isso.');return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
     if(!selected)return;
@@ -481,10 +481,12 @@ function showOnlineStatus(){
  $('online-status').classList.toggle('error',!active);
  $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🏹 Escolha seu nome na lista';
  $('online-banner').textContent=active?'🟢 PLACAR ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
- $('online-status').textContent=!online.enabled?'⚠️ Desafios online aguardam a URL /exec real do Apps Script. Treino offline disponível.':
-  !active?'⏳ Consultando o placar...':user?'✅ Você pode ver seus desafios. Não há senha ou PIN.':'✅ Placar conectado. Escolha seu nome para receber desafios, sem PIN.';
+ $('online-status').textContent=!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
+  !active&&online.state==='error'?'⚠️ Sistema de desafios precisa de atualização no servidor.':
+  !active?'⏳ Verificando conexão...':user?'✅ Desafios disponíveis. Nenhuma senha ou PIN.':'✅ Placar conectado. Selecione seu nome.';
  $('logout').classList.toggle('hidden',!user);
  $('open-inbox').disabled=!active;
+ const retry=$('retry-online');if(retry)retry.classList.toggle('hidden',active||!online.enabled);
  if(user&&($('player').value!==user.id||house!==user.house)){
   selectHouse(user.house);$('player').value=user.id;fillRivals();
  }
@@ -492,7 +494,7 @@ function showOnlineStatus(){
 async function loginStudent(){
  const id=$('player').value;
  if(!id||id==='guest'){toast('Escolha seu nome na lista.');return null;}
- if(!online.enabled){toast('Informe a URL real do Apps Script no arquivo online-config.js.');return null;}
+ if(!online.enabled||online.state!=='ready'){toast('⚠️ Desafios aguardam atualização do servidor pelo professor.');return null;}
  if(online.user?.id===id)return online.user;
  try{
   const user=await online.login(id);
@@ -592,7 +594,9 @@ async function startOnlineClient(){
   renderRanking();
  }catch(error){
   online.state='error';showOnlineStatus();
-  $('online-status').textContent='⚠️ Não foi possível conectar ao servidor. '+error.message+' Use Verificar conexão para tentar novamente.';
+  $('online-status').textContent='⚠️ Desafios online aguardam atualização do servidor pelo professor.';
+  $('online-status').title=error.message;
+  console.warn('ClassMana API:',error);
  }
 }
 
@@ -646,6 +650,11 @@ const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.runni
 document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.08,.92);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.08,.92);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.06,.94);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.06,.94);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
 setInterval(()=>{if(holding&&!match?.paused){scene?.setPower(chargePower());uiHud()}},60);
 
+$('retry-online')?.addEventListener('click',async()=>{
+ const button=$('retry-online');button.disabled=true;
+ try{await startOnlineClient()}
+ finally{button.disabled=false}
+});
 $('open-inbox').addEventListener('click',openInbox);
 $('close-inbox').addEventListener('click',()=>$('online-inbox').classList.add('hidden'));
 $('online-inbox').addEventListener('click',e=>{if(e.target===$('online-inbox'))$('online-inbox').classList.add('hidden')});
