@@ -18,8 +18,12 @@ export function initScene(canvas, getSettings) {
   let pc=null, app=null, gl=null, camera=null, bowRoot=null, bowHandle=null, bowString=null, sightAnchor=null,
       arrowLoaded=null, targetRoot=null, impactMarks=[], currentHouse='A', ready=false, destroyed=false,
       aimX=.5, aimY=.46, power=.3, projectile=null, pendingShot=null, animT=0,
-      equipment={bow:'classico',arrow:'rubi'},terrainElement=null,ambientProps=[],backdropMode=false;
+      equipment={bow:'classico',arrow:'rubi'},terrainElement=null,ambientProps=[],backdropMode=false,targetStand=null,movingRail=null;
+  // O fallback 2D não pode aparecer antes do PlayCanvas: antes ele causava a
+  // troca perceptível de arte após alguns segundos.
   const ctx=canvas.getContext('2d', {alpha:true});
+  canvas.style.opacity='0';
+  parent.dataset.sceneEngine='loading';
   const state={kind:'PlayCanvas + fundo modular',setHouse,setEquipment,setTargetShift,setAim,setPower,setBackdropMode,
     getTargetMetrics, getAimPoint, fire, impact, destroy};
   const root=()=>app.root;
@@ -36,6 +40,7 @@ export function initScene(canvas, getSettings) {
       const center=targetRoot.getPosition().clone().add(new pc.Vec3(0,0,.052*scaled));
       const a=camera.camera.worldToScreen(center);
       const b=camera.camera.worldToScreen(center.clone().add(new pc.Vec3(1.34*scaled,0,0)));
+      // PlayCanvas worldToScreen usa PIXELS CSS do canvas, não o buffer WebGL.
       const kx=w/(gl.clientWidth||w),ky=h/(gl.clientHeight||h),r=Math.abs(b.x-a.x)*kx;
       if(Number.isFinite(a.x)&&Number.isFinite(a.y)&&r>0)return {x:a.x*kx,y:a.y*ky,r};
     }
@@ -49,15 +54,9 @@ export function initScene(canvas, getSettings) {
   }
   function getAimPoint(){
     const {w,h}=canvasSize();
-    if(ready&&camera?.camera&&sightAnchor&&gl){
-      updateBowAim();
-      // This is the visible, physical sight attached to the bow.
-      const p=camera.camera.worldToScreen(sightAnchor.getPosition());
-      const x=p.x/(gl.clientWidth||w),y=p.y/(gl.clientHeight||h);
-      if(Number.isFinite(x)&&Number.isFinite(y))return {x,y};
-    }
-    const sight=fallbackSightGeometry();
-    return {x:sight.sightX/w,y:sight.sightY/h};
+    // A única fonte da pontuação é o mesmo ponteiro normalizado que posiciona
+    // a mira 3D. Não usar projeção atrasada do frame anterior para pontuar.
+    return {x:aimX,y:aimY};
   }
   function bowPalette(){
     const base=palettes[currentHouse];
@@ -87,7 +86,7 @@ export function initScene(canvas, getSettings) {
   // Keep the bow, arrow and the bow's own sight fully inside the camera.
   // Moving the mouse to the edge must not push the bow out of the viewport.
   function setAim(x=.5,y=.46){
-    aimX=clamp(x,.16,.73);aimY=clamp(y,.17,.82);
+    aimX=clamp(x,.06,.94);aimY=clamp(y,.08,.92);
     updateBowAim();
   }
   function setPower(value){power=clamp(value,0,1);}
@@ -112,12 +111,14 @@ export function initScene(canvas, getSettings) {
     ctx.fillStyle=grass;ctx.beginPath();ctx.moveTo(w*.45,h*.64);ctx.lineTo(w*.55,h*.64);ctx.lineTo(w*.95,h);ctx.lineTo(w*.05,h);ctx.closePath();ctx.fill();
     ctx.save();ctx.strokeStyle='rgba(255,250,188,.51)';ctx.lineWidth=2.5;ctx.setLineDash([14,13]);
     for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(w*.5+s*w*.085,h);ctx.lineTo(w*.5+s*w*.016,h*.65);ctx.stroke();}ctx.restore();
-    // Contact shadow and solid wood stand.
-    ctx.fillStyle='rgba(12,22,12,.4)';ctx.beginPath();ctx.ellipse(m.x,m.y+m.r*1.9,m.r*.84,m.r*.15,0,0,Math.PI*2);ctx.fill();
-    for(const sx of [-.5,.5]){
-      const x=m.x+sx*m.r*.85;
-      ctx.strokeStyle='#50301d';ctx.lineWidth=m.r*.12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(m.x+sx*m.r*.37,m.y+m.r*.55);ctx.lineTo(x,m.y+m.r*1.86);ctx.stroke();
-      ctx.strokeStyle='#ab7e45';ctx.lineWidth=m.r*.045;ctx.beginPath();ctx.moveTo(m.x+sx*m.r*.37-2,m.y+m.r*.55);ctx.lineTo(x-2,m.y+m.r*1.84);ctx.stroke();
+    // Cavaletes apenas no nível inicial, quando o alvo repousa no chão.
+    if((getSettings()?.level||'iniciante')==='iniciante'){
+      ctx.fillStyle='rgba(12,22,12,.4)';ctx.beginPath();ctx.ellipse(m.x,m.y+m.r*1.9,m.r*.84,m.r*.15,0,0,Math.PI*2);ctx.fill();
+      for(const sx of [-.5,.5]){
+        const x=m.x+sx*m.r*.85;
+        ctx.strokeStyle='#50301d';ctx.lineWidth=m.r*.12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(m.x+sx*m.r*.37,m.y+m.r*.55);ctx.lineTo(x,m.y+m.r*1.86);ctx.stroke();
+        ctx.strokeStyle='#ab7e45';ctx.lineWidth=m.r*.045;ctx.beginPath();ctx.moveTo(m.x+sx*m.r*.37-2,m.y+m.r*.55);ctx.lineTo(x-2,m.y+m.r*1.84);ctx.stroke();
+      }
     }
     // Straw/woven rim with a ten-ring competition target.
     const shadow=ctx.createRadialGradient(m.x-m.r*.18,m.y-m.r*.18,m.r*.15,m.x,m.y,m.r*1.17);
@@ -248,16 +249,29 @@ export function initScene(canvas, getSettings) {
     targetRoot.setLocalScale(scale,scale,scale);
     const y=2.05-(setting.verticalShift||0)*h/units;
     targetRoot.setLocalPosition(x,y,-9);
+    const moving=setting.level==='avancado'||setting.level==='lendario';
+    if(targetStand)targetStand.enabled=!moving;
+    if(movingRail)movingRail.enabled=moving;
   }
   function buildWorld(){
     const metals={wood:material('#634124',{rough:.8}),woodlight:material('#a2703f',{rough:.8}),rope:material('#d5ae64',{rough:.89}),iron:material('#1d2329',{metal:.73,rough:.31}),silver:material('#c8d2d7',{metal:.82,rough:.19}),red:material('#da332d'),white:material('#f4f2e7')};
     targetRoot=new pc.Entity('Target assembly');root().addChild(targetRoot);moveTarget();
     const d=targetRoot;
-    // Two diagonal oak supports, braces, center shaft; small naturalistic bevels are in the texture.
-    const legL=tube('left wood leg',[[-.50,-1.97,-.28],[-.38,-1.20,-.17],[-.18,-.40,-.12]],[.10,.085,.07],metals.wood,d,12);
-    const legR=tube('right wood leg',[[.5,-1.97,-.28],[.38,-1.20,-.17],[.18,-.40,-.12]],[.10,.085,.07],metals.wood,d,12);
-    tube('cross wood beam',[[-.50,-1.2,-.18],[0,-1.2,-.18],[.5,-1.2,-.18]],[.065,.067,.065],metals.woodlight,d,10);
-    tube('rear wood support',[[0,-2.02,-.69],[0,-1.1,-.48],[0,-.15,-.25]],[.065,.064,.058],metals.wood,d,10);
+    targetStand=new pc.Entity('Removable target ground stand');
+    d.addChild(targetStand);
+    // Cavaletes permanecem apenas no alvo FIXO. O alvo suspenso usa trilho,
+    // sem pernas de madeira flutuando.
+    tube('left wood leg',[[-.50,-1.97,-.28],[-.38,-1.20,-.17],[-.18,-.40,-.12]],[.10,.085,.07],metals.wood,targetStand,12);
+    tube('right wood leg',[[.5,-1.97,-.28],[.38,-1.20,-.17],[.18,-.40,-.12]],[.10,.085,.07],metals.wood,targetStand,12);
+    tube('cross wood beam',[[-.50,-1.2,-.18],[0,-1.2,-.18],[.5,-1.2,-.18]],[.065,.067,.065],metals.woodlight,targetStand,10);
+    tube('rear wood support',[[0,-2.02,-.69],[0,-1.1,-.48],[0,-.15,-.25]],[.065,.064,.058],metals.wood,targetStand,10);
+    movingRail=new pc.Entity('Suspended target sliding rail');
+    root().addChild(movingRail);
+    tube('steel horizontal rail',[[-6,3.85,-9.5],[0,3.85,-9.5],[6,3.85,-9.5]],[.065,.070,.065],metals.iron,movingRail,12);
+    for(const dx of [-6,6]){
+      tube('support rail post '+dx,[[dx,.1,-9.5],[dx,2.2,-9.5],[dx,3.85,-9.5]],[.085,.08,.085],metals.wood,movingRail,10);
+    }
+    movingRail.enabled=false;
     // Body of compressed hay and thick jute rope; target is genuinely spatial.
     primitive('cylinder','woven straw body',[0,0,-.085],[2.7,.25,2.7],material('#946732',{rough:.95}),d,[90,0,0]);
     circleMesh('rope bevel outline',1.365,.055,metals.rope,d);
@@ -333,13 +347,14 @@ export function initScene(canvas, getSettings) {
   function updateBowAim(){
     if(!ready||!camera?.camera||!bowRoot)return;
     const {w,h}=canvasSize(),dx=aimX-.5,dy=aimY-.45,t=performance.now()*.001;
-    // The sight and the aiming point share the same camera-space coordinate.
-    // This is updated synchronously on pointerup, not one animation frame late.
-    const depth=2.16,halfH=depth*Math.tan(camera.camera.fov*Math.PI/360);
-    const sightInCamera=new pc.Vec3((2*aimX-1)*halfH*w/h,(1-2*aimY)*halfH,-depth);
+    // Converter o PONTEIRO para o mesmo raio da câmera em que o alvo é renderizado:
+    // o retículo metálico 3D coincide com o pixel CSS apontado, sem ajuste manual.
+    const depth=2.16;
+    const sightWorld=camera.camera.screenToWorld(aimX*(gl?.clientWidth||w),aimY*(gl?.clientHeight||h),depth);
+    const sightLocal=camera.getWorldTransform().clone().invert().transformPoint(sightWorld);
     bowRoot.setLocalEulerAngles(-dy*2,dx*2,Math.sin(t*1.7)*.1);
     const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55,.25,-.08));
-    bowRoot.setLocalPosition(sightInCamera.sub(offset));
+    bowRoot.setLocalPosition(sightLocal.sub(offset));
     if(arrowLoaded)arrowLoaded.setLocalPosition(.02,-.03,-.40+.36*power);
     if(bowString)bowString.setLocalPosition(0,0,.19*power);
   }
@@ -403,6 +418,7 @@ export function initScene(canvas, getSettings) {
       parent.insertBefore(gl,canvas);canvas.style.position='absolute';canvas.style.inset='0';canvas.style.zIndex='2';
       app=new pc.Application(gl,{graphicsDeviceOptions:{alpha:true,antialias:true,preserveDrawingBuffer:false,preferWebGl2:true}});
       app.setCanvasFillMode(pc.FILLMODE_NONE);app.setCanvasResolution(pc.RESOLUTION_AUTO);
+      app.graphicsDevice.maxPixelRatio=Math.min(window.devicePixelRatio||1,1.8);
       app.scene.ambientLight=new pc.Color(.72,.73,.73);
       app.scene.gammaCorrection=pc.GAMMA_SRGB;app.scene.toneMapping=pc.TONEMAP_ACES;
       camera=new pc.Entity('Player first person camera');camera.addComponent('camera',{clearColor:new pc.Color(0,0,0,0),fov:41,nearClip:.04,farClip:100});
@@ -416,11 +432,15 @@ export function initScene(canvas, getSettings) {
       app.on('destroy',()=>obs.disconnect());
       ready=true;state.kind='PlayCanvas 3D';canvas.style.opacity='0';
       parent.classList.add('engine-ready');
+      parent.dataset.sceneEngine='playcanvas';
+      parent.dispatchEvent(new CustomEvent('classmana:scene-ready',{detail:{engine:'playcanvas'}}));
       const status=document.querySelector('.arena-status');if(status)status.textContent='✦ ARENA 3D ATIVA';
       console.info('[ClassMana] Arena 3D iniciou com PlayCanvas.');
     }catch(error){
       console.warn('[ClassMana] WebGL indisponível, mantendo cena ilustrada:',error);
       gl?.remove();gl=null;app?.destroy();app=null;ready=false;canvas.style.opacity='1';
+      parent.dataset.sceneEngine='fallback';
+      parent.dispatchEvent(new CustomEvent('classmana:scene-ready',{detail:{engine:'fallback',error:String(error)}}));
       const status=document.querySelector('.arena-status');if(status)status.textContent='✦ MODO COMPATÍVEL';
     }
   })();
