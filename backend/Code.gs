@@ -75,7 +75,7 @@ function cmRound_(id,index,level='iniciante'){
    shift:Math.round((-.045+.09*u(7))*1000)/1000,distance};
 }
 function cmScore_(dx,dy,power,wind,distance,level,index,time,rules,bow='classico'){
- const profile={classico:{wind:1,ring:1,bonus:0},real:{wind:1,ring:1.12,bonus:1},vento:{wind:.5,ring:1,bonus:0}}[bow]||{wind:1,ring:1,bonus:0};
+ let profile={classico:{wind:1,ring:1,bonus:0},real:{wind:1,ring:1.12,bonus:1},vento:{wind:.5,ring:1,bonus:0}}[bow]||{wind:1,ring:1,bonus:0};
  // Regras v6 mantidas para desafios antigos, v7 introduz equipamentos.
  if(rules<7)profile={wind:1,ring:1,bonus:0};
  const difficulty=Math.pow(Math.max(10,distance)/30,.55);
