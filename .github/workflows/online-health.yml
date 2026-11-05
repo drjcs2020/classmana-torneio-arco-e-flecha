@@ -1,0 +1,21 @@
+name: Verificar API online do torneio
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'online-client.js'
+      - 'online-config.js'
+      - 'backend/Code.gs'
+      - 'scripts/qa-online.mjs'
+      - '.github/workflows/online-health.yml'
+permissions:
+  contents: read
+jobs:
+  online-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testar a API /exec do torneio
+        run: node scripts/qa-online.mjs
