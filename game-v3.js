@@ -1,4 +1,4 @@
-import {initScene} from './scene-v3.js?v=22';
+import {initScene} from './scene-v3.js?v=23';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
@@ -290,8 +290,8 @@ function updateReticle(){
 }
 function aim(e){
  const rect=$('stage').getBoundingClientRect();
- reticle.x=clamp((e.clientX-rect.left)/rect.width,.16,.73);
- reticle.y=clamp((e.clientY-rect.top)/rect.height,.17,.82);
+ reticle.x=clamp((e.clientX-rect.left)/rect.width,.06,.94);
+ reticle.y=clamp((e.clientY-rect.top)/rect.height,.08,.92);
  updateReticle();
 }
 function levelScore(x,y,r){const norm=Math.hypot(x,y)/r;return norm>1?0:Math.max(1,10-Math.floor(norm*10))}
@@ -609,7 +609,7 @@ $('my-team').addEventListener('change',()=>{
  match.running=false;startMatch();
 });$('share-result').addEventListener('click',()=>{if(match?.onlineSaveFailed)finishMatch();else if(!match?.online)share()});
 const world=$('world');world.addEventListener('pointerdown',e=>{if(!match?.running||match.locked||match.paused)return;e.preventDefault();world.setPointerCapture(e.pointerId);holding=true;pointerStart=Date.now();aim(e);scene?.setPower(.28);$('stage').classList.add('aiming');arenaAudio.play('draw');$('instruction').textContent='ARRASTE PARA MOVER O ARCO • SOLTE PARA ATIRAR'});world.addEventListener('pointermove',e=>{if(!match?.running||match.locked||match.paused)return;if(holding||e.pointerType==='mouse')aim(e);if(holding)scene?.setPower(chargePower())});world.addEventListener('pointerup',e=>{if(!holding)return;e.preventDefault();aim(e);holding=false;$('stage').classList.remove('aiming');$('instruction').textContent='MOVA OU ARRASTE PARA MIRAR • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';const p=chargePower();scene?.setPower(p);spriteHud?.setPower(p);fire(p);uiHud()});world.addEventListener('pointercancel',()=>{holding=false;$('stage').classList.remove('aiming');scene?.setPower(0)});
-document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.17,.82);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.17,.82);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.16,.73);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.16,.73);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
+document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||match.locked)return;let action=true;const step=e.shiftKey?.022:.008;switch(e.code){case'ArrowUp':reticle.y=clamp(reticle.y-step,.08,.92);break;case'ArrowDown':reticle.y=clamp(reticle.y+step,.08,.92);break;case'ArrowLeft':reticle.x=clamp(reticle.x-step,.06,.94);break;case'ArrowRight':reticle.x=clamp(reticle.x+step,.06,.94);break;case'Space':fire(1);break;default:action=false}if(action){e.preventDefault();updateReticle()}});
 setInterval(()=>{if(holding&&!match?.paused){scene?.setPower(chargePower());uiHud()}},60);
 
 $('open-inbox').addEventListener('click',openInbox);
