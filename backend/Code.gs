@@ -122,7 +122,7 @@ try{
    const data=JSON.parse(String(p.payload||'{}')),kind=String(data.kind||''),to=String(data.to||''),level=String(data.level||'iniciante');if(!CM_DISTANCES[level])throw Error('Nível inválido');if(!CM_TYPES.includes(kind))throw Error('Modo de desafio inválido');if(id===to)throw Error('Não é possível desafiar a si mesmo');const opponent=cmPerson_(db,to);
    if(kind==='mesma_turma'&&actor.house!==opponent.house)throw Error('Escolha um aluno da mesma turma');
    if(kind==='interclasses'&&actor.house===opponent.house)throw Error('Escolha uma Casa rival');
-   if(kind==='entre_equipes'&&actor.team===opponent.team)throw Error('Escolha uma equipe adversária');
+   if(kind==='entre_equipes'&&actor.house===opponent.house&&actor.team===opponent.team)throw Error('Escolha uma equipe adversária');
    cmRate_(db,id);const challengeId=cmUuid_();cmSheet_(db,'Desafios').appendRow([challengeId,kind,id,to,CM_STATUS.CRIADOR,cmNow_(),'','','','','','','','',CM_V+'|'+level]);cmLog_(db,id,'challenge',{challengeId,to,kind});
    result={ok:true,challenge:cmSummary_(db,cmFindChallenge_(db,challengeId).data,id)};
   }else if(action==='answer'){
@@ -163,13 +163,20 @@ function cmRank_(db){
   .sort((a,b)=>b.wins-a.wins||b.total-a.total);
  // Team standings count only duels BETWEEN teams; class standings only
  // INTERCLASS duels. Same-class duels never artificially boost class totals.
- function modeGroups(type,field,kind){
-  const group={};students.forEach(s=>{const name=s[field];if(!group[name])group[name]={name,members:0,plays:0,wins:0,ties:0,losses:0,total:0};group[name].members++});
+ function modeGroups(type,field){
+  const key=s=>field==='team'?s.house+'::'+s.team:s[field];
+  const group={};
+  students.forEach(s=>{
+   const k=key(s),name=field==='team'?'4º '+s.house+' · '+s.team:s[field];
+   if(!group[k])group[k]={name,house:s.house,members:0,plays:0,wins:0,ties:0,losses:0,total:0};
+   group[k].members++;
+  });
   for(const c of games){if(c[1]!==type)continue;
-   const a=scoreMap[c[2]],b=scoreMap[c[3]];if(!a||!b||a[field]===b[field])continue;
+   const a=scoreMap[c[2]],b=scoreMap[c[3]];
+   if(!a||!b||key(a)===key(b))continue;
    const sa=Number(c[9]),sb=Number(c[10]);
    for(const [s,pts,opp] of [[a,sa,sb],[b,sb,sa]]){
-    const g=group[s[field]];g.plays++;g.total+=pts;
+    const g=group[key(s)];g.plays++;g.total+=pts;
     if(pts>opp)g.wins++;else if(pts===opp)g.ties++;else g.losses++;
    }
   }
