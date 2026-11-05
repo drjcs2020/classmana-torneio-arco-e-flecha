@@ -53,9 +53,15 @@ export function initScene(canvas, getSettings) {
     return {bx,by,size,sightX:bx-115,sightY:by-size*.03};
   }
   function getAimPoint(){
-    const {w,h}=canvasSize();
-    // A única fonte da pontuação é o mesmo ponteiro normalizado que posiciona
-    // a mira 3D. Não usar projeção atrasada do frame anterior para pontuar.
+    // Pontuação usa a posição PROJETADA do centro da mira 3D.
+    // O ponteiro só comanda o arco: não existe uma segunda mira invisível.
+    if(ready&&sightAnchor&&camera?.camera&&app?.graphicsDevice){
+      updateBowAim();
+      const p=camera.camera.worldToScreen(sightAnchor.getPosition());
+      const width=app.graphicsDevice.width,height=app.graphicsDevice.height;
+      if(Number.isFinite(p.x)&&Number.isFinite(p.y)&&width>0&&height>0)
+        return {x:clamp(p.x/width,0,1),y:clamp(p.y/height,0,1)};
+    }
     return {x:aimX,y:aimY};
   }
   function bowPalette(){
@@ -247,9 +253,11 @@ export function initScene(canvas, getSettings) {
     // Real mesh scale changes with the displayed distance (not just an HUD label).
     const scale=targetScale(setting.distance);
     targetRoot.setLocalScale(scale,scale,scale);
-    const y=2.05-(setting.verticalShift||0)*h/units;
-    targetRoot.setLocalPosition(x,y,-9);
+    // A base do cavalete acompanha a escala da distância e continua no chão.
     const moving=setting.level==='avancado'||setting.level==='lendario';
+    const fixedY=-.28+2.02*scale;
+    const suspendedY=2.05-(setting.verticalShift||0)*h/units;
+    targetRoot.setLocalPosition(x,moving?suspendedY:fixedY,-9);
     if(targetStand)targetStand.enabled=!moving;
     if(movingRail)movingRail.enabled=moving;
   }
@@ -315,7 +323,10 @@ export function initScene(canvas, getSettings) {
   }
   function buildBow(){
     bowRoot=new pc.Entity('Modern competition recurve bow');
-    camera.addChild(bowRoot);bowRoot.setLocalPosition(.61,-.28,-2.08);
+    camera.addChild(bowRoot);
+    // Modelo proporcional ao enquadramento; não deve ocupar toda a tela.
+    bowRoot.setLocalScale(.43,.43,.43);
+    bowRoot.setLocalPosition(.46,-.15,-2.7);
     const pp=bowPalette(),body=material(pp.body,{metal:.79,rough:.19}),gold=material(pp.trim,{metal:.9,rough:.18}),
       dark=material('#1b1c20',{metal:.46,rough:.35}),silver=material('#d5e0e7',{metal:.88,rough:.23}),red=material('#dc342a'),ivory=material('#faf0db');
     const p=[[0,-1.52,0],[.045,-1.35,0],[.12,-.99,.035],[.105,-.55,.02],[.055,-.16,0],[.018,.18,0],[.075,.62,.02],[.09,1,.02],[.02,1.37,.02],[0,1.52,0]];
@@ -349,11 +360,15 @@ export function initScene(canvas, getSettings) {
     const {w,h}=canvasSize(),dx=aimX-.5,dy=aimY-.45,t=performance.now()*.001;
     // Converter o PONTEIRO para o mesmo raio da câmera em que o alvo é renderizado:
     // o retículo metálico 3D coincide com o pixel CSS apontado, sem ajuste manual.
-    const depth=2.16;
-    const sightWorld=camera.camera.screenToWorld(aimX*(gl?.clientWidth||w),aimY*(gl?.clientHeight||h),depth);
+    const depth=2.70;
+    // PlayCanvas usa pixels do render target (incluindo DPI), não pixels CSS.
+    const deviceW=app?.graphicsDevice?.width||gl?.width||w;
+    const deviceH=app?.graphicsDevice?.height||gl?.height||h;
+    const sightWorld=camera.camera.screenToWorld(aimX*deviceW,aimY*deviceH,depth);
     const sightLocal=camera.getWorldTransform().clone().invert().transformPoint(sightWorld);
     bowRoot.setLocalEulerAngles(-dy*2,dx*2,Math.sin(t*1.7)*.1);
-    const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55,.25,-.08));
+    const scale=bowRoot.getLocalScale().x;
+    const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55*scale,.25*scale,-.08*scale));
     bowRoot.setLocalPosition(sightLocal.sub(offset));
     if(arrowLoaded)arrowLoaded.setLocalPosition(.02,-.03,-.40+.36*power);
     if(bowString)bowString.setLocalPosition(0,0,.19*power);
