@@ -370,7 +370,17 @@ function chooseRobotScore(difficulty,playerAverage){const base={easy:5.1,medium:
 async function finishMatch(){
  if(!match||match.scores.length<5)return;
  const current=match;match.locked=true;const finish=$('finish');finish.classList.remove('hidden');
+ // Arte dos resultados é composta por personagens separados, sem painel cobrindo o cenário.
+ const heroOwn=$('finish-hero-own'),heroRival=$('finish-hero-rival');
+ if(heroOwn){heroOwn.src=archerImage();heroOwn.style.display='block';}
+ if(heroRival){
+  const opponentHouse=isDuel(match.mode)?String(match.rivalId||'').charAt(0):'';
+  const crests={A:'aguia-dourada',B:'leao-de-fogo',C:'dragao-esmeralda'};
+  heroRival.style.display=crests[opponentHouse]?'block':'none';
+  if(crests[opponentHouse])heroRival.src='assets/ui/crests/brasao-'+crests[opponentHouse]+'.png';
+ }
  $('share-result').classList.add('hidden');
+ $('share-result').classList.remove('cm-retry');
  if(match.online){
   $('finish-title').textContent='⏳ GRAVANDO RESULTADO NA PLANILHA...';
   $('finish-desc').textContent='Seus disparos estão sendo validados e registrados no placar online.';
@@ -412,7 +422,7 @@ async function finishMatch(){
    $('finish-desc').textContent='O servidor não confirmou a gravação: '+error.message;
    $('finish-results').textContent='Suas cinco flechas permanecem nesta partida.';
    $('share-help').textContent='Tente salvar novamente antes de sair da arena.';
-   $('share-result').classList.remove('hidden');$('share-result').textContent='🔄 TENTAR SALVAR NO PLACAR';
+   $('share-result').classList.remove('hidden');$('share-result').classList.add('cm-retry');$('share-result').textContent='🔄 TENTAR SALVAR NO PLACAR';
   }
   return;
  }
