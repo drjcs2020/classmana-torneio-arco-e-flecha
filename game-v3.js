@@ -269,10 +269,10 @@ async function startMatch(accepted=null){
    }
   }else if(fromInbox.recipient.id!==userId&&fromInbox.creator.id!==userId){toast('Esse desafio não pertence à sua conta.');return;}
   try{
-   onlineLoading=true;$('start-game').disabled=true;$('start-game').textContent='⏳ PREPARANDO DESAFIO ONLINE...';
+   onlineLoading=true;$('start-game').disabled=true;$('start-game').setAttribute('aria-label','Preparando desafio online...');
    challenge=fromInbox||await online.create(duelKind(mode),rivalId,$('challenge-level').value);
   }catch(error){toast('Não foi possível criar o desafio: '+error.message);return}
-  finally{onlineLoading=false;$('start-game').disabled=false;$('start-game').innerHTML='🏹 INICIAR PARTIDA <span>➜</span>'}
+  finally{onlineLoading=false;$('start-game').disabled=false;$('start-game').setAttribute('aria-label','Iniciar partida')}
  }
  if(match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}
  if(online.user&&isDuel(mode)){userId=online.user.id;selectHouse(userId[0]);$('player').value=userId;}
@@ -487,10 +487,16 @@ async function loginStudent(){
  try{
   const user=await online.login(id);
   showOnlineStatus();
-  const inbox=await refreshInbox();
-  const received=inbox.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
-  if(received){toast('🔔 Você recebeu '+received+' desafio(s)!');await openInbox();}
-  else toast('🏹 Arqueiro selecionado: '+user.name);
+  // A seleção do perfil é válida mesmo que a leitura dos convites falhe.
+  try{
+   const inbox=await refreshInbox();
+   const received=inbox.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
+   if(received){toast('🔔 Você recebeu '+received+' desafio(s)!');await openInbox();}
+   else toast('🏹 Arqueiro selecionado: '+user.name);
+  }catch(inboxError){
+   console.warn('Perfil confirmado; convites temporariamente indisponíveis:',inboxError);
+   toast('✅ Perfil confirmado: '+user.name+'. A caixa de desafios será atualizada.');
+  }
   return user;
  }catch(error){toast('⚠️ Não foi possível selecionar o perfil: '+error.message);return null;}
 }
@@ -561,16 +567,23 @@ async function startOnlineClient(){
  showOnlineStatus();
  if(!online.enabled)return;
  try{
-  await online.connect();await online.list();showOnlineStatus();
+  await online.connect();showOnlineStatus();
+  try{await online.list()}catch(err){console.warn('Lista online indisponível; usando nomes cadastrados no jogo:',err)}
   const remembered=localStorage.getItem('cm_arco_nome');
   if(!online.user&&/^[ABC]\d{2}$/.test(remembered||'')){
    selectHouse(remembered[0]);$('player').value=remembered;await loginStudent();
   }
-  const pendentes=await refreshInbox();renderRanking();
+  try{
+   const pendentes=await refreshInbox();
    if(online.user&&pendentes.some(c=>c.recipient.id===online.user.id&&c.status==='PENDENTE')){
-     toast('🔔 Você foi desafiado! Aceite ou recuse quando quiser.');await openInbox();
+    toast('🔔 Você foi desafiado! Aceite ou recuse quando quiser.');await openInbox();
    }
- }catch(error){online.state='error';showOnlineStatus();$('online-status').textContent='⚠️ Serviço online indisponível: '+error.message;}
+  }catch(error){console.warn('Convites temporariamente indisponíveis:',error)}
+  renderRanking();
+ }catch(error){
+  online.state='error';showOnlineStatus();
+  $('online-status').textContent='⚠️ Não foi possível conectar ao servidor. '+error.message+' Use Verificar conexão para tentar novamente.';
+ }
 }
 
 // Interações do jogo.
