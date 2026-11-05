@@ -51,7 +51,7 @@ try{
  await phone.locator('button.house[data-house="C"]').click();
  assert.equal(await phone.locator('#view-inicio').getAttribute('data-step'),'heroi');
  await record(phone,'lobby-mobile-character');
- await phone.locator('[data-lobby-step="partida"]').click();
+ await phone.locator('#confirm-archer').click();
  await record(phone,'lobby-mobile-match');
  await phone.locator('#mode').selectOption('practice');
  await phone.locator('#start-game').click();
