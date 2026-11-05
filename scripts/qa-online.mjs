@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 const raw=readFileSync('online-config.js','utf8');
-const matched=raw.match(/ONLINE_API_URL\s*=\s*['"]([^'"]+)['"]/);
+const matched=raw.match(/^\s*export\s+const\s+ONLINE_API_URL\s*=\s*['"]([^'"]+)['"]/m);
 assert(matched,'ONLINE_API_URL ausente');
 const base=matched[1];
 assert(/^https:\/\/script\.google\.com\/macros\/s\/[-\w]+\/exec$/.test(base),'URL precisa apontar para /exec');
