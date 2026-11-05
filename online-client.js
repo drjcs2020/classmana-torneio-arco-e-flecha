@@ -11,13 +11,27 @@ class ArcheryOnline {
  constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;}
  async get(action,params={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
+  let last;
+  // Alguns navegadores falham no redirecionamento do Apps Script. Tentar
+  // novamente não duplica desafios: GET faz apenas consultas.
+  for(let attempt=0;attempt<3;attempt++){
+   if(attempt)await wait(500*attempt);
+   try{return await this.getOnce(action,params)}catch(error){last=error;}
+  }
+  throw last||Error('Falha de conexão com o serviço online.');
+ }
+ async getOnce(action,params={}){
   const name='cmArcApi_'+(++this.seq)+'_'+randomId().slice(0,10);
   return await new Promise((resolve,reject)=>{
    let settled=false,script=document.createElement('script');
-   const close=(error,data)=>{if(settled)return;settled=true;clearTimeout(timer);script.remove();try{delete window[name]}catch{window[name]=undefined};if(error)reject(error);else resolve(data)};
-   const timer=setTimeout(()=>close(Error('A consulta ao placar online demorou demais.')),18000);
+   const close=(error,data)=>{
+    if(settled)return;settled=true;clearTimeout(timer);script.remove();
+    try{delete window[name]}catch{window[name]=undefined}
+    if(error)reject(error);else resolve(data);
+   };
+   const timer=setTimeout(()=>close(Error('A consulta online não respondeu no prazo.')),8500);
    window[name]=(data)=>close(null,data);
-   script.onerror=()=>close(Error('Não foi possível consultar o serviço online.'));
+   script.onerror=()=>close(Error('Falha ao carregar a resposta do Apps Script. Confira se a implantação /exec está pública.'));
    script.src=this.url+'?'+new URLSearchParams({action,callback:name,...params,_:Date.now()});
    document.head.appendChild(script);
   });
@@ -34,18 +48,26 @@ class ArcheryOnline {
    const input=document.createElement('input');input.type='hidden';input.name=key;input.value=String(value);form.appendChild(input);
   }
   document.body.appendChild(form);form.submit();form.remove();
-  const deadline=Date.now()+32000;
+  const deadline=Date.now()+45000;
+  let lastNetworkError=null;
   while(Date.now()<deadline){
-   await wait(1400);
-   const res=await this.get('opResult',{requestId,token:this.token});
-   if(res.pending)continue;
-   if(!res.ok)throw Error(res.error||'Operação recusada pelo servidor.');
-   return res;
+   await wait(1000);
+   try{
+    const res=await this.get('opResult',{requestId,token:this.token});
+    if(res.pending)continue;
+    if(!res.ok)throw Error(res.error||'Operação recusada pelo servidor.');
+    return res;
+   }catch(error){
+    // Erro explícito do backend NÃO pode ser confundido com indisponibilidade.
+    if(/recusada|inválid|não autorizado|Sessão expirada|não pertence|Desafio|turma|equipe|limite/i.test(error.message||''))throw error;
+    lastNetworkError=error;
+   }
   }
-  throw Error('O servidor não confirmou a gravação. Consulte seus desafios antes de tentar novamente.');
+  throw Error('O servidor não confirmou a gravação. Consulte seus desafios antes de tentar novamente. '+(lastNetworkError?.message||''));
  }
  async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
-  if(Number(ping.api)<6)throw Error('Apps Script desatualizado: publique a versão 6 do backend/Code.gs na implantação existente.');
+  if(Number(ping.api)<6)throw Error('Apps Script antigo: publique a versão atual do backend/Code.gs na implantação /exec existente.');
+  this.apiVersion=Number(ping.api)||0;
   this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
  }
