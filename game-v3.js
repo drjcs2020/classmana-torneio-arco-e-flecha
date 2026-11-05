@@ -14,6 +14,11 @@ const EQUIPMENT={
  bows:{classico:'Arco Clássico',real:'Arco Real',vento:'Arco dos Ventos'},
  arrows:{rubi:'Pena Rubra',esmeralda:'Esmeralda',solar:'Flecha Solar'}
 };
+const BOW_RULES={
+ classico:{wind:1,ring:1,bonus:0,description:'equilibrado: mira estável e pontuação padrão'},
+ real:{wind:1,ring:1.12,bonus:1,description:'+1 ponto por acerto (máximo 10), exige maior precisão'},
+ vento:{wind:.5,ring:1,bonus:0,description:'reduz o desvio causado pelo vento em 50%'}
+};
 function readEquipment(){
  try{const x=JSON.parse(localStorage.getItem('classmana-archery-equipment-v1')||'{}');
   return {bow:EQUIPMENT.bows[x.bow]?x.bow:'classico',arrow:'rubi'};}
@@ -27,7 +32,7 @@ function applyEquipment(){
   el.classList.toggle('chosen',active);el.setAttribute('aria-pressed',String(active));
  }
  const status=$('equipment-summary');
- if(status)status.textContent='✓ '+EQUIPMENT.bows[equipment.bow]+' · flecha oficial igual para todos.';
+ if(status)status.textContent='✓ '+EQUIPMENT.bows[equipment.bow]+' — '+BOW_RULES[equipment.bow].description+'. Flecha oficial igual para todos.';
  scene?.setEquipment?.(equipment);
 }
 function chooseEquipment(key,value){
@@ -272,7 +277,7 @@ async function startMatch(accepted=null){
  if(match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}
  if(online.user&&isDuel(mode)){userId=online.user.id;selectHouse(userId[0]);$('player').value=userId;}
  match={house:userId==='guest'?house:userId[0],playerId:userId,player:nameOf(userId),mode,difficulty:$('difficulty').value,
-  rivalId,scores:[],running:true,locked:false,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,freezeTime:null,stageStartedAt:performance.now(),incoming:null,
+  rivalId,scores:[],running:true,locked:false,bow:equipment.bow,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,freezeTime:null,stageStartedAt:performance.now(),incoming:null,
   online:challenge,onlineShots:[],onlineReplay:challenge?.recipient.id===userId?challenge.creatorShots:[],
   onlineReplayPoints:0,seed:Math.floor(rand(100000,999999))};
  reticle={x:.50,y:.45};$('finish').classList.add('hidden');
@@ -310,9 +315,11 @@ async function fire(power){
  if(!sight||!Number.isFinite(sight.x)||!Number.isFinite(sight.y)){match.locked=false;return toast('A mira ainda não está pronta.');}
  const dx=(sight.x*w-t.x)/t.r,dy=(sight.y*h-t.y)/t.r;
  // Round scores online are calculated again by Apps Script using these normalized offsets.
- if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power,time:match.freezeTime});
+ const activeBow=(!match.online||Number(match.online.rules)>=7)?(match.bow||equipment.bow):'classico';
+ const tuning=BOW_RULES[activeBow]||BOW_RULES.classico;
+ if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power,time:match.freezeTime,bow:match.bow||equipment.bow});
  const distanceFactor=distanceDifficulty(match.distance);
- const drift=match.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
+ const drift=match.wind*tuning.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
  const jitter=match.online?0:(1-power)*t.r*.14*Math.min(2,distanceFactor);
  const ix=sight.x*w+drift+rand(-.08,.08)*jitter;
  const iy=sight.y*h+fall+rand(-.06,.06)*jitter;
@@ -324,8 +331,9 @@ async function fire(power){
  const landingX=impactDx-(rules>=5?after.x-before.x:0);
  const landingY=impactDy-(rules>=5?after.y-before.y:0);
  const blocked=obstacleBlocks(match.level,shotIndex,match.freezeTime+flight,landingX,landingY);
- const norm=Math.hypot(landingX,landingY);
- const score=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
+ const norm=Math.hypot(landingX,landingY)*tuning.ring;
+ const base=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
+ const score=base>0?Math.min(10,base+tuning.bonus):0;
  match.freezeTime=null; // The target keeps moving while the arrow flies.
  $('stage').classList.add('firing');arenaAudio.play('fly');
  try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
