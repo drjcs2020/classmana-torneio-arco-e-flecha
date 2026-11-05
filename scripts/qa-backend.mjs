@@ -109,5 +109,5 @@ const invalid=post('challenge',sessions.A01,{kind:'interclasses',to:'A02',level:
 assert.equal(invalid.ok,false);
 assert(/Casa rival|turma/i.test(invalid.error));
 assert.equal(sheet.Desafios.rows.length,4);
-assert.equal(sheet.Disparos.rows.length,8*5);
+assert.equal(sheet.Disparos.rows.length,7*5); // 3 duelos completos (6 rodadas) + criador do duelo recusado
 console.log('✅ BACKEND v7: login, convites, aceite/recusa, 5+5 disparos, três tipos de desafio, placar por turmas e equipes.');
