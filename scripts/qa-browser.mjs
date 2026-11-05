@@ -40,7 +40,11 @@ try{
  await desktop.locator('button.house[data-house="B"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
  assert.equal(await desktop.locator('button.house[data-house="B"]').getAttribute('aria-pressed'),'true');
- await shot(desktop,'02-arqueiro-desktop');
+ const panelsHero=await desktop.evaluate(()=>['.studio-character','.studio-equipment','.studio-carousel'].map(selector=>{
+ const style=getComputedStyle(document.querySelector(selector));return {selector,background:style.backgroundImage,color:style.backgroundColor};
+}));
+for(const row of panelsHero)assert.equal(row.background,'none','Painel do arqueiro cobriu cenário: '+row.selector);
+await shot(desktop,'02-arqueiro-desktop');
  await desktop.locator('#archer-next').click();
  assert.match(await desktop.locator('#archer-carousel-indicator').textContent(),/Valéria/);
  await desktop.locator('[data-equip-bow="real"]').click();
@@ -48,13 +52,19 @@ try{
  await desktop.locator('#confirm-archer').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'desafio');
  await verifyPicture(desktop,'.cm-duel-title');
- await shot(desktop,'03-desafio-desktop');
+ const duelPanels=await desktop.evaluate(()=>[...document.querySelectorAll('.cm-duel-mode')].map(x=>getComputedStyle(x).backgroundImage));
+assert(duelPanels.every(x=>x==='none'),'Botões do desafio não podem ter painéis atrás');
+await shot(desktop,'03-desafio-desktop');
  await desktop.locator('[data-play-mode="bot"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'partida');
  await desktop.locator('#challenge-level').selectOption('lendario');
  await desktop.locator('#difficulty').selectOption('hard');
  assert.match(await desktop.locator('#lobby-course').getAttribute('aria-label'),/150/);
- await shot(desktop,'04-preparar-desktop');
+ const setupPanels=await desktop.evaluate(()=>['.setup','.online-account','.setup-head','.course-preview'].map(selector=>{
+ const style=getComputedStyle(document.querySelector(selector));return {selector,background:style.backgroundImage};
+}));
+assert(setupPanels.every(x=>x.background==='none'),'Preparação não pode cobrir cenário: '+JSON.stringify(setupPanels));
+await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#start-game').click();
  await desktop.waitForURL('**/arena.html',{timeout:18000});
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
@@ -62,6 +72,24 @@ try{
  assert(await desktop.locator('#world').isVisible());
  assert.equal(await desktop.locator('#stage').getAttribute('data-level'),'lendario');
  await shot(desktop,'05-arena-desktop');
+await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});
+await desktop.locator('#view-arena.active').waitFor({timeout:12000});
+await desktop.waitForTimeout(4500);
+const engine=await desktop.locator('#stage').getAttribute('data-scene-engine');
+console.log('ENGINE3D_DIAGNOSTIC',engine);
+if(engine==='playcanvas'){
+ const r=await desktop.locator('#stage').boundingBox();
+ for(const pos of [[.33,.35],[.66,.58],[.49,.42]]){
+  await desktop.mouse.move(r.x+r.width*pos[0],r.y+r.height*pos[1]);
+  await desktop.waitForTimeout(250);
+  const diag=await desktop.evaluate(()=>document.querySelector('#stage').cmAimDiagnostic?.());
+  assert(diag&&diag.kind==='PlayCanvas 3D','Diagnóstico 3D indisponível');
+  const delta=Math.hypot(diag.input.x-diag.projected.x,diag.input.y-diag.projected.y);
+  console.log('MIRA',JSON.stringify(diag),delta);
+  assert(delta<.025,'Mira 3D deslocada do ponteiro: '+delta);
+ }
+}
+
  await desktop.close();
  const mobile=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
  mobile.on('pageerror',e=>errors.push('mobile: '+e.message));
