@@ -33,6 +33,26 @@ jobs:
           else
             echo "Kit ainda não enviado: jogo existente permanece funcional com arte antiga."
           fi
+      - name: Descompactar partes 1 e 2 do novo kit ClassMana
+        run: |
+          P1="ClassMana_Assets_Parte_1_Personagens_Interface.zip"
+          P2="ClassMana_Assets_Parte_2_Cenarios_Botoes_HUD.zip"
+          if [ -f "$P1" ] && [ -f "$P2" ]; then
+            unzip -q -o "$P1" -d .
+            unzip -q -o "$P2" -d .
+            test -f assets/ui/buttons/botao-jogar-3d.png
+            test -f assets/ui/hud/forca-01-moldura.png
+            test -f assets/ui/hud/logo-torneio.png
+            test -f assets/ui/hud/brasao-aguia-dourada.png
+            test -f assets/scenes/aguia.webp
+            test -f assets/scenes/leao.webp
+            test -f assets/scenes/dragao.webp
+            echo "OK: kit dividido em dois ZIPs publicado."
+          elif [ -f "$P1" ] || [ -f "$P2" ]; then
+            echo "::warning::Apenas uma parte do kit foi enviada. Envie os dois ZIPs para ativar as novas artes."
+          else
+            echo "As novas duas partes ainda não estão presentes no repositório."
+          fi
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
       - name: Preparar arquivos do jogo
