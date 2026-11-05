@@ -9,7 +9,7 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 6;
+const CM_V = 7;
 const CM_DISTANCES={iniciante:[10,35,65,100,150],avancado:[20,45,75,110,150],lendario:[30,60,90,120,150]};
 /** Reproduz a mesma proteção dinâmica da arena no navegador; tempo em segundos. */
 function cmObstacle_(level,index,time){
@@ -74,26 +74,32 @@ function cmRound_(id,index,level='iniciante'){
  return {index,wind:Math.round((-4+8*u(0))*windFactor*10)/10,
    shift:Math.round((-.045+.09*u(7))*1000)/1000,distance};
 }
-function cmScore_(dx,dy,power,wind,distance,level,index,time,rules){
+function cmScore_(dx,dy,power,wind,distance,level,index,time,rules,bow='classico'){
+ const profile={classico:{wind:1,ring:1,bonus:0},real:{wind:1,ring:1.12,bonus:1},vento:{wind:.5,ring:1,bonus:0}}[bow]||{wind:1,ring:1,bonus:0};
+ // Regras v6 mantidas para desafios antigos, v7 introduz equipamentos.
+ if(rules<7)profile={wind:1,ring:1,bonus:0};
  const difficulty=Math.pow(Math.max(10,distance)/30,.55);
  const flight=cmFlight_(distance,power);
  // Compute movement between release and impact from the same formula as the arena.
  const before=cmTargetMotion_(level,index,time),after=cmTargetMotion_(level,index,time+flight);
  const leadX=rules>=5?after.x-before.x:0,leadY=rules>=5?after.y-before.y:0;
- const ax=dx+wind*.04*difficulty-leadX,ay=dy+(1-power)*.70*difficulty-leadY;
+ const ax=dx+wind*profile.wind*.04*difficulty-leadX,ay=dy+(1-power)*.70*difficulty-leadY;
  const obstructionTime=rules>=5?time+flight:time;
- const blocked=cmObstructed_(level,index,obstructionTime,ax,ay),norm=Math.hypot(ax,ay);
- return {score:blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10)),blocked,impactDx:ax,impactDy:ay};
+ const blocked=cmObstructed_(level,index,obstructionTime,ax,ay),norm=Math.hypot(ax,ay)*profile.ring;
+ const base=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
+ return {score:base?Math.min(10,base+profile.bonus):0,blocked,impactDx:ax,impactDy:ay};
 }
 function cmShots_(id,shots,level,rules=CM_V){
  if(!Array.isArray(shots)||shots.length!==5)throw Error('É obrigatório registrar exatamente 5 flechas');
+ const bow=['classico','real','vento'].includes(String(shots[0]?.bow||''))?String(shots[0].bow):'classico';
+ if(shots.some(x=>String(x.bow||'classico')!==bow))throw Error('Todas as flechas da rodada precisam usar o mesmo arco');
  let sum=0;const rec=shots.map((x,i)=>{
   const dx=Number(x.dx),dy=Number(x.dy),power=Number(x.power),time=Number(x.time??0);
   if(![dx,dy,power,time].every(Number.isFinite)||Math.abs(dx)>9||Math.abs(dy)>9||power<.28||power>1||time<0||time>120)
    throw Error('Disparo inválido: '+(i+1));
-  const cfg=cmRound_(id,i,level),score=cmScore_(dx,dy,power,cfg.wind,cfg.distance,level,i,time,rules);
+  const cfg=cmRound_(id,i,level),score=cmScore_(dx,dy,power,cfg.wind,cfg.distance,level,i,time,rules,bow);
   sum+=score.score;
-  return {...cfg,dx,dy,power,time,blocked:score.blocked,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy};
+  return {...cfg,dx,dy,power,time,bow,blocked:score.blocked,score:score.score,impactDx:score.impactDx,impactDy:score.impactDy};
  });return {sum,shots:rec}
 }
 function cmRate_(db,id){let now=new Date(),today=now.toISOString().slice(0,10);const count=cmChallenges_(db).filter(x=>String(x.data[2])===id&&String(x.data[5]).slice(0,10)===today).length;if(count>=10)throw Error('Limite de 10 novos desafios por dia');}
