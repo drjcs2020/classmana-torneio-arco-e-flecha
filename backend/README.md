@@ -19,7 +19,7 @@ A versão do servidor precisa ser atualizada **sem criar outra planilha**:
 5. Em Versão, escolha **Nova versão**, mantenha **Executar como eu** e **Acesso: qualquer pessoa** e implante.
 6. A URL `/exec` normalmente permanece a mesma quando a implantação existente é atualizada.
    O endereço público já está em `online-config.js`.
-7. Verifique a URL do Apps Script com `?action=ping`. A resposta deve conter `"api":3`.
+7. Verifique a URL do Apps Script com `?action=ping`. A resposta deve conter `"api":7`.
    Uma versão anterior será recusada pelo jogo para evitar erro de PIN.
 
 ## Como os alunos jogam
@@ -28,9 +28,9 @@ A versão do servidor precisa ser atualizada **sem criar outra planilha**:
 2. Escolhem **treino**, **robô**, **colega da mesma turma**, **outra equipe** ou **outra turma**.
 3. Em desafios de equipe, escolhem equipe própria, local da disputa, turma/equipe adversária e o representante.
 4. Escolhem o circuito de distância:
-   - Aprendiz: 10, 20, 30, 40, 50 metros;
-   - Aventureiro: 30, 40, 50, 60, 80 metros;
-   - Lendário: 60, 80, 100, 120, 150 metros.
+   - Aprendiz: 10, 35, 65, 100, 150 metros;
+   - Aventureiro: 20, 45, 75, 110, 150 metros;
+   - Lendário: 30, 60, 90, 120, 150 metros.
 5. Jogam cinco flechas. A pontuação é recalculada pelo servidor e salva na planilha.
 6. O adversário encontra o convite em **Meus desafios**, podendo **aceitar ou recusar** dias depois.
 7. Se aceitar, vê a reprodução dos cinco tiros gravados e joga a própria rodada. O resultado é salvo e alimenta o ranking.
@@ -62,6 +62,7 @@ equipes; a de turmas considera interclasses.
 - Aceite, conclua os cinco tiros e verifique as abas Desafios, Disparos e Ranking.
 - Repita com circuito Lendário: os disparos devem ir de 60 m a 150 m.
 - Verifique que a mesma sequência foi usada nos dois lados da disputa.
+- No GitHub Actions, acompanhe **Verificar API online do torneio**: o teste só fica verde depois de implantar a API v7 na URL /exec existente.
 
-O GitHub Pages publica o frontend; o Apps Script publica o backend. Atualizar
+**Diagnóstico de 05/11/2026:** URL /exec respondeu com `api: 3` nos testes da publicação, enquanto o repositório utiliza v7. É indispensável republicar a implantação existente para habilitar desafios. O GitHub Pages publica o frontend; o Apps Script publica o backend. Atualizar
 o GitHub **não** atualiza automaticamente a implantação do Google Apps Script.
