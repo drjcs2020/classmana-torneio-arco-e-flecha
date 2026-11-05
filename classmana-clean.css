@@ -1,0 +1,236 @@
+/* ClassMana — versão clean 11/2026.
+   Painéis semitransparentes removidos: cenário permanece VISÍVEL.
+   Botões PNG independentes, controles HTML reais e tipografia legível. */
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .character-studio,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-character,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-equipment,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-carousel,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected {
+ background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-character,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-equipment {
+ overflow:visible!important;padding:clamp(4px,1.2vw,17px)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-carousel{
+ min-height:0!important;border-radius:0!important;overflow:visible!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-portrait{background:none!important;overflow:visible!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #hero-preview-img{
+ object-fit:contain!important;object-position:center bottom!important;
+ filter:drop-shadow(0 6px 2px #0008) drop-shadow(0 15px 15px #0008)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading{
+ padding:0!important;filter:drop-shadow(0 3px 5px #000c)
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading h2 {
+ font:800 clamp(25px,2.35vw,37px)/1.12 "Cinzel",Georgia,serif!important;
+ color:#fff0bc!important;text-shadow:0 2px 4px #000,0 5px 14px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading small{
+ font:900 clamp(15px,1.1vw,18px)/1.2 Nunito,sans-serif!important;
+ color:#fff3ce!important;text-shadow:0 2px 5px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading p{
+ color:#fff7de!important;font:750 clamp(14px,1vw,17px) Nunito,sans-serif!important;text-shadow:0 2px 5px #000
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected{
+ padding:0!important;justify-content:center!important;text-align:center!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected strong{
+ background:none!important;border:0!important;color:#fff7de!important;
+ font:900 clamp(21px,1.8vw,29px) Cinzel,Georgia,serif!important;
+ text-shadow:0 2px 4px #000,0 0 14px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected span{
+ color:#fff4d2!important;text-shadow:0 2px 4px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows{
+ gap:clamp(8px,1.4vh,14px)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice.chosen{
+ min-height:0!important;
+ border:3px solid #f2c56b!important;border-radius:14px!important;
+ background:linear-gradient(180deg,#002f38,#071b26)!important;
+ box-shadow:0 3px 0 #533313,0 8px 17px #0009!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice.chosen{
+ border-color:#fbefac!important;background:linear-gradient(160deg,#0f7048,#063a30)!important;
+ box-shadow:0 0 0 2px #fff1a2,0 0 20px #f4ebbb8a!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{
+ font:900 clamp(18px,1.5vw,24px) Nunito,sans-serif!important;color:#fff3cd!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{
+ font:750 clamp(13px,1.05vw,16px) Nunito,sans-serif!important;color:#f6edd9!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-arrow{
+ border:2px solid #f3d58e!important;background:linear-gradient(160deg,#004581,#002448)!important;
+ box-shadow:0 4px 11px #000a!important
+}
+/* Desafio: cinco imagens clicáveis, sem os retângulos de fundo. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-screen,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes{
+ align-items:center!important;justify-items:center!important;gap:clamp(8px,2.1vw,28px)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode{
+ width:100%!important;height:100%!important;min-height:0!important;
+ padding:0!important;overflow:visible!important;border-radius:0!important;
+ filter:drop-shadow(0 7px 10px #000a)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode img{
+ display:block!important;object-fit:contain!important;height:100%!important;width:100%!important;
+ max-height:100%!important;max-width:100%!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode span{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:hover,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:focus-visible{
+ transform:translateY(-3px) scale(1.045)!important;filter:brightness(1.12) drop-shadow(0 7px 12px #000a)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-guidance{
+ color:#fff7e7!important;font:900 clamp(17px,1.6vw,24px) Nunito,sans-serif!important;
+ text-shadow:0 3px 5px #000,0 0 14px #000!important
+}
+/* Preparação: eliminar TODO painel de fundo; manter apenas selects estilizados. */
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label{
+ background:transparent!important;border:0!important;box-shadow:none!important;outline:0!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{
+ align-items:center!important;padding:0!important;min-height:0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account strong{
+ color:#fff6d9!important;font:900 clamp(16px,1.3vw,21px) Nunito,sans-serif!important;
+ text-shadow:0 3px 7px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account small{
+ color:#fff1ca!important;font:800 clamp(13px,1vw,16px) Nunito,sans-serif!important;
+ text-shadow:0 2px 7px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{
+ color:#fff2bc!important;font:900 clamp(29px,3.2vw,47px) Cinzel,Georgia,serif!important;
+ text-shadow:0 3px 4px #000,0 0 18px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head small{
+ color:#fff5d1!important;font:800 clamp(13px,1.1vw,17px) Nunito,sans-serif!important;
+ text-shadow:0 2px 7px #000
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label{
+ font:900 clamp(17px,1.45vw,23px)/1.15 Nunito,sans-serif!important;color:#fff9e9!important;
+ text-shadow:0 2px 4px #000,0 0 14px #000!important;
+ padding:3px!important;gap:5px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ color:#fff6e0!important;background:linear-gradient(180deg,#07375d,#061b34)!important;
+ border:3px solid #f4cf79!important;border-radius:13px!important;
+ box-shadow:0 5px 0 #49300f,0 8px 16px #0008!important;
+ font:900 clamp(16px,1.36vw,21px) Nunito,sans-serif!important;
+ min-height:clamp(46px,6.5vh,63px)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-label{
+ color:#fff6de!important;font:900 clamp(15px,1.15vw,18px) Nunito,sans-serif!important;text-shadow:0 2px 5px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-nodes:before{
+ height:7px!important;background:linear-gradient(90deg,#fef1b5,#f6ce51,#fef1b5)!important;box-shadow:0 1px 8px #000
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-node{
+ background:linear-gradient(150deg,#003f7b,#001d40)!important;
+ color:#fff6d4!important;border:2px solid #fbe2a0!important;
+ font:900 clamp(13px,1.15vw,17px) Nunito,sans-serif!important;
+ box-shadow:0 4px 7px #0007!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ background:none!important;border:0!important;box-shadow:none!important
+}
+/* Arena: eliminar pequenas caixas secundárias sem sacrificar instrumentos do HUD. */
+body.cm-art-on .stage.cm-art-ready .range-progress{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ backdrop-filter:none!important;filter:drop-shadow(0 3px 5px #000c)!important
+}
+body.cm-art-on .stage.cm-art-ready .battle-hud,
+body.cm-art-on .stage.cm-art-ready .hud-pill,
+body.cm-art-on .stage.cm-art-ready .arena-mode-badge{
+ background:transparent!important;box-shadow:none!important;backdrop-filter:none!important
+}
+/* Resultado: destaque épico sem modal marrom nem blur geral sobre a arena. */
+#view-arena #finish.finish{
+ background:transparent!important;backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important
+}
+#view-arena #finish .finish-card{
+ width:min(950px,97%)!important;max-width:none!important;
+ background:transparent!important;border:0!important;outline:0!important;
+ box-shadow:none!important;backdrop-filter:none!important;
+ -webkit-backdrop-filter:none!important;overflow:visible!important;
+ padding:clamp(6px,2vw,22px)!important;
+ filter:drop-shadow(0 4px 7px #000e)!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important
+}
+#view-arena #finish .finish-card > small{
+ color:#fff5d2!important;font:900 clamp(15px,1.3vw,21px) Cinzel,Georgia,serif!important;
+ text-shadow:0 2px 7px #000,0 0 17px #000!important
+}
+#view-arena #finish #finish-title{
+ color:#fff3ba!important;font:900 clamp(34px,5.4vw,72px)/1.06 Cinzel,Georgia,serif!important;
+ text-shadow:0 3px 0 #8c3505,0 6px 7px #000,0 0 26px #fc8c18!important;
+ margin:1px 0!important
+}
+#view-arena #finish #finish-desc{
+ max-width:750px!important;color:#fff8e5!important;
+ font:850 clamp(18px,1.8vw,27px)/1.3 Nunito,sans-serif!important;
+ text-shadow:0 2px 4px #000,0 0 14px #000!important
+}
+#view-arena #finish .finish-results{
+ border:0!important;color:#fff5c6!important;
+ font:900 clamp(25px,3.4vw,48px) Cinzel,Georgia,serif!important;
+ text-shadow:0 3px 5px #000,0 0 18px #000!important;
+ margin:0!important;padding:7px!important
+}
+#view-arena #finish .finish-actions{width:100%;display:flex;justify-content:center;gap:clamp(12px,3vw,36px)}
+#view-arena #finish #play-again{
+ border:0!important;background: url("assets/ui/buttons/botao-jogar-novamente.png") center/contain no-repeat!important;
+ color:transparent!important;font-size:0!important;
+ width:min(42vw,420px)!important;height:clamp(65px,13vh,118px)!important;
+ box-shadow:none!important;padding:0!important;filter:drop-shadow(0 6px 7px #000a)!important
+}
+#view-arena #finish #share-result{
+ border:0!important;background:url("assets/ui/buttons/botao-proximo-desafio.png") center/contain no-repeat!important;
+ color:transparent!important;font-size:0!important;
+ width:min(42vw,420px)!important;height:clamp(65px,13vh,118px)!important;
+ padding:0!important;box-shadow:none!important;filter:drop-shadow(0 6px 7px #000a)!important
+}
+#view-arena #finish #share-result.cm-retry{
+ color:#fff5cc!important;font:900 clamp(14px,1.5vw,22px) Nunito,sans-serif!important;
+ background:linear-gradient(160deg,#053f78,#013262)!important;border:3px solid #f9ce71!important;
+ border-radius:14px!important
+}
+#view-arena #finish .share-help{
+ color:#fff7d9!important;font:800 clamp(13px,1.1vw,16px) Nunito,sans-serif!important;
+ text-shadow:0 2px 6px #000!important;max-width:min(85vw,750px)
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading h2{font-size:22px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading p{font-size:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected strong{font-size:18px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{font-size:13px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{font-size:11px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{font-size:22px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label{font-size:15px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{font-size:14px!important;min-height:40px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{display:none!important}
+ #view-arena #finish #finish-title{font-size:clamp(29px,7vw,43px)!important}
+ #view-arena #finish #finish-desc{font-size:16px!important}
+ #view-arena #finish .finish-results{font-size:20px!important}
+ #view-arena #finish #play-again,#view-arena #finish #share-result{width:44vw!important;height:68px!important}
+}
