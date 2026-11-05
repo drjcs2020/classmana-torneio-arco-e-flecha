@@ -23,6 +23,16 @@ jobs:
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
+      - name: Extrair kit de artes aprovado (quando presente)
+        run: |
+          if [ -f ClassMana_Integracao_Visual_01.zip ]; then
+            unzip -q -o ClassMana_Integracao_Visual_01.zip -d .
+            test -f assets/ui/hud/forca-01-moldura.png
+            test -f assets/scenes/aguia.webp
+            echo "Sprites individuais e cenários disponíveis."
+          else
+            echo "Kit ainda não enviado: jogo existente permanece funcional com arte antiga."
+          fi
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
       - name: Preparar arquivos do jogo
