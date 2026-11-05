@@ -43,6 +43,8 @@ jobs:
           cp backend/Code.gs /tmp/classmana-backend-qa.js
           node --check /tmp/classmana-backend-qa.js
           node scripts/qa-static.mjs
+      - name: Testar backend v7 em memória (sem alterar planilha real)
+        run: node scripts/qa-backend.mjs
       - name: Install browser test runner
         run: |
           npm install --no-save --ignore-scripts playwright@1.56.1
