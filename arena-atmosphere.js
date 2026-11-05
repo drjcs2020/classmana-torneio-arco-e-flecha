@@ -131,7 +131,7 @@ export function initAtmosphere(stage,read){
    const m=data.metrics;
    const shift=targetMotion(data.level,data.index||0,data.seconds||0);
    const baseX=m.x-shift.x*m.r,baseY=m.y-shift.y*m.r;
-   drawRail(w,h,{x:baseX,y:baseY,r:m.r},palette);
+   if(stage.dataset.sceneEngine!=='playcanvas')drawRail(w,h,{x:baseX,y:baseY,r:m.r},palette);
    if(data.level==='lendario'){
     const o=obstacleAt(data.level,data.index||0,data.seconds||0);
     if(o)shield(m.x+o.x*m.r,m.y+o.y*m.r,m.r,palette,t);
