@@ -32,6 +32,10 @@ try{
  });
  console.log('LAYOUT DIAGNOSTIC',JSON.stringify(geometry));
  assert(geometry['button.house[data-house="A"]'].rect.height>140,'House card collapsed');
+ for(const house of await desktop.locator('button.house').all()){
+  const b=await house.boundingBox();
+  assert(b&&b.width>200&&b.height>250,'House card collapsed on desktop: '+JSON.stringify(b));
+ }
  await shot(desktop,'01-escolha-casa-desktop');
  await desktop.locator('button.house[data-house="B"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
@@ -63,6 +67,10 @@ try{
  mobile.on('pageerror',e=>errors.push('mobile: '+e.message));
  await mobile.goto(base,{waitUntil:'domcontentloaded'});await mobile.waitForTimeout(600);
  assert.equal(await mobile.locator('#view-inicio').getAttribute('data-step'),'reino');
+ for(const house of await mobile.locator('button.house').all()){
+  const b=await house.boundingBox();
+  assert(b&&b.width>250&&b.height>120,'House card collapsed on mobile: '+JSON.stringify(b));
+ }
  await shot(mobile,'06-casa-mobile');
  await mobile.locator('button.house[data-house="C"]').click();
  assert.equal(await mobile.locator('#view-inicio').getAttribute('data-step'),'heroi');
