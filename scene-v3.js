@@ -26,6 +26,10 @@ export function initScene(canvas, getSettings) {
   parent.dataset.sceneEngine='loading';
   const state={kind:'PlayCanvas + fundo modular',setHouse,setEquipment,setTargetShift,setAim,setPower,setBackdropMode,
     getTargetMetrics, getAimPoint, fire, impact, destroy};
+  // Diagnóstico apenas durante testes (?qa=1), sem controles visíveis no jogo.
+  if(new URLSearchParams(location.search).has('qa'))parent.cmAimDiagnostic=()=>({
+   kind:state.kind,input:{x:aimX,y:aimY},projected:getAimPoint()
+  });
   const root=()=>app.root;
   const canvasSize=()=>({w:parent.clientWidth||1050,h:parent.clientHeight||540});
 
@@ -58,7 +62,9 @@ export function initScene(canvas, getSettings) {
     if(ready&&sightAnchor&&camera?.camera&&app?.graphicsDevice){
       updateBowAim();
       const p=camera.camera.worldToScreen(sightAnchor.getPosition());
-      const width=app.graphicsDevice.width,height=app.graphicsDevice.height;
+      // worldToScreen devolve pixels CSS; width/height do WebGL são pixels
+       // físicos e causavam desvios horizontais/verticais com zoom/DPR.
+       const width=gl?.clientWidth||canvasSize().w,height=gl?.clientHeight||canvasSize().h;
       if(Number.isFinite(p.x)&&Number.isFinite(p.y)&&width>0&&height>0)
         return {x:clamp(p.x/width,0,1),y:clamp(p.y/height,0,1)};
     }
@@ -335,8 +341,10 @@ export function initScene(canvas, getSettings) {
     tube('bow-trim lower line',[[.062,-.2,-.028],[.118,-.90,-.021],[.04,-1.36,.025]],[.01,.011,.007],gold,bowRoot);
     const grip=primitive('cylinder','ergonomic dark handgrip',[.03,-.12,-.08],[.17,.43,.13],dark,bowRoot,[0,0,90]);
     // Sight rig: ring placed left of riser, towards player, distinct from 2D crosshair.
-    tube('sight bridge',[[-.02,.25,-.08],[-.25,.25,-.08],[-.52,.25,-.08]],[.013,.012,.009],dark,bowRoot);
-    const sight=new pc.Entity('Circle aiming sight');sight.setLocalPosition(-.55,.25,-.08);bowRoot.addChild(sight);sightAnchor=sight;
+    tube('sight bridge',[[-.02,.25,-.08],[-.57,.25,-.08],[-1.12,.25,-.08]],[.013,.012,.009],dark,bowRoot);
+    // Visão em primeira pessoa: o corpo do arco fica à direita do alvo,
+    // enquanto o anel da mira acompanha exatamente o ponteiro.
+    const sight=new pc.Entity('Circle aiming sight');sight.setLocalPosition(-1.15,.25,-.08);bowRoot.addChild(sight);sightAnchor=sight;
     circleMesh('sight black metal ring',.088,.007,dark,sight);
     circleMesh('sight gilded inner rim',.078,.0026,gold,sight);
     tube('sight vertical line',[[0,-.044,.003],[0,0,.003],[0,.044,.003]],[.0009,.0009,.0009],silver,sight,5);
@@ -361,14 +369,15 @@ export function initScene(canvas, getSettings) {
     // Converter o PONTEIRO para o mesmo raio da câmera em que o alvo é renderizado:
     // o retículo metálico 3D coincide com o pixel CSS apontado, sem ajuste manual.
     const depth=2.70;
-    // PlayCanvas usa pixels do render target (incluindo DPI), não pixels CSS.
-    const deviceW=app?.graphicsDevice?.width||gl?.width||w;
-    const deviceH=app?.graphicsDevice?.height||gl?.height||h;
-    const sightWorld=camera.camera.screenToWorld(aimX*deviceW,aimY*deviceH,depth);
+    // screenToWorld EXIGE pixels CSS do canvas (offsetWidth/offsetHeight).
+    // Usar width/height do buffer multiplicava a mira pelo DPR da tela.
+    const cssW=gl?.clientWidth||w;
+    const cssH=gl?.clientHeight||h;
+    const sightWorld=camera.camera.screenToWorld(aimX*cssW,aimY*cssH,depth);
     const sightLocal=camera.getWorldTransform().clone().invert().transformPoint(sightWorld);
     bowRoot.setLocalEulerAngles(-dy*2,dx*2,Math.sin(t*1.7)*.1);
     const scale=bowRoot.getLocalScale().x;
-    const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-.55*scale,.25*scale,-.08*scale));
+    const offset=bowRoot.getLocalRotation().transformVector(new pc.Vec3(-1.15*scale,.25*scale,-.08*scale));
     bowRoot.setLocalPosition(sightLocal.sub(offset));
     if(arrowLoaded)arrowLoaded.setLocalPosition(.02,-.03,-.40+.36*power);
     if(bowString)bowString.setLocalPosition(0,0,.19*power);
