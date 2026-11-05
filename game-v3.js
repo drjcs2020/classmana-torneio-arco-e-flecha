@@ -62,7 +62,7 @@ function openView(name){
  if(name==='ranking')renderRanking();
 }
 function setLobbyStep(step){
- if(!['reino','heroi','partida'].includes(step))return;
+ if(!['menu','reino','heroi','partida'].includes(step))return;
  const el=$('view-inicio');if(!el)return;
  el.dataset.step=step;
  document.querySelectorAll('[data-lobby-step]').forEach(button=>{
@@ -107,14 +107,14 @@ function fillRivals(){
 }
 
 const ARCHER_SKINS={
- A:{m:"aguia-masculino.webp",f:"aguia-feminino.webp",desc:"Armadura azul e dourada, precisão do vento.",mascot:"Águia Dourada"},
- B:{m:"leao-masculino.webp",f:"leao-feminino.webp",desc:"Armadura vermelha e dourada, coragem do fogo.",mascot:"Leão de Fogo"},
- C:{m:"dragao-masculino.webp",f:"dragao-feminino.webp",desc:"Armadura verde-esmeralda e arco dracônico.",mascot:"Dragão de Esmeralda"}
+ A:{m:"arqueiro-aguia-dourada.png",f:"arqueira-aguia-dourada.png",desc:"Armadura azul e dourada, precisão do vento.",mascot:"Águia Dourada"},
+ B:{m:"arqueiro-leao-de-fogo.png",f:"arqueira-leao-de-fogo.png",desc:"Armadura vermelha e dourada, coragem do fogo.",mascot:"Leão de Fogo"},
+ C:{m:"arqueiro-dragao-de-esmeralda.png",f:"arqueira-dragao-de-esmeralda.png",desc:"Armadura verde-esmeralda e arco dracônico.",mascot:"Dragão de Esmeralda"}
 };
 let selectedSkins={};
 try{selectedSkins=JSON.parse(localStorage.getItem("classmana-archer-skins-v1")||"{}")||{}}catch{}
 function archerGender(){return selectedSkins[house]==="f"?"f":"m"}
-function archerImage(){return "assets/archers/"+ARCHER_SKINS[house][archerGender()]}
+function archerImage(){return "assets/ui/characters/"+ARCHER_SKINS[house][archerGender()]}
 function refreshArcher(){
  const female=archerGender()==='f',title=(female?'Arqueira':'Arqueiro')+' da '+H[house].name;
  const titleEl=$('hero-preview-name'),desc=$('hero-preview-desc'),img=$('hero-preview-img');
@@ -635,7 +635,15 @@ spriteHud=mountSpriteHUD({
   $('stage').classList.remove('aiming');scene?.setPower(p);fire(p);uiHud();},
  onPause:toggleArenaPause
 });
-selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');
+selectHouse('A');updateMode();drawCourse();setLobbyStep('menu');
+$('cm-start-play')?.addEventListener('click',()=>setLobbyStep('reino'));
+$('cm-menu-challenge')?.addEventListener('click',()=>{setLobbyStep('partida');$('mode').value='challenge_same';updateMode();});
+$('cm-menu-rank')?.addEventListener('click',()=>openView('ranking'));
+$('cm-menu-rules')?.addEventListener('click',()=>openView('regras'));
+$('cm-lobby-back')?.addEventListener('click',()=>{
+ const step=$('view-inicio')?.dataset.step;
+ setLobbyStep(step==='partida'?'heroi':step==='heroi'?'reino':'menu');
+});
 function restoreArena(){
  if(document.body.dataset.page!=='arena')return;
  let saved=null;

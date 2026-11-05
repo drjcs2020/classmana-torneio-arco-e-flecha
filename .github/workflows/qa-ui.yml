@@ -24,6 +24,17 @@ jobs:
             test -f assets/scenes/dragao.webp
             echo "Sprites e cenários carregados para QA."
           fi
+      - name: Carregar as artes aprovadas em dois pacotes para os testes
+        run: |
+          P1=ClassMana_Assets_Parte_1_Personagens_Interface.zip
+          P2=ClassMana_Assets_Parte_2_Cenarios_Botoes_HUD.zip
+          if [ -f "$P1" ] && [ -f "$P2" ]; then
+            unzip -q -o "$P1" -d .
+            unzip -q -o "$P2" -d .
+            test -f assets/ui/titles/logo-classmana-torneio.png
+            test -f assets/ui/characters/arqueiro-aguia-dourada.png
+            test -f assets/ui/buttons/botao-jogar-3d.png
+          fi
       - name: Check JavaScript syntax and file references
         run: |
           node --check game-v3.js

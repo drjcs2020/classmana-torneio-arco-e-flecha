@@ -2,13 +2,13 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#d6f9e9">
+<meta name="theme-color" content="#081a36">
 <meta name="description" content="Torneio de Arco e Flecha das três Casas ClassMana: Águia Dourada, Leão de Fogo e Dragão de Esmeralda.">
 <title>ClassMana — Torneio de Arco e Flecha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Cinzel:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
-<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1">
+<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1"><link rel="stylesheet" href="lobby-fantasy.css?v=1">
 </head>
 <body data-page="lobby">
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -23,7 +23,26 @@
 </header>
 
 <main>
-<section id="view-inicio" class="view active" data-step="reino" aria-label="Página 1 — Preparar o torneio">
+<section id="view-inicio" class="view active" data-step="menu" aria-label="Página 1 — Preparar o torneio">
+
+ <div class="cm-start-menu" id="cm-main-menu" aria-label="Menu principal do Torneio">
+  <div class="cm-menu-worlds" aria-hidden="true"><div class="cm-menu-world"></div><div class="cm-menu-world"></div><div class="cm-menu-world"></div></div>
+  <img class="cm-menu-logo" src="assets/ui/titles/logo-classmana-torneio.png" alt="ClassMana — Torneio das Três Casas — Arena de Arco e Flecha">
+  <div class="cm-menu-archers" aria-hidden="true">
+   <img class="cm-menu-archer" src="assets/ui/characters/arqueiro-aguia-dourada.png" alt="">
+   <img class="cm-menu-archer" src="assets/ui/characters/arqueiro-leao-de-fogo.png" alt="">
+   <img class="cm-menu-archer" src="assets/ui/characters/arqueira-dragao-de-esmeralda.png" alt="">
+  </div>
+  <div class="cm-menu-actions">
+   <button type="button" id="cm-start-play" class="cm-sprite-button" aria-label="Jogar — escolher uma Casa"><img src="assets/ui/buttons/botao-jogar-3d.png" alt=""></button>
+   <div class="cm-menu-links">
+    <button type="button" id="cm-menu-challenge" class="cm-sprite-button" aria-label="Desafios"><img src="assets/ui/buttons/classmana-desafios.png" alt=""></button>
+    <button type="button" id="cm-menu-rank" class="cm-sprite-button" aria-label="Ranking"><img src="assets/ui/buttons/classmana-ranking.png" alt=""></button>
+    <button type="button" id="cm-menu-rules" class="cm-sprite-button" aria-label="Regras"><img src="assets/ui/buttons/classmana-regras.png" alt=""></button>
+   </div>
+  </div>
+ </div>
+ <button type="button" id="cm-lobby-back" class="cm-sprite-button cm-lobby-back" aria-label="Voltar à tela anterior"><img src="assets/ui/buttons/classmana-voltar.png" alt=""></button>
  <div class="section-title kingdom-title"><div><small>⚔️ TORNEIO DAS TRÊS CASAS</small><h1>Escolha seu Reino</h1></div><p>3 Casas · 6 arqueiros · 1 grande aventura</p></div>
  <div class="lobby-steps" id="lobby-steps" role="tablist" aria-label="Preparação do torneio">
   <button type="button" class="lobby-step chosen" data-lobby-step="reino" role="tab" aria-selected="true">1 · Reino</button>
@@ -31,15 +50,15 @@
   <button type="button" class="lobby-step" data-lobby-step="partida" role="tab" aria-selected="false">3 · Jogar</button>
  </div>
  <div class="houses" id="houses" aria-label="Escolha sua Casa">
-  <button class="house house-a selected" data-house="A" aria-pressed="true" style="--house-bg:url('assets/kingdoms/aguia-card.webp')">
+  <button class="house house-a selected" data-house="A" aria-pressed="true" style="--house-bg:url('assets/scenes/aguia.webp')">
    <span class="house-shine" aria-hidden="true"></span><span class="house-name">ÁGUIA DOURADA</span>
    <span class="house-grade">4º ANO A · CASTELO AZUL E DOURADO</span><span class="house-check">✓ SELECIONADA</span>
   </button>
-  <button class="house house-b" data-house="B" aria-pressed="false" style="--house-bg:url('assets/kingdoms/leao-card.webp')">
+  <button class="house house-b" data-house="B" aria-pressed="false" style="--house-bg:url('assets/scenes/leao.webp')">
    <span class="house-shine" aria-hidden="true"></span><span class="house-name">LEÃO DE FOGO</span>
    <span class="house-grade">4º ANO B · CASTELO VERMELHO E DOURADO</span><span class="house-check">ESCOLHER CASA</span>
   </button>
-  <button class="house house-c" data-house="C" aria-pressed="false" style="--house-bg:url('assets/kingdoms/dragao-card.webp')">
+  <button class="house house-c" data-house="C" aria-pressed="false" style="--house-bg:url('assets/scenes/dragao.webp')">
    <span class="house-shine" aria-hidden="true"></span><span class="house-name">DRAGÃO DE ESMERALDA</span>
    <span class="house-grade">4º ANO C · CASTELO VERDE E ESMERALDA</span><span class="house-check">ESCOLHER CASA</span>
   </button>
@@ -49,7 +68,7 @@
   <div class="studio-heading"><small>PERSONAGEM DA SUA CASA</small><h2 id="hero-preview-name">Águia Dourada · 4º A</h2></div>
   <div class="studio-carousel" role="group" aria-label="Carrossel dos personagens">
    <button id="archer-prev" type="button" class="studio-arrow" aria-label="Personagem anterior">‹</button>
-   <div class="studio-portrait"><img src="assets/archers/aguia-masculino.webp" id="hero-preview-img" alt="Arqueiro da Águia Dourada, de corpo inteiro" draggable="false"></div>
+   <div class="studio-portrait"><img src="assets/ui/characters/arqueiro-aguia-dourada.png" id="hero-preview-img" alt="Arqueiro da Águia Dourada, de corpo inteiro" draggable="false"></div>
    <button id="archer-next" type="button" class="studio-arrow" aria-label="Próximo personagem">›</button>
   </div>
   <div class="studio-selected" aria-live="polite"><strong id="archer-carousel-indicator">Arqueiro · 1 de 2</strong><span id="hero-preview-desc">Armadura azul e dourada.</span></div>
@@ -174,6 +193,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=sprite1"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=lobby2"></script>
 </body>
 </html>

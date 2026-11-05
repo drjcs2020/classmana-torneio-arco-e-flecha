@@ -17,10 +17,14 @@ try{
  await page.waitForTimeout(1100);
  assert.equal(await page.locator('body').getAttribute('data-page'),'lobby');
  await record(page,'lobby-desktop');
+ assert(await page.locator('#cm-main-menu').isVisible(),'Menu inicial com sprites não apareceu');
+ assert(await page.locator('#cm-start-play').isVisible(),'Botão JOGAR não apareceu');
+ await page.locator('#cm-start-play').click();
+ assert.equal(await page.locator('#view-inicio').getAttribute('data-step'),'reino');
  await page.locator('button.house[data-house="B"]').click();
  assert.equal(await page.locator('button.house[data-house="B"]').getAttribute('aria-pressed'),'true');
  await page.locator('#archer-next').click();
- assert.match(await page.locator('#hero-preview-img').getAttribute('src'),/leao-feminino\.webp$/);
+ assert.match(await page.locator('#hero-preview-img').getAttribute('src'),/arqueira-leao-de-fogo\.png$/);
  await page.locator('[data-equip-bow="real"]').click();
  assert.equal(await page.locator('[data-equip-bow="real"]').getAttribute('aria-pressed'),'true');
  await page.locator('#confirm-archer').click();
@@ -43,6 +47,7 @@ try{
  phone.on('pageerror',e=>errors.push(e.message));
  await phone.goto(base,{waitUntil:'domcontentloaded'});await phone.waitForTimeout(850);
  await record(phone,'lobby-mobile-realm');
+ await phone.locator('#cm-start-play').click();
  await phone.locator('button.house[data-house="C"]').click();
  assert.equal(await phone.locator('#view-inicio').getAttribute('data-step'),'heroi');
  await record(phone,'lobby-mobile-character');
