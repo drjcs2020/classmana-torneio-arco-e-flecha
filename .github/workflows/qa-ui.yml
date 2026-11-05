@@ -14,6 +14,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Preparar artes para teste quando o ZIP existir
+        run: |
+          if [ -f ClassMana_Integracao_Visual_01.zip ]; then
+            unzip -q -o ClassMana_Integracao_Visual_01.zip -d .
+            test -f assets/ui/hud/painel-vento-dinamico.png
+            test -f assets/ui/hud/forca-01-moldura.png
+            test -f assets/scenes/leao.webp
+            test -f assets/scenes/dragao.webp
+            echo "Sprites e cenários carregados para QA."
+          fi
       - name: Check JavaScript syntax and file references
         run: |
           node --check game-v3.js
