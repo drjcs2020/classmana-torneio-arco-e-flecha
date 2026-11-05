@@ -1,0 +1,280 @@
+/* ClassMana 2026 — revisão visual. Este arquivo carrega DEPOIS dos estilos antigos.
+ * Nenhum menu em prancha: cada botão/figura é um DOM independente.
+ * Paleta: pedra grafite, bronze, ouro, cores das Casas; sem painéis azuis translúcidos.
+ */
+body[data-page="lobby"]{background:#140e0b!important;color:#fff3d0!important}
+body[data-page="lobby"] #view-inicio.active{position:relative!important;display:block!important;width:100vw!important;height:100dvh!important;overflow:hidden!important}
+body[data-page="lobby"] #view-inicio{background-position:center center!important;background-size:cover!important}
+body[data-page="lobby"] #view-inicio:before{background:linear-gradient(180deg,#130d090f 0%,transparent 55%,#100a0d75 100%)!important;z-index:0!important}
+body[data-page="lobby"] #view-inicio > .cm-start-menu{display:none!important}
+body[data-page="lobby"] #view-inicio > .lobby-steps{display:none!important}
+body[data-page="lobby"] #view-inicio:not([data-step="reino"]) > .houses,
+body[data-page="lobby"] #view-inicio:not([data-step="reino"]) > .cm-house-title,
+body[data-page="lobby"] #view-inicio:not([data-step="heroi"]) > .character-studio,
+body[data-page="lobby"] #view-inicio:not([data-step="desafio"]) > .cm-duel-screen,
+body[data-page="lobby"] #view-inicio:not([data-step="partida"]) > .setup{display:none!important}
+body[data-page="lobby"] #view-inicio > .kingdom-title{
+ position:absolute!important;top:0!important;left:50%!important;transform:translateX(-50%)!important;
+ display:block!important;width:min(45vw,570px)!important;height:clamp(98px,20vh,172px)!important;
+ background:url("assets/ui/titles/logo-classmana-torneio.png") center/contain no-repeat!important;
+ z-index:4!important;pointer-events:none
+}
+body[data-page="lobby"] #view-inicio .kingdom-title *{display:none!important}
+body[data-page="lobby"] #view-inicio > .cm-house-title{
+ display:block!important;position:absolute;top:17.5%;left:50%;transform:translateX(-50%);
+ width:min(59vw,860px);max-height:12.5%;object-fit:contain;z-index:4;filter:drop-shadow(0 6px 12px #130707)
+}
+body[data-page="lobby"] #cm-lobby-back{
+ display:none!important;position:absolute!important;top:12px!important;left:11px!important;
+ z-index:20!important;width:clamp(95px,13vw,170px)!important;height:clamp(48px,7.5vh,76px)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #cm-lobby-back,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-lobby-back,
+body[data-page="lobby"] #view-inicio[data-step="partida"] #cm-lobby-back{display:block!important}
+body[data-page="lobby"] #cm-lobby-back img,.cm-image-control img{width:100%;height:100%;object-fit:contain!important;pointer-events:none}
+body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{
+ position:absolute!important;left:5%!important;right:5%!important;top:31%!important;bottom:4%!important;
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:clamp(12px,2vw,30px)!important;width:auto!important;height:auto!important;max-height:none!important;
+ align-items:stretch!important;z-index:3!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house{
+ position:relative!important;display:block!important;min-height:0!important;height:100%!important;
+ overflow:hidden!important;border:6px ridge #e8b447!important;border-radius:clamp(15px,1.8vw,26px)!important;
+ background:#29140f!important;padding:0!important;
+ box-shadow:0 14px 31px #000b,inset 0 0 36px #e6bd7a88!important;
+ transition:transform .24s ease,filter .24s ease!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:before{
+ position:absolute!important;inset:0!important;
+ background:var(--house-bg) center top/cover no-repeat!important;
+ filter:brightness(.83) saturate(1.15)!important;opacity:1!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:after{
+ background:linear-gradient(180deg,#100d1244 0%,#1b130914 34%,#10080822 60%,#080709df 100%)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .cm-house-sigil{
+ display:block!important;position:absolute!important;left:50%!important;top:1%!important;
+ width:clamp(50px,6.3vw,99px)!important;height:clamp(58px,9.3vh,110px)!important;
+ transform:translateX(-50%);z-index:6!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .cm-house-sigil img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px #000b)}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .cm-house-pair{
+ position:absolute!important;bottom:13%!important;top:26%!important;left:1%!important;right:1%!important;
+ display:flex!important;align-items:end;justify-content:center;gap:0;z-index:2!important;pointer-events:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .cm-house-pair img{
+ display:block;width:53%;height:100%;max-width:53%;object-fit:contain;object-position:center bottom;
+ filter:drop-shadow(0 9px 7px #02020298)
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .cm-house-pair img:first-child{transform:translateX(9%) scale(1.05)}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .cm-house-pair img:last-child{transform:translateX(-10%)}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-name,
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-grade{
+ position:absolute!important;left:3%!important;right:3%!important;z-index:7!important;
+ display:block!important;text-align:center!important;color:#fff6d6!important;
+ text-shadow:0 3px 4px #070303,0 0 7px #000!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-name{
+ top:15.5%!important;font:900 clamp(18px,2.1vw,31px)/1.05 'Cinzel',Georgia,serif!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-grade{
+ top:23%!important;font:800 clamp(10px,.94vw,13px)/1.3 Nunito,sans-serif!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-check{
+ position:absolute!important;left:50%!important;bottom:2.6%!important;transform:translateX(-50%);
+ z-index:8!important;width:min(70%,280px)!important;white-space:nowrap!important;
+ padding:clamp(7px,1.2vh,13px) 7px!important;
+ background:linear-gradient(180deg,#177c35,#0a4d20)!important;border:3px ridge #ffde84!important;
+ border-radius:12px!important;font:900 clamp(13px,1.23vw,19px) Nunito,sans-serif!important;color:#fff4d1!important;
+ box-shadow:0 4px 12px #000b!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:hover{transform:translateY(-3px) scale(1.013)!important;filter:brightness(1.1)}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:focus-visible{outline:4px solid #e5f3ff!important;outline-offset:3px!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house.selected{outline:3px solid #ffe493!important;outline-offset:2px!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .character-studio{
+ position:absolute!important;display:grid!important;top:22%!important;bottom:3%!important;left:5%!important;right:5%!important;
+ grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;gap:clamp(10px,2.4vw,30px)!important;
+ width:auto!important;height:auto!important;min-height:0!important;padding:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-character,
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-equipment{
+ min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;
+ padding:clamp(12px,1.4vw,23px)!important;
+ background:linear-gradient(140deg,#24180df0,#110f0cf2 62%,#382413f3)!important;
+ border:5px ridge #e4b15d!important;border-radius:23px!important;box-shadow:inset 0 0 18px #100909,0 10px 22px #0009!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading h2{color:#ffdfa3!important;font:900 clamp(23px,2.45vw,38px) 'Cinzel',Georgia,serif!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading small{color:#ffd380!important;font:900 clamp(12px,1vw,15px) Nunito,sans-serif!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading p{display:block!important;color:#f9e7c1!important;font-size:clamp(12px,1vw,15px)!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-carousel{
+ flex:1 1 0!important;min-height:0!important;background:radial-gradient(ellipse at 50% 93%,#86522270,transparent 70%)!important;
+ border:2px ridge #b88445!important;border-radius:15px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-portrait{overflow:hidden!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #hero-preview-img{
+ width:100%!important;height:100%!important;max-width:100%!important;object-fit:contain!important;object-position:center bottom!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-arrow{
+ background:#3b230f!important;border:2px solid #e5b45d!important;color:#ffe5a8!important;font-size:32px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected{
+ background:transparent!important;border:0!important;color:#fff5d7!important;padding:6px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected strong{
+ font:900 clamp(15px,1.5vw,24px) 'Cinzel',Georgia,serif!important;color:#ffe5ae!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows{flex:1 1 0!important;min-height:0!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice{
+ display:grid!important;grid-template-columns:minmax(56px,75px) minmax(0,1fr) 26px!important;
+ min-height:0!important;height:100%!important;background:linear-gradient(145deg,#302112,#1c1711)!important;
+ border:2px solid #c99748!important;color:#f6e6c8!important;border-radius:13px!important;padding:7px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice.chosen{
+ background:linear-gradient(145deg,#144721,#0e2a19)!important;border-color:#ffe0a4!important;
+ box-shadow:0 0 16px #50df5b59,inset 0 0 7px #ffd16e5c!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{color:#ffda8d!important;font-size:clamp(15px,1.3vw,21px)!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{color:#f3e9d7!important;font-size:clamp(11px,.92vw,14px)!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{
+ display:block!important;position:relative!important;align-self:center!important;flex:none!important;
+ width:min(88%,470px)!important;height:auto!important;aspect-ratio:3.9/1!important;
+ padding:0!important;min-height:0!important;margin:6px auto!important;background:none!important;border:0!important;
+ box-shadow:none!important;filter:drop-shadow(0 4px 8px #000a)!important;font-size:0!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-screen{
+ position:absolute!important;display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;
+ left:6%;right:6%;top:21%;bottom:4%;z-index:4!important;min-height:0;
+ padding:0 0 10px!important;background:transparent!important
+}
+.cm-duel-title{height:clamp(77px,12vh,120px);width:min(70vw,800px);object-fit:contain;filter:drop-shadow(0 5px 12px #1b0604)}
+.cm-duel-guidance{font:700 clamp(14px,1.25vw,20px) Nunito,sans-serif!important;color:#fff3d5!important;text-shadow:0 2px 7px #000;max-width:90%;text-align:center;margin:0 0 clamp(8px,2vh,25px)!important}
+.cm-duel-modes{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:clamp(7px,1.3vw,22px)!important;max-width:min(1030px,96%);width:100%;flex:1;min-height:0!important;align-items:stretch}
+.cm-duel-mode{
+ appearance:none;border:3px ridge #d9ab4e!important;border-radius:16px;min-height:0;overflow:hidden;
+ background:linear-gradient(160deg,#2e1c0fec,#120f0dec)!important;
+ box-shadow:0 5px 16px #000b!important;cursor:pointer;padding:10px!important;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px!important;
+ transition:transform .16s,filter .16s;min-width:0
+}
+.cm-duel-mode img{display:block;max-width:100%;width:100%;min-height:0;height:calc(100% - 26px);object-fit:contain;filter:drop-shadow(0 4px 8px #0008)}
+.cm-duel-mode span{font:900 clamp(13px,1.23vw,19px) 'Cinzel',Georgia,serif;color:#ffebbc;text-shadow:0 2px 6px #000}
+.cm-duel-mode:hover,.cm-duel-mode:focus-visible{transform:translateY(-3px);filter:brightness(1.18)}
+.cm-duel-mode:focus-visible{outline:3px solid #fff2ad;outline-offset:3px}
+.cm-duel-mode[data-play-mode="challenge_team"]{grid-column:1/2}
+.cm-duel-mode[data-play-mode="challenge"]{grid-column:2/4}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{
+ position:absolute!important;top:22%!important;bottom:3%!important;left:10%!important;right:10%!important;z-index:4;
+ display:flex!important;flex-direction:column!important;gap:clamp(6px,1.1vh,13px)!important;
+ width:auto!important;height:auto!important;min-height:0!important;max-width:none!important;padding:0!important;margin:0!important;
+ background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{
+ flex:none!important;background:linear-gradient(100deg,#2b1c10ef,#14110ded)!important;
+ border:3px ridge #d8aa5b!important;border-radius:16px!important;
+ box-shadow:0 6px 12px #0008!important;color:#ffefd0!important;
+ padding:8px 14px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{max-height:none!important;min-height:clamp(55px,8vh,90px)!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account strong{font-size:clamp(15px,1.4vw,20px)!important;color:#ffe5aa!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account small{font-size:clamp(12px,1vw,15px)!important;color:#eee5cd!important;white-space:normal}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{font:900 clamp(22px,2.6vw,36px) 'Cinzel',Georgia,serif!important;color:#ffdf9b!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+ flex:1 1 auto!important;min-height:0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-rows:minmax(75px,auto)!important;align-content:center!important;gap:10px!important;overflow:auto!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label{
+ display:flex!important;flex-direction:column!important;gap:7px!important;min-height:74px;
+ padding:clamp(8px,1vw,15px)!important;
+ font:900 clamp(15px,1.2vw,20px) 'Cinzel',Georgia,serif!important;
+ background:linear-gradient(150deg,#261b10f4,#120e0be9)!important;
+ border:3px ridge #c9974a!important;border-radius:13px;color:#ffe5a6!important;
+ text-shadow:0 1px 2px #000
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label.hidden{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ background:#1a170f!important;color:#fff4d8!important;border:2px solid #cda455!important;
+ border-radius:8px!important;min-height:clamp(39px,5.3vh,53px)!important;
+ font:700 clamp(15px,1.18vw,19px) Nunito,sans-serif!important;padding:6px 14px!important;width:100%!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields small{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{
+ min-height:clamp(76px,10vh,110px)!important;display:flex!important;flex-direction:column;justify-content:center;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-label{font-size:clamp(12px,1vw,17px)!important;color:#ffe0a4!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-node{
+ min-height:33px!important;font-size:clamp(12px,1vw,16px)!important;color:#ffe7ba!important;
+ background:#262014!important;border:2px ridge #e7b86b!important;border-radius:13px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-nodes:before{background:linear-gradient(90deg,#a8702a,#ffe78f,#a8702a)}
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ display:block!important;flex:none!important;position:relative!important;align-self:center!important;
+ min-height:0!important;max-height:none!important;width:min(62vw,560px)!important;
+ aspect-ratio:3.96/1!important;height:auto!important;padding:0!important;margin:0!important;
+ background:none!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 5px 10px #0009)!important;
+ font-size:0!important;cursor:pointer
+}
+body[data-page="lobby"] #start-game img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important}
+body[data-page="lobby"] #start-game:disabled{filter:grayscale(1) brightness(.6)!important;cursor:progress}
+body[data-page="lobby"] .cm-online-btn{background:#37200d!important;border:2px solid #d9ab52!important;color:#ffecbf!important}
+body[data-page="lobby"] #view-ranking.active,body[data-page="lobby"] #view-regras.active{
+ background:linear-gradient(#130f0cce,#190c08df),url("assets/scenes/aguia.webp") center/cover no-repeat!important
+}
+body[data-page="lobby"] .information-view .page-heading,
+body[data-page="lobby"] .information-view .ranking-panel,body[data-page="lobby"] .information-view .rules-grid article{
+ background:linear-gradient(135deg,#2e1d14f5,#18110df5)!important;
+ border:3px ridge #e0b75d!important;color:#ffedc9!important
+}
+body[data-page="lobby"] .information-view .page-heading h1{color:#ffe4a3!important}
+body[data-page="lobby"] .information-view .ranking-panel h2{color:#ffdd9c!important}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio > .kingdom-title{top:0!important;width:min(75vw,450px)!important;height:13vh!important}
+ body[data-page="lobby"] #view-inicio > .cm-house-title{top:13%;width:83vw;max-height:9%}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{
+  top:23%!important;bottom:2%!important;left:5%!important;right:5%!important;
+  display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:7px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house{border-width:3px!important;border-radius:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .cm-house-sigil{left:8%!important;top:11%!important;transform:none;width:51px!important;height:60px!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .cm-house-pair{left:42%!important;right:0!important;top:2%!important;bottom:1%!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-name{top:21%!important;left:2%!important;right:43%!important;font-size:clamp(17px,4.1vw,26px)!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-grade{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-check{bottom:5%!important;left:23%!important;width:43%!important;font-size:11px!important;padding:5px!important}
+ body[data-page="lobby"] #cm-lobby-back{top:6px!important;left:3px!important;width:90px!important;height:48px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .character-studio{
+  top:16%!important;bottom:1%!important;left:2%!important;right:2%!important;
+  grid-template-columns:1fr!important;grid-template-rows:minmax(0,1.05fr) minmax(0,.95fr)!important;gap:5px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-character,
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-equipment{padding:7px!important;border-width:2px!important;border-radius:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:1fr!important;gap:4px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice{display:flex!important;flex-direction:column!important;gap:2px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{font-size:clamp(11px,2.9vw,15px)!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{font-size:10px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{height:56px!important;aspect-ratio:auto!important;width:min(92%,400px)!important}
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-screen{top:16%!important;bottom:2%!important;left:2%;right:2%}
+ .cm-duel-title{width:94vw;height:12vh}
+ .cm-duel-guidance{font-size:12px!important;margin:3px!important}
+ .cm-duel-modes{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:4px!important}
+ .cm-duel-mode{padding:4px!important;border-width:2px!important;border-radius:9px!important}
+ .cm-duel-mode span{font-size:11px}
+ .cm-duel-mode[data-play-mode="challenge_team"]{grid-column:auto}
+ .cm-duel-mode[data-play-mode="challenge"]{grid-column:1/3}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{top:16%!important;bottom:1%!important;left:2%!important;right:2%!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{min-height:47px!important;max-height:67px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account strong{font-size:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account small{font-size:10px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{font-size:19px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{grid-template-columns:1fr!important;grid-auto-rows:minmax(57px,auto)!important;gap:5px!important;align-content:start!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label{min-height:56px!important;padding:5px!important;font-size:12px!important;gap:2px!important;border-width:2px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{font-size:13px!important;min-height:31px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{width:min(95vw,490px)!important;height:67px!important;aspect-ratio:auto!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .cm-duel-mode,body[data-page="lobby"] #view-inicio[data-step="reino"] .house{transition:none!important}
+}
