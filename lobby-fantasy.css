@@ -1,0 +1,180 @@
+/* ClassMana — Entrada cinematográfica e menus com sprites independentes.
+   Visuais reais vêm do kit aprovado, carregado por GitHub Pages. */
+body[data-page="lobby"]{background:#071827!important;color:#f9f2dc!important}
+body[data-page="lobby"] .sky-sparkles{display:none!important}
+body[data-page="lobby"] .page{max-width:none!important;width:100%!important;padding:0!important;margin:0!important}
+body[data-page="lobby"] .nav-bar{display:none!important}
+body[data-page="lobby"] main{height:100dvh!important;max-height:100dvh!important;width:100%!important;min-height:0!important;overflow:hidden!important}
+body[data-page="lobby"] #view-inicio.active{
+ display:block!important;position:relative!important;width:100%!important;height:100%!important;min-height:0!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;isolation:isolate;
+ background:#071a2c url('assets/scenes/aguia.webp') center/cover no-repeat!important
+}
+body[data-page="lobby"] #view-inicio::before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(180deg,rgba(0,7,19,.20) 0%,rgba(3,13,33,.02) 30%,rgba(3,12,32,.68) 100%)!important
+}
+body[data-page="lobby"] #view-inicio[data-house="B"]{background-image:url('assets/scenes/leao.webp')!important}
+body[data-page="lobby"] #view-inicio[data-house="C"]{background-image:url('assets/scenes/dragao.webp')!important}
+body[data-page="lobby"] #view-inicio[data-step="menu"] > :not(.cm-start-menu){display:none!important}
+body[data-page="lobby"] #view-inicio:not([data-step="menu"]) .cm-start-menu{display:none!important}
+.cm-start-menu{position:absolute;inset:0;display:block;isolation:isolate;overflow:hidden}
+.cm-menu-worlds{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);z-index:-1}
+.cm-menu-world{position:relative;background-size:cover;background-position:center;filter:saturate(1.2) contrast(1.07)}
+.cm-menu-world:nth-child(1){background-image:url('assets/scenes/aguia.webp')}
+.cm-menu-world:nth-child(2){background-image:url('assets/scenes/leao.webp')}
+.cm-menu-world:nth-child(3){background-image:url('assets/scenes/dragao.webp')}
+.cm-menu-world:before{content:"";position:absolute;inset:0;box-shadow:inset 0 0 65px #031225b5}
+.cm-menu-world+.cm-menu-world{border-left:4px ridge rgba(241,190,91,.8)}
+.cm-start-menu:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#02091f6b,transparent 19%,#03112942 49%,#030d24e8 94%)}
+.cm-menu-logo{position:absolute;z-index:3;top:0;left:50%;transform:translateX(-50%);width:min(43vw,630px);height:min(25vh,195px);object-fit:contain;filter:drop-shadow(0 10px 12px #020d24ba)}
+.cm-menu-archers{position:absolute;z-index:2;top:18%;bottom:17%;left:4.5%;right:4.5%;display:flex;align-items:end;justify-content:space-around;pointer-events:none}
+.cm-menu-archer{display:block;flex:0 0 31%;width:31%;height:100%;max-height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 18px #000b);transition:transform .25s ease}
+.cm-menu-archer:nth-child(2){transform:scale(1.06)}
+.cm-menu-actions{position:absolute;z-index:4;left:50%;bottom:2.6%;width:min(92vw,1130px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0}
+.cm-sprite-button{display:block;position:relative;appearance:none;cursor:pointer;padding:0;border:0;background:transparent!important;box-shadow:none!important;line-height:0!important;outline-offset:3px}
+.cm-sprite-button img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 5px 9px #020a1daa);pointer-events:none}
+.cm-sprite-button:hover{transform:translateY(-3px) scale(1.035);filter:brightness(1.15)}
+.cm-sprite-button:active{transform:translateY(1px) scale(.98)}
+.cm-sprite-button:focus-visible{outline:4px solid #68efff;border-radius:18px}
+#cm-start-play{width:clamp(290px,33vw,485px);height:clamp(77px,12vh,117px);max-width:90vw}
+.cm-menu-links{display:flex;justify-content:center;align-items:center;gap:clamp(8px,1.8vw,25px);width:100%}
+.cm-menu-links .cm-sprite-button{width:clamp(170px,26vw,318px);height:clamp(52px,8.7vh,87px)}
+.cm-lobby-back{display:none;position:absolute;top:12px;left:12px;z-index:6;width:clamp(115px,13vw,182px);height:65px}
+#view-inicio:not([data-step="menu"]) .cm-lobby-back{display:block}
+#view-inicio:not([data-step="menu"]) .cm-start-menu{display:none}
+body[data-page="lobby"] #view-inicio:not([data-step="menu"]) > .kingdom-title{display:flex!important;position:absolute!important;z-index:4;top:0;left:50%;transform:translateX(-50%);height:min(20vh,155px);width:min(67vw,750px);margin:0!important;padding:0!important;align-items:center!important;justify-content:center!important;pointer-events:none}
+body[data-page="lobby"] #view-inicio > .kingdom-title div{display:block!important}
+body[data-page="lobby"] #view-inicio > .kingdom-title h1,body[data-page="lobby"] #view-inicio > .kingdom-title small{display:none!important}
+body[data-page="lobby"] #view-inicio > .kingdom-title p{display:none!important}
+body[data-page="lobby"] #view-inicio > .kingdom-title{background:url('assets/ui/titles/logo-classmana-torneio.png') center/contain no-repeat!important}
+body[data-page="lobby"] #view-inicio > .lobby-steps{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{
+ position:absolute!important;top:25%!important;bottom:5%!important;left:4%!important;right:4%!important;
+ width:auto!important;height:auto!important;max-height:none!important;min-height:0!important;
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:clamp(14px,2vw,35px)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house{
+ display:flex!important;position:relative!important;min-height:0!important;max-height:none!important;width:100%!important;
+ border:5px ridge #dba947!important;border-radius:25px!important;padding:20px 10px!important;
+ box-shadow:0 14px 35px #000a,inset 0 0 25px #ffef9570!important;
+ background:#05192b!important;overflow:hidden;justify-content:end!important;flex-direction:column!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:before{
+ background:var(--house-bg) center/cover no-repeat!important;inset:0!important;opacity:1!important;filter:brightness(.83) saturate(1.15)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:after{
+ content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 35%,#020a18d9 100%)!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house>*{position:relative!important;z-index:2!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house-name{color:#fff6d6!important;font:900 clamp(22px,2.35vw,38px)/1.1 'Cinzel',Georgia,serif!important;text-shadow:0 3px 8px #000!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house-grade{color:#eee4ca!important;font:800 clamp(11px,1vw,16px) Nunito,sans-serif!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house-check{color:#ffe9ac!important;background:linear-gradient(#065b27,#062912)!important;border:2px solid #f3d37a!important;border-radius:14px!important;font:900 clamp(13px,1.2vw,17px) Nunito,sans-serif!important;padding:12px 18px!important;box-shadow:0 5px 0 #03111b}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house.selected{outline:4px solid #fff5b2!important;outline-offset:2px!important}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house:hover{transform:translateY(-4px);filter:brightness(1.15)}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .character-studio{
+ display:grid!important;position:absolute!important;top:22%!important;bottom:5%!important;left:8%!important;right:8%!important;
+ width:auto!important;max-width:none!important;height:auto!important;min-height:0!important;margin:0!important;
+ grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr)!important;gap:clamp(14px,2vw,28px)!important;
+ padding:clamp(15px,2vw,28px)!important;background:linear-gradient(125deg,#041937ed,#0b3154ed 50%,#05142ceb)!important;
+ border:4px ridge #f4c56d!important;border-radius:28px!important;box-shadow:0 17px 40px #000c!important
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading h2{font:800 clamp(23px,2.6vw,36px) 'Cinzel',Georgia,serif!important;color:#ffe5a6!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading small{color:#ffe3ac!important;font-size:15px!important;letter-spacing:1px}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-character{overflow:hidden!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-carousel{background:radial-gradient(ellipse at 50% 70%,#416c96b0,#0619351f 75%)!important;border:3px ridge #d9ae5b!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-portrait{background:transparent!important;box-shadow:none!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #hero-preview-img{width:100%!important;height:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 5px 12px #0009)}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-equipment{background:#05192e9c!important;border:2px solid #94753a!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .gear-choice{color:#f4f0e9!important;background:#112f54!important;border:2px solid #d7ac5d!important;box-shadow:0 4px 0 #06152e!important;border-radius:15px!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .gear-choice.chosen{background:#12562f!important;border-color:#fce0a1!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{color:#ffe6a5!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{color:#e8eef7!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-selected strong{color:#ffe7af!important}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-continue{
+ flex:none;min-height:70px!important;width:min(100%,510px);margin:5px auto 0!important;
+ background:#086d27 url('assets/ui/buttons/classmana-confirmar.png') center/100% 100% no-repeat!important;
+ border:0!important;box-shadow:none!important;color:transparent!important;font-size:0!important;
+ filter:drop-shadow(0 4px 9px #0008);cursor:pointer
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{
+ position:absolute!important;top:22%!important;bottom:4%!important;left:15%!important;right:15%!important;
+ width:auto!important;height:auto!important;max-width:none!important;min-height:0!important;
+ padding:clamp(14px,2vw,25px)!important;margin:0!important;gap:12px!important;display:flex!important;
+ background:linear-gradient(135deg,#051a39ed,#0c3565f1,#06192fef)!important;
+ border:4px ridge #e6b85a!important;border-radius:26px!important;box-shadow:0 14px 35px #000b!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{
+ font:900 clamp(24px,2.7vw,36px) 'Cinzel',Georgia,serif!important;color:#ffe9b9!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head small{color:#eec767!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields label{color:#ffecbd!important;font-size:clamp(15px,1.25vw,18px)!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ background:#091b33!important;color:#fff5e4!important;border:2px solid #dcae4e!important;
+ border-radius:12px!important;font-size:17px!important;min-height:46px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields small{color:#c5def2!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{
+ background:#0e3156!important;border:2px solid #b58b4b!important;color:#f9e9bc!important;box-shadow:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account strong{color:#ffe2a1!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account small{color:#d1e6ff!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{background:#102f55!important;border:2px solid #98743b!important;color:#f1e2b9!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-node{color:#f5edcc!important;background:#0c1b31!important;border-color:#e4b75e!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .start{
+ background:#166833 url('assets/ui/buttons/botao-iniciar-partida.png') center/100% 100% no-repeat!important;
+ border:0!important;box-shadow:none!important;font-size:0!important;color:transparent!important;
+ min-height:72px!important;max-height:100px!important;filter:drop-shadow(0 6px 10px #0007)!important
+}
+body[data-page="lobby"] #view-ranking.active,body[data-page="lobby"] #view-regras.active{
+ position:absolute;inset:0;display:flex!important;flex-direction:column;z-index:8;padding:6vh 7vw!important;
+ height:100%!important;overflow:auto!important;
+ background:linear-gradient(#061327d9,#061b37ed),url('assets/scenes/aguia.webp') center/cover no-repeat!important;
+ color:#fff1ce!important
+}
+body[data-page="lobby"] .information-view .page-heading{background:#092951ec!important;border:3px ridge #c99c4c!important;border-radius:20px!important}
+body[data-page="lobby"] .information-view .page-heading h1{color:#ffdd95!important;font:900 clamp(26px,3.3vw,49px) 'Cinzel',Georgia,serif!important}
+body[data-page="lobby"] .information-view .page-heading p,body[data-page="lobby"] .information-view .page-heading small{color:#e9dcae!important}
+body[data-page="lobby"] .information-view .ranking-panel,body[data-page="lobby"] .information-view .rules-grid article{
+ background:#082548e8!important;border:2px solid #c9a45b!important;border-radius:18px!important;color:#fbf3da!important
+}
+body[data-page="lobby"] .information-view .rules-grid b,body[data-page="lobby"] .information-view .ranking-panel h2{color:#ffe0a0!important}
+body[data-page="lobby"] .information-view .rules-grid p{color:#e5eaf2!important}
+body[data-page="lobby"] .information-view .primary{color:#ffe9a2!important;background:#063a22!important;border:3px solid #d9b25b!important}
+@media(max-width:760px){
+ .cm-menu-logo{top:1.5%;width:93vw;height:22vh}
+ .cm-menu-archers{top:24%;bottom:24%;left:0;right:0}
+ .cm-menu-archer{flex-basis:34%;width:34%;object-position:center bottom}
+ .cm-menu-actions{bottom:4.5%;width:100%;gap:4px}
+ #cm-start-play{width:min(78vw,355px);height:92px}
+ .cm-menu-links{gap:2px;flex-wrap:wrap}
+ .cm-menu-links .cm-sprite-button{width:30vw;height:63px}
+ #view-inicio:not([data-step="menu"]) .cm-lobby-back{top:3px;left:2px;width:92px;height:47px}
+ body[data-page="lobby"] #view-inicio:not([data-step="menu"]) > .kingdom-title{top:1%;left:50%;height:15vh;width:74vw}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{top:18%!important;bottom:3%!important;left:5%!important;right:5%!important;grid-template-columns:1fr!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house{padding:6px!important;border-width:3px!important;border-radius:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house-name{font-size:clamp(19px,6vw,28px)!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house-grade{font-size:11px!important}
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house-check{font-size:11px!important;padding:4px 11px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .character-studio{
+  top:16%!important;bottom:2%!important;left:3%!important;right:3%!important;
+  display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important;padding:7px!important;border-width:2px!important;border-radius:14px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading h2{font-size:16px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-heading small{font-size:10px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-bows .gear-choice{grid-template-columns:46px minmax(0,1fr) 12px!important;gap:4px!important;padding:4px!important;min-height:0!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label strong{font-size:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .bow-label small{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] .studio-continue{min-height:45px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{top:16%!important;left:2%!important;right:2%!important;bottom:2%!important;gap:6px!important;padding:7px!important;border-width:2px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{max-height:54px!important;padding:3px 7px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account strong{font-size:13px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account small{font-size:10px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{font-size:21px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{grid-template-columns:1fr!important;gap:5px!important;min-height:0!important;overflow:auto!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields label{font-size:12px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{font-size:13px!important;min-height:35px!important;padding:5px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .start{min-height:48px!important}
+}
+@media(prefers-reduced-motion:reduce){.cm-sprite-button,.cm-menu-archer{transition:none!important}}
