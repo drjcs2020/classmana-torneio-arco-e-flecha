@@ -278,3 +278,70 @@ body[data-page="lobby"] .information-view .ranking-panel h2{color:#ffdd9c!import
 @media(prefers-reduced-motion:reduce){
  .cm-duel-mode,body[data-page="lobby"] #view-inicio[data-step="reino"] .house{transition:none!important}
 }
+
+
+/* REVISION 2 — O grid legado aplicava align-self:center e altura auto,
+ * reduzindo cartões das Casas a uma linha. Alturas explícitas e isolamento. */
+body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{
+ display:grid!important;
+ position:absolute!important;
+ top:31vh!important;bottom:auto!important;
+ left:5vw!important;right:5vw!important;
+ width:90vw!important;height:64vh!important;min-height:390px!important;
+ max-height:none!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ grid-template-rows:minmax(0,1fr)!important;
+ align-self:stretch!important;align-items:stretch!important;
+ margin:0!important;padding:0!important
+}
+body[data-page="lobby"] #view-inicio[data-step="reino"] .house{
+ display:block!important;height:100%!important;min-height:390px!important;max-height:none!important;
+ align-self:stretch!important;box-sizing:border-box!important;isolation:isolate!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{
+ gap:7px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head{
+ min-height:55px!important;max-height:75px!important;padding:6px 12px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{
+ min-height:52px!important;max-height:65px!important;padding:5px 11px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+ grid-auto-rows:minmax(65px,auto)!important;align-content:start!important;
+ overflow-y:auto!important;scrollbar-color:#b58138 #24190b!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label{
+ padding:6px 10px!important;min-height:63px!important;gap:4px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ min-height:36px!important;font-size:15px!important;padding:4px 9px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{
+ min-height:73px!important;max-height:91px!important;padding:6px 10px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ height:82px!important;aspect-ratio:auto!important;width:min(60vw,460px)!important
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="reino"] > .houses{
+  top:23vh!important;bottom:auto!important;height:75vh!important;min-height:0!important;
+  left:5vw!important;right:5vw!important;width:90vw!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:7px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house{
+  height:100%!important;min-height:0!important;max-height:none!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head{max-height:65px!important;min-height:46px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{min-height:45px!important;max-height:63px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+  grid-template-columns:1fr!important;grid-auto-rows:minmax(56px,auto)!important;gap:5px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label{
+  min-height:55px!important;padding:4px 7px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+  width:min(94vw,430px)!important;height:63px!important
+ }
+}
