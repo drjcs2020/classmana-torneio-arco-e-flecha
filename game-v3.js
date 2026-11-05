@@ -647,10 +647,7 @@ spriteHud=mountSpriteHUD({
  onPause:toggleArenaPause
 });
 selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');
-$('cm-start-play')?.addEventListener('click',()=>setLobbyStep('reino'));
-$('cm-menu-challenge')?.addEventListener('click',()=>{setLobbyStep('partida');$('mode').value='challenge_same';updateMode();});
-$('cm-menu-rank')?.addEventListener('click',()=>openView('ranking'));
-$('cm-menu-rules')?.addEventListener('click',()=>openView('regras'));
+// A abertura duplicada foi removida. O fluxo começa na escolha da Casa.
 $('cm-lobby-back')?.addEventListener('click',()=>{
  const step=$('view-inicio')?.dataset.step;
  setLobbyStep(step==='partida'?'desafio':step==='desafio'?'heroi':'reino');
