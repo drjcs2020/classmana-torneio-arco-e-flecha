@@ -25,6 +25,13 @@ try{
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'reino','Must open on house selection');
  assert.equal(await desktop.locator('#cm-main-menu').count(),0,'Deprecated intro screen must not be rendered');
  await verifyPicture(desktop,'.cm-house-title');
+ const geometry=await desktop.evaluate(()=>{
+ const list=['#view-inicio','#houses','button.house[data-house="A"]','.cm-house-title'];
+ return Object.fromEntries(list.map(sel=>{const el=document.querySelector(sel),cs=getComputedStyle(el),r=el.getBoundingClientRect();
+ return [sel,{rect:{x:r.x,y:r.y,width:r.width,height:r.height},display:cs.display,position:cs.position,top:cs.top,bottom:cs.bottom,height:cs.height,minHeight:cs.minHeight,maxHeight:cs.maxHeight,overflow:cs.overflow,gridRows:cs.gridTemplateRows,visibility:cs.visibility}]}));
+ });
+ console.log('LAYOUT DIAGNOSTIC',JSON.stringify(geometry));
+ assert(geometry['button.house[data-house="A"]'].rect.height>140,'House card collapsed');
  await shot(desktop,'01-escolha-casa-desktop');
  await desktop.locator('button.house[data-house="B"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
