@@ -18,9 +18,9 @@ export function initScene(canvas, getSettings) {
   let pc=null, app=null, gl=null, camera=null, bowRoot=null, bowHandle=null, bowString=null, sightAnchor=null,
       arrowLoaded=null, targetRoot=null, impactMarks=[], currentHouse='A', ready=false, destroyed=false,
       aimX=.5, aimY=.46, power=.3, projectile=null, pendingShot=null, animT=0,
-      equipment={bow:'classico',arrow:'rubi'};
+      equipment={bow:'classico',arrow:'rubi'},terrainElement=null,ambientProps=[],backdropMode=false;
   const ctx=canvas.getContext('2d', {alpha:true});
-  const state={kind:'Cenário ilustrado',setHouse, setEquipment, setTargetShift, setAim, setPower,
+  const state={kind:'PlayCanvas + fundo modular',setHouse,setEquipment,setTargetShift,setAim,setPower,setBackdropMode,
     getTargetMetrics, getAimPoint, fire, impact, destroy};
   const root=()=>app.root;
   const canvasSize=()=>({w:parent.clientWidth||1050,h:parent.clientHeight||540});
@@ -91,6 +91,11 @@ export function initScene(canvas, getSettings) {
     updateBowAim();
   }
   function setPower(value){power=clamp(value,0,1);}
+  function setBackdropMode(value){
+    backdropMode=Boolean(value);
+    if(terrainElement)terrainElement.enabled=!backdropMode;
+    for(const prop of ambientProps)prop.enabled=!backdropMode;
+  }
   function destroy(){destroyed=true;if(app){app.destroy();app=null;}gl?.remove();}
 
   // -------- VISUAL FALLBACK: uses art backgrounds, painted metal bow and target. --------
@@ -270,16 +275,18 @@ export function initScene(canvas, getSettings) {
     const fieldTexture=terrainTexture();
     const grass=new pc.StandardMaterial();grass.diffuse=new pc.Color(1,1,1);grass.diffuseMap=fieldTexture;
     grass.diffuseMapTiling=new pc.Vec2(3,4);grass.metalness=0;grass.gloss=4;grass.update();
-    primitive('plane','procedural textured playing field',[0,-.28,-7],[40,1,36],grass);
+    terrainElement=primitive('plane','procedural textured playing field',[0,-.28,-7],[40,1,36],grass);terrainElement.enabled=!backdropMode;
     const line=material(currentHouse==='B'?'#d48e54':'#dddab4',{rough:.87});
-    for(const side of [-1,1])tube('range boundary stripe '+side,[[side*2.85,-.245,6],[side*2.0,-.245,-1],[side*1.15,-.245,-11]],
-      [.023,.022,.017],line,root(),7);
+    for(const side of [-1,1]){
+      const stripe=tube('range boundary stripe '+side,[[side*2.85,-.245,6],[side*2.0,-.245,-1],[side*1.15,-.245,-11]],
+      [.023,.022,.017],line,root(),7);ambientProps.push(stripe);stripe.enabled=!backdropMode;
+    }
 
     const brass=material('#dba84d',{metal:.65,rough:.23});
     const rocks=material('#56574d',{rough:.93});
     for(let side of [-1,1])for(let i=0;i<3;i++){
       const z=-3-i*4.2,x=side*(3.8-i*.36),scale=1.0-i*.14;
-      const base=new pc.Entity('Range prop');base.setLocalPosition(x,0,z);root().addChild(base);
+      const base=new pc.Entity('Range prop');base.setLocalPosition(x,0,z);root().addChild(base);ambientProps.push(base);base.enabled=!backdropMode;
       tube('wooden fence post',[[0,-.38,0],[0,.32,0],[0,.75,0]],[.12*scale,.105*scale,.09*scale],metals.wood,base);
       primitive('sphere','fence cap bronze',[0,.76,0],[.17,.16,.17],brass,base);
       // Torch glows and slow animated ambient fire sprite.
@@ -287,7 +294,7 @@ export function initScene(canvas, getSettings) {
     }
     for(let i=0;i<16;i++){
       const z=-3-i*.55,x=(i%2?-1:1)*(2.1+(i%5)*.12);
-      primitive('sphere','natural stone '+i,[x,-.19,z],[.20+i%3*.08,.13+i%2*.08,.22],rocks);
+      const stone=primitive('sphere','natural stone '+i,[x,-.19,z],[.20+i%3*.08,.13+i%2*.08,.22],rocks);ambientProps.push(stone);stone.enabled=!backdropMode;
     }
     // Set house color and look immediately.
     buildBow();colorBow();colorTarget();
