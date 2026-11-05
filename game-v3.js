@@ -98,7 +98,7 @@ function fillRivals(){
  ownTeamField.innerHTML=ownTeams.map(t=>`<option value="${t}">${t}</option>`).join('');
  if(myTeam)ownTeamField.value=myTeam;
  const opposingTeamField=$('opponent-team'),priorTeam=opposingTeamField.value;
- const availableTeams=[...new Set(choices(enemyHouse).map(p=>TEAMS[p.id]))].filter(t=>t&&t!==myTeam).sort();
+ const availableTeams=[...new Set(choices(enemyHouse).map(p=>TEAMS[p.id]))].filter(t=>t&&(enemyHouse!==house||t!==myTeam)).sort();
  opposingTeamField.innerHTML=availableTeams.map(t=>`<option value="${t}">${t}</option>`).join('');
  if(availableTeams.includes(priorTeam))opposingTeamField.value=priorTeam;
  const old=$('rival').value;
@@ -264,7 +264,7 @@ async function startMatch(accepted=null){
    if(!rivalId||!choices(rivalId[0]).some(x=>x.id===rivalId)){toast('Escolha um adversário.');return}
    if(userId===rivalId){toast('Você não pode desafiar a si mesmo.');return}
    if((mode==='challenge_same'&&userId[0]!==rivalId[0])||(mode==='challenge'&&userId[0]===rivalId[0])||
-      (mode==='challenge_team'&&TEAMS[userId]===TEAMS[rivalId])){
+      (mode==='challenge_team'&&userId[0]===rivalId[0]&&TEAMS[userId]===TEAMS[rivalId])){
     toast('Escolha um adversário válido para este tipo de desafio.');return;
    }
   }else if(fromInbox.recipient.id!==userId&&fromInbox.creator.id!==userId){toast('Esse desafio não pertence à sua conta.');return;}
