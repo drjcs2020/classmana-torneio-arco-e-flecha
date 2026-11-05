@@ -66,7 +66,7 @@ class ArcheryOnline {
   throw Error('O servidor não confirmou a gravação. Consulte seus desafios antes de tentar novamente. '+(lastNetworkError?.message||''));
  }
  async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
-  if(Number(ping.api)<6)throw Error('Apps Script antigo: publique a versão atual do backend/Code.gs na implantação /exec existente.');
+  if(Number(ping.api)<7)throw Error('SERVIDOR DESATUALIZADO: API v'+(ping.api??'?')+' publicada; é necessário publicar o backend/Code.gs v7 no Apps Script (Implantar → Gerenciar implantações → Editar → Nova versão).');
   this.apiVersion=Number(ping.api)||0;
   this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
