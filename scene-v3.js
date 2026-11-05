@@ -281,9 +281,10 @@ export function initScene(canvas, getSettings) {
     tube('rear wood support',[[0,-2.02,-.69],[0,-1.1,-.48],[0,-.15,-.25]],[.065,.064,.058],metals.wood,targetStand,10);
     movingRail=new pc.Entity('Suspended target sliding rail');
     root().addChild(movingRail);
-    tube('steel horizontal rail',[[-6,3.85,-9.5],[0,3.85,-9.5],[6,3.85,-9.5]],[.065,.070,.065],metals.iron,movingRail,12);
-    for(const dx of [-6,6]){
-      tube('support rail post '+dx,[[dx,.1,-9.5],[dx,2.2,-9.5],[dx,3.85,-9.5]],[.085,.08,.085],metals.wood,movingRail,10);
+    // Trilho compacto, colocado acima do alvo: sem estrutura gigante cobrindo a paisagem.
+    tube('steel horizontal rail',[[-3.25,3.85,-9.5],[0,3.85,-9.5],[3.25,3.85,-9.5]],[.035,.040,.035],metals.iron,movingRail,12);
+    for(const dx of [-3.25,3.25]){
+      tube('support rail post '+dx,[[dx,-.28,-9.5],[dx,1.7,-9.5],[dx,3.85,-9.5]],[.045,.043,.041],metals.wood,movingRail,10);
     }
     movingRail.enabled=false;
     // Body of compressed hay and thick jute rope; target is genuinely spatial.
