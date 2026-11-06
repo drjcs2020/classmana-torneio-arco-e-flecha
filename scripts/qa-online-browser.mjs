@@ -24,18 +24,17 @@ try {
   const {online}=await import('./online-client.js?qa=browser-online');
   const out={};
   const start=Date.now();
+  // A API deve estar realmente utilizável pelo cliente, e não apenas
+  // responder JSONP ao ping num navegador de teste.
+  await online.connect();
+  if(!online.bridgeReady||online.apiVersion<8)
+    throw Error('A implantação pública exige API v8 e ponte HTML funcional');
   for (const action of ['ping','roster','ranking']) {
    const resp=await online.get(action);
    if(!resp.ok)throw Error(action+': '+resp.error);
    out[action]=action==='ping'?{api:resp.api}:action==='roster'?{players:resp.players?.length}:{games:resp.games};
   }
-  // Provar separadamente o caminho /a/~/ usado como fallback para a
-  // instabilidade 302/404 do ContentService. Nenhuma escrita é realizada.
-  const alternate=online.url.replace('https://script.google.com/macros/s/','https://script.google.com/a/~/macros/s/');
-  try{
-   const fallbackPing=await online.getOnce('ping',{},alternate);
-   out.alternate={ok:fallbackPing.ok,api:fallbackPing.api};
-  }catch(err){out.alternate={ok:false,error:String(err.message||err)}}
+  out.transport='HTMLService + postMessage';
   const requestId='a'.repeat(48),token='b'.repeat(48);
   const op=await online.get('opResult',{requestId,token});
   if(!op.pending)throw Error('opResult deveria retornar pending para ID não utilizado');
@@ -45,7 +44,7 @@ try {
  });
  console.log('BROWSER ONLINE SUCCESS:',JSON.stringify(result));
  console.log('NETWORK:',JSON.stringify(trace));
- assert.equal(result.ping.api,7);
+ assert(Number(result.ping.api)>=8,'O navegador deve usar a API v8 real');
  assert(result.roster.players>=70);
  assert.equal(result.opResult.pending,true);
 } catch(error) {
