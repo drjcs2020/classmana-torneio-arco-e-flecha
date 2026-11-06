@@ -170,7 +170,8 @@ class ArcheryOnline {
    catch(error){throw Error('A API v8 com ponte HTML precisa ser publicada no Apps Script. A resposta JSONP antiga falhou: '+error.message+' | Ponte HTML: '+(bridgeError?.message||''))}
   }
   if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
-  if(Number(ping.api)<7)throw Error('SERVIDOR DESATUALIZADO: API v'+(ping.api??'?')+' publicada; é necessário publicar o backend/Code.gs v7 no Apps Script (Implantar → Gerenciar implantações → Editar → Nova versão).');
+  if(Number(ping.api)<8)throw Error('SERVIDOR DESATUALIZADO: a implantação está na versão '+(ping.api??'?')+', mas o torneio precisa da versão 8 para receber e gravar desafios. No Google Apps Script, atualize Code.gs e escolha Implantar → Gerenciar implantações → Editar → Nova versão. A URL /exec permanece a mesma.');
+  if(!this.bridgeReady)throw Error('A API v8 foi detectada, mas a ponte de comunicação ainda não respondeu neste navegador. Verifique as permissões da implantação ou o bloqueio de páginas incorporadas.');
   this.apiVersion=Number(ping.api)||0;
   this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
