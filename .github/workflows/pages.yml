@@ -55,10 +55,19 @@ jobs:
           fi
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
+      - name: Montar site público sem ZIPs e código privado
+        run: |
+          mkdir -p _site
+          find . -maxdepth 1 -type f \\( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '.nojekyll' \\) -exec cp -t _site/ -- {} +
+          cp -a assets _site/assets
+          test -s _site/index.html
+          test -s _site/online-client.js
+          test -s _site/assets/scenes/aguia.webp
+          echo "Site estático preparado: $(du -sh _site | cut -f1); ZIPs de 35 MB removidos da publicação."
       - name: Preparar arquivos do jogo
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: '_site'
       - name: Publicar site
         id: deployment
         uses: actions/deploy-pages@v4
