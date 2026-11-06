@@ -8,9 +8,79 @@ const randomId=()=>Array.from(crypto.getRandomValues(new Uint8Array(24)),v=>v.to
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function apiIsConfigured(){return /^https:\/\/script\.google\.com\/macros\/s\/[-\w]+\/exec$/.test(ONLINE_API_URL)}
 class ArcheryOnline {
- constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;this.loginPending=null;this.lastError=null;}
+ constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;this.loginPending=null;this.lastError=null;this.bridgeReady=false;}
+ /** Google HTMLService bridge. Unlike ContentService/JSONP it does not issue
+  * a 302 redirect to the fragile user_content_key /macros/echo endpoint.
+  * Results arrive through a nonce-bound, origin-checked postMessage.
+  */
+ bridgeRequest(action,params={},method='GET',timeoutMs=16000){
+  if(!this.enabled)return Promise.reject(Error('Servidor online ainda não publicado.'));
+  const rid=randomId(),type='classmana-html-bridge-v1';
+  return new Promise((resolve,reject)=>{
+   const frame=document.createElement('iframe');
+   frame.name=frame.id='cm_html_'+rid.slice(0,16);
+   frame.style.cssText='position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none';
+   frame.setAttribute('title','Conexão segura do torneio');
+   let form=null,settled=false;
+   const finish=(err,result)=>{
+    if(settled)return;settled=true;clearTimeout(timer);
+    window.removeEventListener('message',onMessage);
+    form?.remove();frame.remove();
+    if(err)reject(err);else resolve(result);
+   };
+   const onMessage=event=>{
+    if(!/^https:\/\/(?:script\.google\.com|(?:[a-z\d-]+\.)*googleusercontent\.com)$/.test(event.origin))return;
+    const msg=event.data;
+    if(!msg||msg.type!==type||msg.rid!==rid)return;
+    finish(null,msg.data);
+   };
+   const timer=setTimeout(()=>finish(Error('A ponte HTML não respondeu. É necessário publicar a API v8 no Apps Script, ou o Google bloqueou a página incorporada.')),timeoutMs);
+   window.addEventListener('message',onMessage);
+   const args={...params,action,bridge:'1',rid};
+   if(method==='GET'){
+    const url=new URL(this.url);
+    for(const [key,value] of Object.entries(args))url.searchParams.set(key,String(value));
+    url.searchParams.set('_',String(Date.now()));
+    frame.src=url.href;document.body.appendChild(frame);
+   }else{
+    document.body.appendChild(frame);
+    form=document.createElement('form');form.method='POST';form.action=this.url;form.target=frame.name;form.style.display='none';
+    for(const [key,value] of Object.entries(args)){
+     const input=document.createElement('input');input.type='hidden';input.name=key;input.value=String(value);form.appendChild(input);
+    }
+    document.body.appendChild(form);
+    form.submit();form.remove();form=null;
+   }
+  });
+ }
+ getHtmlBridge(action,params={},timeoutMs){return this.bridgeRequest(action,params,'GET',timeoutMs)}
+ async postHtmlBridge(action,payload={},extra={}){
+  if(!this.token)this.token=randomId();
+  const token=this.token,requestId=randomId();
+  const params={token,requestId,payload:JSON.stringify(payload),...extra};
+  try{
+   const answer=await this.bridgeRequest(action,params,'POST',22000);
+   if(!answer.ok)throw Error(answer.error||'Operação recusada pelo servidor.');
+   return answer;
+  }catch(error){
+   // Não enviar outra operação com novo requestId: o primeiro POST pode
+   // já ter sido gravado. Procurar confirmação usando o mesmo ID.
+   if(/Operação recusada pelo servidor|Aluno não autorizado|Selecione um aluno|Desafio não|inválid|expirada|limite/i.test(String(error.message)))throw error;
+   let networkError=error;
+   for(let attempt=0;attempt<3;attempt++){
+    try{
+     const result=await this.getHtmlBridge('opResult',{requestId,token},14000);
+     if(result.pending){await wait(950*(attempt+1));continue}
+     if(!result.ok)throw Error(result.error||'Operação recusada pelo servidor.');
+     return result;
+    }catch(e){networkError=e}
+   }
+   throw Error('Não foi possível confirmar a gravação no servidor: '+networkError.message);
+  }
+ }
  async get(action,params={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
+  if(this.bridgeReady)return this.getHtmlBridge(action,params);
   // Rotas equivalentes do Google podem falhar independentemente no salto
   // ContentService (/exec) -> script.googleusercontent.com.
   // GET é somente leitura; repetir não cria convites nem duplica resultados.
@@ -52,6 +122,7 @@ class ArcheryOnline {
  }
  async post(action,payload={},extra={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
+  if(this.bridgeReady)return this.postHtmlBridge(action,payload,extra);
   if(!this.token)this.token=randomId();
   // Cada POST mantém o token original até confirmar a operação.
   // Não ler this.token durante a espera: a troca de perfil poderia alterá-lo.
@@ -85,7 +156,20 @@ class ArcheryOnline {
    throw Error('O servidor não confirmou a gravação. Não repita a partida antes de consultar Meus Desafios. '+(lastNetworkError?.message||''));
   }finally{frame.remove();}
  }
- async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
+ async connect(){
+  if(!this.enabled){this.state='off';return false}
+  let ping=null,bridgeError=null;
+  // Teste a entrega HTML primeiro. Sem redirecionamento ContentService.
+  try{
+   ping=await this.getHtmlBridge('ping',{},11000);
+   if(ping.ok&&Number(ping.api)>=8)this.bridgeReady=true;
+   else throw Error('Ponte HTML ainda não implantada.');
+  }catch(error){bridgeError=error;this.bridgeReady=false}
+  if(!this.bridgeReady){
+   try{ping=await this.get('ping');}
+   catch(error){throw Error('A API v8 com ponte HTML precisa ser publicada no Apps Script. A resposta JSONP antiga falhou: '+error.message+' | Ponte HTML: '+(bridgeError?.message||''))}
+  }
+  if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
   if(Number(ping.api)<7)throw Error('SERVIDOR DESATUALIZADO: API v'+(ping.api??'?')+' publicada; é necessário publicar o backend/Code.gs v7 no Apps Script (Implantar → Gerenciar implantações → Editar → Nova versão).');
   this.apiVersion=Number(ping.api)||0;
   this.state='ready';
