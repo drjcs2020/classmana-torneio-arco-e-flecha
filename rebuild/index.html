@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+ <meta name="theme-color" content="#122f44">
+ <meta name="description" content="ClassMana — Torneio das Três Casas: arqueiros, desafios entre alunos e ranking oficial.">
+ <title>ClassMana • Torneio das Três Casas</title>
+ <link rel="stylesheet" href="./style.css?v=rebuild1">
+</head>
+<body data-screen="houses" data-house="A">
+ <div class="scenery" aria-hidden="true"></div>
+ <div class="scenery-light" aria-hidden="true"></div>
+ <header class="masthead">
+  <div class="brand"><img src="../assets/images/arte-002.webp" alt="ClassMana"><div><strong>CLASSMANA</strong><small>TORNEIO DE ARCO E FLECHA</small></div></div>
+  <div class="heading-online" id="connection" aria-live="polite">⏳ Verificando competição online...</div>
+  <nav class="mast-actions"><button id="open-ranks" type="button">🏆 Ranking</button><button id="open-challenges" type="button">🔔 Meus desafios <span id="pending-count">0</span></button></nav>
+ </header>
+ <main class="main">
+  <section class="screen active" data-view="houses" aria-label="Seleção de Casa">
+   <div class="screen-heading"><span class="eyebrow">TORNEIO DAS TRÊS CASAS</span><h1>Escolha sua Casa</h1><p>Três reinos, três lendas. Qual bandeira você defenderá?</p></div>
+   <div class="house-grid">
+    <button type="button" class="house-card house-a" data-pick-house="A">
+     <img class="crest" src="../assets/ui/hud/brasao-aguia-dourada.png" alt="">
+     <div class="hero-duo"><img src="../assets/ui/characters/arqueiro-aguia-dourada.png" alt=""><img src="../assets/ui/characters/arqueira-aguia-dourada.png" alt=""></div>
+     <strong>ÁGUIA DOURADA</strong><small>4º ANO A</small><span class="card-action">ESCOLHER CASA</span>
+    </button>
+    <button type="button" class="house-card house-b" data-pick-house="B">
+     <img class="crest" src="../assets/ui/hud/brasao-leao-de-fogo.png" alt="">
+     <div class="hero-duo"><img src="../assets/ui/characters/arqueiro-leao-de-fogo.png" alt=""><img src="../assets/ui/characters/arqueira-leao-de-fogo.png" alt=""></div>
+     <strong>LEÃO DE FOGO</strong><small>4º ANO B</small><span class="card-action">ESCOLHER CASA</span>
+    </button>
+    <button type="button" class="house-card house-c" data-pick-house="C">
+     <img class="crest" src="../assets/ui/hud/brasao-dragao-esmeralda.png" alt="">
+     <div class="hero-duo"><img src="../assets/ui/characters/arqueiro-dragao-de-esmeralda.png" alt=""><img src="../assets/ui/characters/arqueira-dragao-de-esmeralda.png" alt=""></div>
+     <strong>DRAGÃO DE ESMERALDA</strong><small>4º ANO C</small><span class="card-action">ESCOLHER CASA</span>
+    </button>
+   </div>
+  </section>
+  <section class="screen" data-view="hero" aria-label="Seleção de arqueiro e arco">
+   <div class="screen-heading compact"><span class="eyebrow">SEU HERÓI</span><h1>Escolha seu arqueiro</h1></div>
+   <div class="hero-layout">
+    <div class="hero-selection">
+     <button class="circle-nav" id="hero-prev" aria-label="Arqueiro anterior">‹</button>
+     <figure class="hero-figure"><img id="selected-hero" alt="Arqueiro da sua Casa" src="../assets/ui/characters/arqueiro-aguia-dourada.png"><figcaption id="hero-caption">Auron — Águia Dourada</figcaption></figure>
+     <button class="circle-nav" id="hero-next" aria-label="Próximo arqueiro">›</button>
+    </div>
+    <div class="gear-menu"><h2>Seu arco</h2><p>Escolha uma vantagem de combate.</p>
+     <div class="gear-options">
+      <button class="gear chosen" data-bow="classico"><strong>🏹 Arco Clássico</strong><small>Precisão equilibrada</small></button>
+      <button class="gear" data-bow="real"><strong>👑 Arco Real</strong><small>+1 ponto por acerto • mira mais exigente</small></button>
+      <button class="gear" data-bow="vento"><strong>🌬️ Arco dos Ventos</strong><small>Metade do desvio do vento</small></button>
+     </div><button class="rune-button primary" id="hero-confirm">CONFIRMAR E CONTINUAR</button>
+    </div>
+   </div>
+  </section>
+  <section class="screen" data-view="modes" aria-label="Escolha do desafio">
+   <div class="screen-heading"><span class="eyebrow">ARENA DOS CAMPEÕES</span><h1>Escolha o desafio</h1><p>Enfrente o robô ou desafie outro arqueiro, mesmo em outro dia.</p></div>
+   <div class="mode-grid">
+    <button class="mode-button" data-mode="bot"><span>🤖</span><strong>Contra robô</strong><small>Três dificuldades</small></button>
+    <button class="mode-button" data-mode="practice"><span>🎯</span><strong>Treino livre</strong><small>Sem pontuação oficial</small></button>
+    <button class="mode-button" data-mode="challenge_same"><span>🏹</span><strong>Desafiar colega</strong><small>Da mesma turma</small></button>
+    <button class="mode-button" data-mode="challenge_team"><span>🛡️</span><strong>Desafiar equipe</strong><small>Da sua Casa ou de outra</small></button>
+    <button class="mode-button" data-mode="challenge"><span>🏰</span><strong>Duelo interclasses</strong><small>Contra outra Casa</small></button>
+   </div>
+  </section>
+  <section class="screen" data-view="setup" aria-label="Prepare a partida">
+   <div class="screen-heading compact"><span class="eyebrow">O DESAFIO VAI COMEÇAR</span><h1>Prepare a partida</h1><p>5 flechas em cada disputa.</p></div>
+   <div class="setup-grid">
+    <div class="fields">
+     <label>Seu nome <select id="player"><option value="">Carregando alunos...</option></select></label>
+     <label>Tipo de partida <select id="mode">
+      <option value="bot">Contra robô</option><option value="practice">Treino livre</option>
+      <option value="challenge_same">Colega da mesma turma</option><option value="challenge_team">Outra equipe</option>
+      <option value="challenge">Duelo interclasses</option>
+     </select></label>
+     <label id="level-label">Trilha <select id="level"><option value="iniciante">🌱 Iniciante — 10 / 35 / 65 / 100 / 150 m</option><option value="avancado">🏹 Avançado — alvo móvel</option><option value="lendario">🔥 Lendário — obstáculos</option></select></label>
+     <label id="bot-level-row">Dificuldade do robô <select id="bot-level"><option value="easy">Fácil</option><option value="medium" selected>Médio</option><option value="hard">Difícil</option></select></label>
+     <label id="team-scope-row" hidden>Onde está a equipe adversária? <select id="team-scope"><option value="same">Na minha turma</option><option value="other">Em outra turma</option></select></label>
+     <label id="enemy-house-row" hidden>Casa adversária <select id="enemy-house"></select></label>
+     <label id="enemy-team-row" hidden>Equipe adversária <select id="enemy-team"></select></label>
+     <label id="enemy-row" hidden>Aluno que receberá o convite <select id="enemy"></select></label>
+    </div>
+    <div class="ready-area">
+     <div class="range-nodes"><span>10m</span><span>35m</span><span>65m</span><span>100m</span><span>150m</span></div>
+     <p id="setup-helper">Escolha seu nome e prepare o arco.</p>
+     <button id="start-match" class="rune-button primary">🏹 INICIAR PARTIDA</button>
+     <button id="reconnect" class="text-link">↻ Reconectar competição online</button>
+    </div>
+   </div>
+  </section>
+  <section class="screen arena-screen" data-view="arena" aria-label="Arena tridimensional">
+   <div class="arena-stage" id="arena-stage">
+    <canvas id="arena-canvas" aria-label="Arena tridimensional PlayCanvas"></canvas>
+    <div id="target-fallback" class="target-fallback" hidden aria-hidden="true"></div>
+    <div class="arena-bar top-left"><span id="arena-stage-title">🏹 Flecha 1 de 5</span><span id="arena-distance">🎯 10 metros</span></div>
+    <div class="arena-bar top-right"><span id="arena-wind">🌬 0 km/h</span><span id="arena-points">PONTOS: 0</span></div>
+    <div id="aim-cursor" class="aim-cursor" aria-hidden="true"><i></i></div>
+    <div id="draw-charge" class="draw-charge" aria-hidden="true"></div>
+    <div class="arena-status" id="arena-tip">MOVA PARA MIRAR • SEGURE O MOUSE PARA PUXAR • SOLTE PARA DISPARAR</div>
+   </div>
+  </section>
+  <section class="screen" data-view="results" aria-label="Resultado da rodada">
+   <div class="screen-heading results-heading"><span class="eyebrow">TORNEIO DAS TRÊS CASAS</span><h1 id="result-title">🏆 Rodada concluída</h1><p id="result-subtitle">Sua pontuação foi registrada.</p></div>
+   <div class="result-layout">
+    <img id="result-hero" alt="Seu arqueiro" src="../assets/ui/characters/arqueiro-aguia-dourada.png">
+    <div class="result-center"><strong id="result-score">0</strong><span>SEUS PONTOS</span><div id="result-rival">Aguardando outro arqueiro</div>
+      <button class="rune-button primary" id="result-continue">VOLTAR AOS DESAFIOS</button>
+      <button class="text-link" id="result-inbox">🔔 Meus desafios</button></div>
+   </div>
+  </section>
+  <section class="screen" data-view="inbox" aria-label="Convites de desafio">
+   <div class="screen-heading compact"><span class="eyebrow">CORREIO DAS CASAS</span><h1>Meus desafios</h1><p id="inbox-hint">Escolha seu nome para receber convites de outros alunos.</p></div>
+   <div class="inbox-tools"><label>Seu nome <select id="inbox-player"></select></label><button class="rune-button" id="inbox-load">ATUALIZAR CONVITES</button></div>
+   <div class="challenge-list" id="challenge-list"><p>Conectando ao servidor...</p></div>
+  </section>
+  <section class="screen" data-view="ranking" aria-label="Ranking oficial">
+   <div class="screen-heading compact"><span class="eyebrow">SALÃO DOS CAMPEÕES</span><h1>Ranking do torneio</h1><p>Somente desafios oficiais concluídos.</p></div>
+   <div class="rank-tabs"><button data-rank="players" class="chosen">Arqueiros</button><button data-rank="teams">Equipes</button><button data-rank="classes">Casas</button></div>
+   <div class="rank-content" id="rank-content"><p>Consultando resultados...</p></div>
+  </section>
+ </main>
+ <footer class="bottom-bar"><button id="nav-back">← VOLTAR</button><span id="route-text">ESCOLHA SUA CASA</span><span>CLASSMANA • NOVA ARENA</span></footer>
+ <div id="message" role="alert" aria-live="assertive" hidden></div>
+ <script src="../roster.js"></script><script src="../teams.js"></script>
+ <script type="module" src="./app.js?v=rebuild1"></script>
+</body></html>
