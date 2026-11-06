@@ -6,11 +6,19 @@ https://drjcs2020.github.io/classmana-torneio-arco-e-flecha/
 **A planilha existente é mantida**:
 https://docs.google.com/spreadsheets/d/1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY/edit
 
-## Bloqueio diagnosticado em 06/11/2026 — API pública v3, cliente v7
+## Situação atual — 06/11/2026
 
-O GitHub Pages está atualizado, mas a implantação pública do Apps Script continua na versão **v3**. O teste real `Verificar API online do torneio` foi reexecutado em 06/11/2026 e confirmou `api: 3`. É preciso editar **a implantação existente** — criar uma segunda implantação sem atualizar a URL do jogo não resolve.
+A implantação pública foi atualizada para **API v7**. O teste no Chromium
+confirmou a leitura da lista de 78 perfis, o login técnico, a consulta aos
+convites e a validação da rota de criação de desafios. O teste de gravação
+usou um destinatário inválido para **não criar partidas fictícias nem alterar
+o ranking**. O fluxo completo de dois estudantes ainda não foi homologado.
 
-## Atualização obrigatória no Google Apps Script
+A interface recebeu uma correção para liberar a partida assim que o perfil
+é confirmado; os convites passam a carregar em paralelo. A navegação entre
+a página inicial e a arena usa a mesma versão do arquivo JavaScript.
+
+## Implantação do Google Apps Script (apenas se precisar atualizar novamente)
 
 A API anterior exigia PIN. A interface atual não exige mais senha nem PIN.
 A versão do servidor precisa ser atualizada **sem criar outra planilha**:
@@ -68,5 +76,4 @@ equipes; a de turmas considera interclasses.
 - Verifique que a mesma sequência foi usada nos dois lados da disputa.
 - No GitHub Actions, acompanhe **Verificar API online do torneio**: o teste só fica verde depois de implantar a API v7 na URL /exec existente.
 
-**Diagnóstico confirmado em 06/11/2026:** URL /exec ainda respondeu com `api: 3` no teste real reexecutado, enquanto o repositório utiliza v7. É indispensável republicar a implantação existente para habilitar desafios. O GitHub Pages publica o frontend; o Apps Script publica o backend. Atualizar
-o GitHub **não** atualiza automaticamente a implantação do Google Apps Script.
+**Verificação atualizada:** API v7 confirmada no Apps Script. Não é necessário republicar o backend se o endpoint continuar retornando `"api":7`. O GitHub Pages não publica o Google Apps Script.
