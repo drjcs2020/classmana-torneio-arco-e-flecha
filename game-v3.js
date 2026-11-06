@@ -42,7 +42,7 @@ function chooseEquipment(key,value){
  try{localStorage.setItem('classmana-archery-equipment-v1',JSON.stringify(equipment))}catch{}
  applyEquipment();
 }
-let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false;
+let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false,startMatchPending=false;
 const TEAMS=window.CLASSMANA_TEAMS||{};
 
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -249,7 +249,9 @@ function changeTarget(){
  scene?.setTargetShift(match.shift);uiHud();
 }
 async function startMatch(accepted=null){
- if(onlineLoading)return;
+ if(onlineLoading||startMatchPending)return;
+ startMatchPending=true;
+ try{
  const fromInbox=accepted&&typeof accepted.id==='string'?accepted:null;
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
@@ -290,6 +292,7 @@ async function startMatch(accepted=null){
   }catch(error){console.warn('Navegação entre páginas indisponível:',error)}
  }
  openView('arena');refreshArcher();ensureScene();changeTarget();updateReticle();uiHud();
+ }finally{startMatchPending=false;}
 }
 
 function updateReticle(){
@@ -499,16 +502,17 @@ async function loginStudent(){
  try{
   const user=await online.login(id);
   showOnlineStatus();
-  // A seleção do perfil é válida mesmo que a leitura dos convites falhe.
-  try{
-   const inbox=await refreshInbox();
-   const received=inbox.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
-   if(received){toast('🔔 Você recebeu '+received+' desafio(s)!');await openInbox();}
-   else toast('🏹 Arqueiro selecionado: '+user.name);
-  }catch(inboxError){
-   console.warn('Perfil confirmado; convites temporariamente indisponíveis:',inboxError);
-   toast('✅ Perfil confirmado: '+user.name+'. A caixa de desafios será atualizada.');
-  }
+  // A confirmação do perfil libera imediatamente a partida; a caixa
+  // de convites não pode travar o botão Iniciar por demora do Google.
+  toast('✅ Perfil confirmado. Você já pode jogar.');
+  void refreshInbox().then(rows=>{
+   if(online.user?.id!==user.id)return;
+   const pending=rows.filter(c=>c.recipient.id===user.id&&c.status==='PENDENTE').length;
+   if(pending){
+    toast('🔔 Você recebeu '+pending+' desafio(s)!');
+    void openInbox().catch(console.warn);
+   }
+  }).catch(error=>console.warn('Convites temporariamente indisponíveis, mas perfil já confirmado:',error));
   return user;
  }catch(error){toast('⚠️ Não foi possível selecionar o perfil: '+error.message);return null;}
 }
