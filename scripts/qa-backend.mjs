@@ -67,12 +67,12 @@ for(const [id,token] of Object.entries(sessions)){
  assert.equal(logged.ok,true,'login '+id+': '+logged.error);
  assert.equal(logged.user.id,id);
 }
-assert.equal(get('ping').api,8);
+assert.equal(get('ping').api,9);
 assert.equal(get('roster').players.length,5);
 const bridgeId='f'.repeat(48);
 const bridgePing=context.doGet({parameter:{action:'ping',bridge:'1',rid:bridgeId}});
 assert(bridgePing.html.includes('classmana-html-bridge-v1'));
-assert(bridgePing.html.includes('"api":8'));
+assert(bridgePing.html.includes('"api":9'));
 assert(bridgePing.html.includes('https://drjcs2020.github.io'));
 const bridgeParams={action:'login',id:'A01',bridge:'1',rid:bridgeId,token:'a'.repeat(48),requestId:'f'.repeat(48),payload:'{}'};
 const bridgePost=context.doPost({parameter:bridgeParams});
@@ -122,4 +122,4 @@ assert.equal(invalid.ok,false);
 assert(/Casa rival|turma/i.test(invalid.error));
 assert.equal(sheet.Desafios.rows.length,4);
 assert.equal(sheet.Disparos.rows.length,7*5); // 3 duelos completos (6 rodadas) + criador do duelo recusado
-console.log('✅ BACKEND v8: login, convites, aceite/recusa, 5+5 disparos, três tipos de desafio, placar por turmas e equipes.');
+console.log('✅ BACKEND v9: login, convites, aceite/recusa, 5+5 disparos, três tipos de desafio, placar por turmas e equipes.');
