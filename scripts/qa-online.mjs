@@ -22,7 +22,7 @@ async function ping(action){
 }
 try{
  const p=await ping('ping');
- if(Number(p.api)<7)throw Error('API /exec na versão '+p.api+'; código no GitHub é v7. Republique backend/Code.gs na mesma implantação.');
+ if(Number(p.api)<8)throw Error('IMPLANTAÇÃO DESATUALIZADA: URL pública continua em API v'+p.api+'. O cliente exige API v8 para evitar bloqueio do iframe/JSONP. Copie backend/Code.gs do GitHub para o Apps Script e atualize a mesma implantação (Gerenciar implantações → Editar → Nova versão).');
  console.log('OK ping: API v'+p.api);
  const roster=await ping('roster');
  console.log('OK roster: '+(roster.players?.length||0)+' perfis disponíveis');
