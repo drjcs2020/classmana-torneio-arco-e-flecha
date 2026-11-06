@@ -14,11 +14,16 @@ class ArcheryOnline {
   let last;
   // Alguns navegadores falham no redirecionamento do Apps Script. Tentar
   // novamente não duplica desafios: GET faz apenas consultas.
-  for(let attempt=0;attempt<3;attempt++){
-   if(attempt)await wait(500*attempt);
+  const maxAttempts=4;
+  // O ContentService do Apps Script redireciona para googleusercontent.com;
+  // quedas intermitentes nesse segundo domínio não devem interromper a partida.
+  const delays=[0,800,2200,4500];
+  for(let attempt=0;attempt<maxAttempts;attempt++){
+   if(delays[attempt])await wait(delays[attempt]);
    try{return await this.getOnce(action,params)}catch(error){last=error;}
   }
-  throw last||Error('Falha de conexão com o serviço online.');
+  throw Error('Consulta '+action+' falhou após '+maxAttempts+' tentativas. '+(last?.message||'Sem resposta da rede.'));
+
  }
  async getOnce(action,params={}){
   const name='cmArcApi_'+(++this.seq)+'_'+randomId().slice(0,10);
@@ -29,9 +34,9 @@ class ArcheryOnline {
     try{delete window[name]}catch{window[name]=undefined}
     if(error)reject(error);else resolve(data);
    };
-   const timer=setTimeout(()=>close(Error('A consulta online não respondeu no prazo.')),8500);
+   const timer=setTimeout(()=>close(Error('A consulta online não respondeu em 12 segundos.')),12000);
    window[name]=(data)=>close(null,data);
-   script.onerror=()=>close(Error('Falha ao carregar a resposta do Apps Script. Confira se a implantação /exec está pública.'));
+   script.onerror=()=>close(Error('Falha na resposta do Apps Script (redirecionamento Google). Verifique a conexão com script.googleusercontent.com.'));
    script.src=this.url+'?'+new URLSearchParams({action,callback:name,...params,_:Date.now()});
    document.head.appendChild(script);
   });
@@ -42,31 +47,34 @@ class ArcheryOnline {
   // Cada POST mantém o token original até confirmar a operação.
   // Não ler this.token durante a espera: a troca de perfil poderia alterá-lo.
   const token=this.token;
-  const requestId=randomId(),frameName='cm_arc_post_iframe';
-  let frame=document.getElementById(frameName);
-  if(!frame){frame=document.createElement('iframe');frame.name=frame.id=frameName;frame.style.display='none';frame.setAttribute('title','Envio seguro ClassMana');document.body.appendChild(frame)}
+  const requestId=randomId(),frameName='cm_arc_post_'+requestId.slice(0,16);
+  // Um iframe por operação: não misturar respostas de duas gravações simultâneas.
+  const frame=document.createElement('iframe');
+  frame.name=frame.id=frameName;frame.style.display='none';
+  frame.setAttribute('title','Envio ClassMana');
+  document.body.appendChild(frame);
   const form=document.createElement('form');form.action=this.url;form.method='POST';form.target=frameName;form.style.display='none';
   const data={action,token,requestId,payload:JSON.stringify(payload),...extra};
   for(const [key,value] of Object.entries(data)){
    const input=document.createElement('input');input.type='hidden';input.name=key;input.value=String(value);form.appendChild(input);
   }
   document.body.appendChild(form);form.submit();form.remove();
-  const deadline=Date.now()+45000;
+  const deadline=Date.now()+80000;
   let lastNetworkError=null;
-  while(Date.now()<deadline){
-   await wait(1000);
-   try{
-    const res=await this.get('opResult',{requestId,token});
+  try{
+   while(Date.now()<deadline){
+    await wait(1100);
+    let res;
+    try{res=await this.get('opResult',{requestId,token});}
+    catch(error){lastNetworkError=error;continue;}
     if(res.pending)continue;
+    // Um erro de regras/perfil retornado pelo servidor é definitivo,
+    // independentemente do texto da mensagem. Não ficar aguardando 80 segundos.
     if(!res.ok)throw Error(res.error||'Operação recusada pelo servidor.');
     return res;
-   }catch(error){
-    // Erro explícito do backend NÃO pode ser confundido com indisponibilidade.
-    if(/recusada|inválid|não autorizado|Sessão expirada|não pertence|Desafio|turma|equipe|limite/i.test(error.message||''))throw error;
-    lastNetworkError=error;
    }
-  }
-  throw Error('O servidor não confirmou a gravação. Consulte seus desafios antes de tentar novamente. '+(lastNetworkError?.message||''));
+   throw Error('O servidor não confirmou a gravação. Não repita a partida antes de consultar Meus Desafios. '+(lastNetworkError?.message||''));
+  }finally{frame.remove();}
  }
  async connect(){if(!this.enabled){this.state='off';return false}const ping=await this.get('ping');if(!ping.ok)throw Error(ping.error||'Servidor desconectado');
   if(Number(ping.api)<7)throw Error('SERVIDOR DESATUALIZADO: API v'+(ping.api??'?')+' publicada; é necessário publicar o backend/Code.gs v7 no Apps Script (Implantar → Gerenciar implantações → Editar → Nova versão).');
