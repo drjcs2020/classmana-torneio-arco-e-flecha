@@ -9,7 +9,7 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 7;
+const CM_V = 8;
 const CM_DISTANCES={iniciante:[10,35,65,100,150],avancado:[20,45,75,110,150],lendario:[30,60,90,120,150]};
 /** Reproduz a mesma proteção dinâmica da arena no navegador; tempo em segundos. */
 function cmObstacle_(level,index,time){
@@ -146,7 +146,24 @@ try{
 }catch(error){result={ok:false,error:String(error.message||error)}}
 return cmOp_(db,req,token,result)
 }
-function doPost(e){return cmReply_(cmWithLock_(()=>{try{return cmDo_(e)}catch(err){return{ok:false,error:String(err.message||err)}}}),null)}
+/** HTML bridge for ContentService redirect failures (HTTP 302 to 404).
+ * Only official GitHub Pages origin can receive the result.
+ */
+function cmBridgePage_(reply,rid){
+ if(!/^[0-9a-f]{48}$/i.test(String(rid||'')))throw Error('Identificador da ponte inválido');
+ const data=JSON.stringify({type:'classmana-html-bridge-v1',rid:String(rid),data:reply}).replace(/</g,'\\u003c');
+ const html='<!doctype html><html><head><meta charset="UTF-8"></head><body>'+
+  '<script>window.top.postMessage('+data+',"https://drjcs2020.github.io");</script>'+
+  '</body></html>';
+ return HtmlService.createHtmlOutput(html)
+  .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+function doPost(e){
+ const p=e&&e.parameter||{};
+ const result=cmWithLock_(()=>{try{return cmDo_(e)}catch(err){return{ok:false,error:String(err.message||err)}}});
+ if(String(p.bridge||'')==='1')return cmBridgePage_(result,p.rid);
+ return cmReply_(result,null);
+}
 function cmRank_(db){
  const students=cmPublicRoster_(db),scoreMap={};
  students.forEach(s=>scoreMap[s.id]={...s,plays:0,wins:0,ties:0,losses:0,total:0,last:''});
@@ -185,7 +202,7 @@ function cmRank_(db){
  return {players,teams:modeGroups('entre_equipes','team'),classes:modeGroups('interclasses','house'),games:games.length,updated:cmNow_()};
 }
 function cmUpdateRank_(db){const rows=cmRank_(db).players;const sh=cmSheet_(db,'Ranking');if(sh.getLastRow()>1)sh.getRange(2,1,sh.getLastRow()-1,CM_COL.Ranking.length).clearContent();if(rows.length)sh.getRange(2,1,rows.length,CM_COL.Ranking.length).setValues(rows.map(p=>[p.id,p.name,'4º '+p.house,p.team,p.plays,p.wins,p.ties,p.losses,p.total,p.avg,p.last]));}
-function doGet(e){let p=e.parameter||{},o;try{const db=cmBook_(),action=String(p.action||'ranking'),token=String(p.token||'');if(action==='ping')o={ok:true,api:CM_V};
+function cmGetData_(e){let p=e.parameter||{},o;try{const db=cmBook_(),action=String(p.action||'ranking'),token=String(p.token||'');if(action==='ping')o={ok:true,api:CM_V};
 else if(action==='ranking')o={ok:true,...cmRank_(db)};
 else if(action==='roster')o={ok:true,players:cmPublicRoster_(db)};
 else if(action==='opResult'){
@@ -195,6 +212,12 @@ else if(action==='opResult'){
  else if(action==='inbox'){const relevant=cmChallenges_(db).filter(x=>x.data[2]===id||x.data[3]===id).sort((a,b)=>b.row-a.row).slice(0,60);o={ok:true,user:a,challenges:relevant.map(x=>cmVisible_(db,x,id))}}
  else if(action==='challenge'){o={ok:true,challenge:cmVisible_(db,cmFindChallenge_(db,String(p.id||'')),id)}}
  else throw Error('Consulta inválida');}
-}catch(err){o={ok:false,error:String(err.message||err)}}return cmReply_(o,p.callback)}
+}catch(err){o={ok:false,error:String(err.message||err)}}return o}
+function doGet(e){
+ const p=e&&e.parameter||{};
+ const result=cmGetData_(e);
+ if(String(p.bridge||'')==='1')return cmBridgePage_(result,p.rid);
+ return cmReply_(result,p.callback);
+}
 /** Compatibilidade: a versão por seleção de nome não exige configuração de PIN. */
 function setupOnce(){return {message:'Sem PIN: não é necessário executar setupOnce.'}}
