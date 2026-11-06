@@ -58,7 +58,9 @@ jobs:
       - name: Montar site público sem ZIPs e código privado
         run: |
           mkdir -p _site
-          find . -maxdepth 1 -type f \\( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '.nojekyll' \\) -exec cp -t _site/ -- {} +
+          for file in *.html *.css *.js .nojekyll; do
+            if [ -f "$file" ]; then cp -- "$file" _site/; fi
+          done
           cp -a assets _site/assets
           test -s _site/index.html
           test -s _site/online-client.js
