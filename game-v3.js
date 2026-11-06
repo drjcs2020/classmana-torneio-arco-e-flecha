@@ -270,11 +270,39 @@ async function startMatch(accepted=null){
     toast('Escolha um adversário válido para este tipo de desafio.');return;
    }
   }else if(fromInbox.recipient.id!==userId&&fromInbox.creator.id!==userId){toast('Esse desafio não pertence à sua conta.');return;}
+  const requestedAt=Date.now(),kind=duelKind(mode),level=$('challenge-level').value;
   try{
-   onlineLoading=true;$('start-game').disabled=true;$('start-game').setAttribute('aria-label','Preparando desafio online...');
-   challenge=fromInbox||await online.create(duelKind(mode),rivalId,$('challenge-level').value);
-  }catch(error){toast('Não foi possível criar o desafio: '+error.message);return}
-  finally{onlineLoading=false;$('start-game').disabled=false;$('start-game').setAttribute('aria-label','Iniciar partida')}
+   onlineLoading=true;
+   $('start-game').disabled=true;
+   $('start-game').setAttribute('aria-busy','true');
+   $('start-game').setAttribute('aria-label','Registrando desafio online...');
+   $('online-status').textContent='⏳ Registrando convite na planilha online...';
+   challenge=fromInbox||await online.create(kind,rivalId,level);
+  }catch(error){
+   // Se o servidor gravou mas a confirmação se perdeu, recuperar o convite
+   // novo pela caixa de entrada sem criar uma segunda disputa.
+   if(!fromInbox){
+    $('online-status').textContent='⏳ Verificando se o convite foi salvo...';
+    try{
+     const recent=await online.inbox();
+     challenge=recent.find(c=>c.creator?.id===userId&&c.recipient?.id===rivalId&&
+       c.kind===kind&&c.level===level&&c.status==='CRIADOR_JOGANDO'&&
+       new Date(c.created).getTime()>=requestedAt-4000)||null;
+    }catch(recoveryError){console.warn('Não foi possível recuperar convite online:',recoveryError);}
+   }
+   if(!challenge){
+    $('online-status').textContent='⚠️ Falha ao registrar convite: '+error.message;
+    toast('Não foi possível confirmar o desafio: '+error.message);
+    return;
+   }
+   toast('✅ Convite recuperado no servidor. Abrindo a arena...');
+  }finally{
+   onlineLoading=false;
+   $('start-game').disabled=false;
+   $('start-game').removeAttribute('aria-busy');
+   $('start-game').setAttribute('aria-label','Iniciar partida');
+   if(challenge)showOnlineStatus();
+  }
  }
  if(match?.running){match.running=false;match.locked=false;holding=false;$('stage').classList.remove('aiming','firing');scene?.setPower(0);}
  if(online.user&&isDuel(mode)){userId=online.user.id;selectHouse(userId[0]);$('player').value=userId;}
