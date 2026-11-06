@@ -9,7 +9,7 @@
  * tokens de sessão randômicos permitem ler o resultado de cada POST.
  */
 const CM_DB = '1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY';
-const CM_V = 8;
+const CM_V = 9;
 const CM_DISTANCES={iniciante:[10,35,65,100,150],avancado:[20,45,75,110,150],lendario:[30,60,90,120,150]};
 /** Reproduz a mesma proteção dinâmica da arena no navegador; tempo em segundos. */
 function cmObstacle_(level,index,time){
@@ -213,7 +213,62 @@ else if(action==='opResult'){
  else if(action==='challenge'){o={ok:true,challenge:cmVisible_(db,cmFindChallenge_(db,String(p.id||'')),id)}}
  else throw Error('Consulta inválida');}
 }catch(err){o={ok:false,error:String(err.message||err)}}return o}
+
+/**
+ * v9: o Apps Script é a página PRINCIPAL do torneio online.
+ * O iframe exibe apenas os recursos estáticos do jogo (GitHub Pages).
+ * Leituras/escritas passam por google.script.run e NÃO por redirect JSONP.
+ */
+function cmGateway(request){
+ try{
+  const verb=String(request&&request.verb||''),action=String(request&&request.action||'');
+  const p=request&&request.params&&typeof request.params==='object'?request.params:{};
+  if(verb==='GET'&&['ping','roster','ranking','me','inbox','challenge','opResult'].indexOf(action)>=0)
+   return cmGetData_({parameter:Object.assign({},p,{action:action})});
+  if(verb==='POST'&&['login','challenge','answer','submit'].indexOf(action)>=0)
+   return cmWithLock_(function(){return cmDo_({parameter:Object.assign({},p,{action:action})})});
+  return {ok:false,error:'Operação não permitida'};
+ }catch(error){return {ok:false,error:String(error&&error.message||error)}}
+}
+function cmOnlinePortal_(p){
+ const origin='https://drjcs2020.github.io';
+ const chosenHouse=/^[ABC]$/.test(String(p.house||''))?String(p.house):'A';
+ const chosenMode=['challenge_same','challenge_team','challenge'].indexOf(String(p.mode||''))>=0?String(p.mode):'challenge_same';
+ const player=/^[ABC][0-9]{2}$/.test(String(p.player||''))?String(p.player):'';
+ const requestedInbox=String(p.inbox||'')==='1'?'1':'';
+ const query='?'+[['hosted','1'],['house',chosenHouse],['mode',chosenMode],['player',player],['inbox',requestedInbox]].map(function(v){return encodeURIComponent(v[0])+'='+encodeURIComponent(v[1])}).join('&');
+ const gameURL=origin+'/classmana-torneio-arco-e-flecha/'+query;
+ const html=[
+ '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">',
+ '<meta name="viewport" content="width=device-width,initial-scale=1">',
+ '<title>ClassMana — Arena Online</title>',
+ '<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07182b;color:#ffebac;font:700 18px sans-serif}#cm-game{display:block;width:100%;height:100dvh;border:0}#status{position:absolute;top:46%;left:12%;right:12%;text-align:center;pointer-events:none;text-shadow:0 2px 3px #000}body.ready #status{display:none}</style>',
+ '</head><body><div id="status">Carregando a Arena Online ClassMana...</div>',
+ '<iframe id="cm-game" title="Jogo ClassMana" allow="fullscreen" src="'+gameURL+'"></iframe>',
+ '<script>',
+ '(function(){',
+ 'const game=document.getElementById("cm-game"),origin="https://drjcs2020.github.io";',
+ 'const ready={type:"cm-gateway-ready-v1",version:9};',
+ 'function send(msg){if(game.contentWindow)game.contentWindow.postMessage(msg,origin)}',
+ 'window.addEventListener("message",function(ev){',
+ ' if(ev.origin!==origin||ev.source!==game.contentWindow)return;',
+ ' const d=ev.data;if(!d||typeof d!=="object")return;',
+ ' if(d.type==="cm-gateway-hello-v1"){document.body.classList.add("ready");send(ready);return;}',
+ ' if(d.type!=="cm-gateway-request-v1"||!/^[0-9a-f]{48}$/i.test(String(d.rid||"")))return;',
+ ' const rid=d.rid,reply=function(result){send({type:"cm-gateway-response-v1",rid:rid,data:result})};',
+ ' google.script.run.withSuccessHandler(reply).withFailureHandler(function(err){',
+ '  reply({ok:false,error:String(err&&err.message||err||"Falha no servidor")});',
+ ' }).cmGateway({verb:d.verb,action:d.action,params:d.params});',
+ '});',
+ 'game.addEventListener("load",function(){send(ready)});',
+ '})();',
+ '</script></body></html>'
+ ].join('\n');
+ return HtmlService.createHtmlOutput(html).setTitle('ClassMana — Arena Online');
+}
+
 function doGet(e){
+ if(String(e&&e.parameter&&e.parameter.play||'')==='1')return cmOnlinePortal_(e.parameter);
  const p=e&&e.parameter||{};
  const result=cmGetData_(e);
  if(String(p.bridge||'')==='1')return cmBridgePage_(result,p.rid);
