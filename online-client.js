@@ -8,7 +8,7 @@ const randomId=()=>Array.from(crypto.getRandomValues(new Uint8Array(24)),v=>v.to
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function apiIsConfigured(){return /^https:\/\/script\.google\.com\/macros\/s\/[-\w]+\/exec$/.test(ONLINE_API_URL)}
 class ArcheryOnline {
- constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;}
+ constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;this.loginPending=null;this.lastError=null;}
  async get(action,params={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
   let last;
@@ -39,11 +39,14 @@ class ArcheryOnline {
  async post(action,payload={},extra={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
   if(!this.token)this.token=randomId();
+  // Cada POST mantém o token original até confirmar a operação.
+  // Não ler this.token durante a espera: a troca de perfil poderia alterá-lo.
+  const token=this.token;
   const requestId=randomId(),frameName='cm_arc_post_iframe';
   let frame=document.getElementById(frameName);
   if(!frame){frame=document.createElement('iframe');frame.name=frame.id=frameName;frame.style.display='none';frame.setAttribute('title','Envio seguro ClassMana');document.body.appendChild(frame)}
   const form=document.createElement('form');form.action=this.url;form.method='POST';form.target=frameName;form.style.display='none';
-  const data={action,token:this.token,requestId,payload:JSON.stringify(payload),...extra};
+  const data={action,token,requestId,payload:JSON.stringify(payload),...extra};
   for(const [key,value] of Object.entries(data)){
    const input=document.createElement('input');input.type='hidden';input.name=key;input.value=String(value);form.appendChild(input);
   }
@@ -53,7 +56,7 @@ class ArcheryOnline {
   while(Date.now()<deadline){
    await wait(1000);
    try{
-    const res=await this.get('opResult',{requestId,token:this.token});
+    const res=await this.get('opResult',{requestId,token});
     if(res.pending)continue;
     if(!res.ok)throw Error(res.error||'Operação recusada pelo servidor.');
     return res;
@@ -71,16 +74,29 @@ class ArcheryOnline {
   this.state='ready';
   try{if(this.token){const resp=await this.get('me',{token:this.token});if(resp.ok)this.user=resp.user;else{this.token='';sessionStorage.removeItem(TOKEN_KEY)}}}catch{this.token='';sessionStorage.removeItem(TOKEN_KEY)}return true;
  }
- async login(id){
-  if(!/^[ABC]\d{2}$/.test(id||''))throw Error('Escolha seu nome na lista.');
-  if(this.user?.id===id&&this.token)return this.user;
-  const old=this.token,previous=this.user;this.token=randomId();this.user=null;
+ login(id){
+  if(!/^[ABC]\d{2}$/.test(id||''))return Promise.reject(Error('Escolha seu nome na lista.'));
+  if(this.loginPending){
+   // Mesmo perfil selecionado e clique em Jogar durante o login:
+   // compartilham a mesma requisição, sem gerar tokens concorrentes.
+   return this.loginPending.then(()=>this.user?.id===id?this.user:this.login(id));
+  }
+  if(this.user?.id===id&&this.token)return Promise.resolve(this.user);
+  const operation=this.loginOnce(id);
+  this.loginPending=operation;
+  operation.finally(()=>{if(this.loginPending===operation)this.loginPending=null}).catch(()=>{});
+  return operation;
+ }
+ async loginOnce(id){
+  const previousToken=this.token,previousUser=this.user;
+  const attemptToken=randomId();this.token=attemptToken;this.user=null;
   try{
     const r=await this.post('login',{}, {id});
-    this.user=r.user;sessionStorage.setItem(TOKEN_KEY,this.token);this.state='ready';
+    if(!r.ok||r.user?.id!==id)throw Error(r.error||'Perfil não confirmado pelo servidor.');
+    this.user=r.user;sessionStorage.setItem(TOKEN_KEY,attemptToken);this.state='ready';
     localStorage.setItem('cm_arco_nome',id);
     return r.user;
-  }catch(e){this.token=old;this.user=previous;throw e}
+  }catch(e){this.token=previousToken;this.user=previousUser;throw e}
  }
  logout(){this.token='';this.user=null;sessionStorage.removeItem(TOKEN_KEY);localStorage.removeItem('cm_arco_nome')}
  async list(){const r=await this.get('roster');if(!r.ok)throw Error(r.error);this.roster=r.players||[];return this.roster}
