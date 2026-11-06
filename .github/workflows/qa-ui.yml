@@ -43,8 +43,10 @@ jobs:
           cp backend/Code.gs /tmp/classmana-backend-qa.js
           node --check /tmp/classmana-backend-qa.js
           node scripts/qa-static.mjs
-      - name: Testar backend v7 em memória (sem alterar planilha real)
+      - name: Testar backend em memória (sem alterar planilha real)
         run: node scripts/qa-backend.mjs
+      - name: Verificar protocolo da Arena Online v9 sem alterar alunos
+        run: node scripts/qa-portal.mjs
       - name: Install browser test runner
         run: |
           npm install --no-save --ignore-scripts playwright@1.56.1
@@ -53,12 +55,8 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/classmana-http.log 2>&1 &
           node scripts/qa-browser.mjs
-      - name: Validar transporte HTML sem redirecionamento (simulação sem dados reais)
-        run: node scripts/qa-bridge-browser.mjs
-      - name: Verificar JSONP real no navegador Chromium (sem alterar dados)
-        run: node scripts/qa-online-browser.mjs
-      - name: Verificar POST REAL com perfil inexistente (sem criar desafios)
-        run: node scripts/qa-online-post-probe.mjs
+      # JSONP e iframe cross-site de Apps Script foram substituídos pelo portal v9.
+      # Teste de rede /exec separado: scripts/qa-online.mjs (não cria desafios).
       - name: Testar do zero os 2 competidores, convite, aceite e 10 disparos
         run: |
           node --check rebuild/api.js
