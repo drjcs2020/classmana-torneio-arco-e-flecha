@@ -76,7 +76,7 @@ try{
   const message=JSON.stringify({type:'classmana-html-bridge-v1',rid,data:result}).replace(/</g,'\\u003c');
   await route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><meta charset="utf-8"><script>window.top.postMessage('+message+', "*");</script>'});
  });
- await page.goto('http://127.0.0.1:8769/rebuild/',{waitUntil:'domcontentloaded',timeout:30000});
+ await page.goto('http://127.0.0.1:8769/rebuild/?qa=1',{waitUntil:'domcontentloaded',timeout:30000});
  await page.waitForFunction(()=>document.getElementById('connection').textContent.includes('3 arqueiros'),{timeout:18000});
  await page.locator('[data-pick-house="A"]').click();
  await page.locator('#hero-confirm').click();
@@ -85,6 +85,7 @@ try{
  await page.selectOption('#enemy','A02');
  await page.locator('#start-match').click();
  await page.waitForFunction(()=>document.body.dataset.screen==='arena',{timeout:25000});
+ console.log('REBUILD ARENA ENGINE:',await page.evaluate(()=>window.classmanaQA?.getEngine()));
  const shoot=async()=>{
   for(let i=0;i<5;i++){
    await page.waitForFunction(index=>document.getElementById('arena-stage-title').textContent.includes('FLECHA '+(index+1)+' / 5'),i,{timeout:13000});
