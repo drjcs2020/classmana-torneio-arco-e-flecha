@@ -34,7 +34,7 @@ assert(index.includes('sprite-hud.css?v=1'),'Sprite style not loaded');
 const spriteZipExists=fs.existsSync('ClassMana_Integracao_Visual_01.zip');
 if(!spriteZipExists)console.warn('⚠️ Sprites staged in ZIP but ZIP not yet uploaded to repository.');
 assert(read('arena-difficulty.js').includes('obstacleBlocks'),'Hard obstacle logic missing');
-assert(read('online-client.js').includes('Number(ping.api)<7'),'Server version validation missing');
+assert(read('online-client.js').includes('Number(ping.api)<8'),'Server v8 validation missing');
 const config=read('online-config.js');
 console.log('✅ UI structure, asset refs, modules and IDs: passed');
 if(config.includes('macros/s/.../exec'))console.warn('⚠️ Online tournament not connected: missing real Apps Script /exec URL');
