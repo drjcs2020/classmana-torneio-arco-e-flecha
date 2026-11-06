@@ -29,6 +29,13 @@ try {
    if(!resp.ok)throw Error(action+': '+resp.error);
    out[action]=action==='ping'?{api:resp.api}:action==='roster'?{players:resp.players?.length}:{games:resp.games};
   }
+  // Provar separadamente o caminho /a/~/ usado como fallback para a
+  // instabilidade 302/404 do ContentService. Nenhuma escrita é realizada.
+  const alternate=online.url.replace('https://script.google.com/macros/s/','https://script.google.com/a/~/macros/s/');
+  try{
+   const fallbackPing=await online.getOnce('ping',{},alternate);
+   out.alternate={ok:fallbackPing.ok,api:fallbackPing.api};
+  }catch(err){out.alternate={ok:false,error:String(err.message||err)}}
   const requestId='a'.repeat(48),token='b'.repeat(48);
   const op=await online.get('opResult',{requestId,token});
   if(!op.pending)throw Error('opResult deveria retornar pending para ID não utilizado');
