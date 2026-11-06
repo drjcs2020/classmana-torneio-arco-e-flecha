@@ -268,7 +268,7 @@ function cmOnlinePortal_(p){
 }
 
 function doGet(e){
- if(String(e&&e.parameter&&e.parameter.play||'')==='1')return cmOnlinePortal_(e.parameter);
+ if(String(e&&e.parameter&&e.parameter.play||'')==='1'||(!e?.parameter?.action&&!e?.parameter?.callback&&!e?.parameter?.bridge))return cmOnlinePortal_(e&&e.parameter||{});
  const p=e&&e.parameter||{};
  const result=cmGetData_(e);
  if(String(p.bridge||'')==='1')return cmBridgePage_(result,p.rid);
