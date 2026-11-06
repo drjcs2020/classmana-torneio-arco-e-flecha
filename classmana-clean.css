@@ -267,3 +267,22 @@ body.cm-art-on .stage.cm-art-ready .arena-mode-badge{
 }
 /* Não esconder a moldura do botão de erro de rede quando for preciso reenviar. */
 #view-arena #finish #share-result.cm-retry{font-size:clamp(14px,1.3vw,19px)!important;color:#fff5db!important}
+
+
+/* CORREÇÃO CRÍTICA: dropdown nativo aberto usa a própria paleta do sistema.
+   No Chromium/Windows, opções herdam branco do select mas o popup é branco.
+   Forçar contraste do popup independentemente do sistema operacional. */
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ color-scheme:dark!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select option,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select optgroup{
+ background-color:#ffffff!important;
+ color:#111827!important;
+ font:700 17px/1.4 Arial,sans-serif!important;
+ text-shadow:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select option:checked{
+ background-color:#175ac6!important;
+ color:#ffffff!important;
+}
