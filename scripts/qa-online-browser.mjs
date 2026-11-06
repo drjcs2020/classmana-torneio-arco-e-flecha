@@ -40,6 +40,17 @@ try {
   const op=await online.get('opResult',{requestId,token});
   if(!op.pending)throw Error('opResult deveria retornar pending para ID não utilizado');
   out.opResult={pending:op.pending};
+  // Este é um POST real, usando o mesmo formulário oculto do jogo.
+  // O ID Z99 é propositalmente INVÁLIDO: não cria sessão nem desafio,
+  // e só registra uma linha de diagnóstico na aba de operações.
+  // Se a resposta for "Selecione um aluno", provamos que a escrita
+  // e a consulta de confirmação chegaram ao mesmo Apps Script.
+  let writeError='';
+  try {await online.post('login',{}, {id:'Z99'});}
+  catch(err){writeError=String(err.message||err);}
+  if(!/Selecione um aluno da lista|Aluno não autorizado/i.test(writeError))
+   throw Error('POST não confirmado via formulário+opResult: '+writeError);
+  out.post={transport:'iframe-form + opResult',confirmed:true,errorCode:'perfil de diagnóstico rejeitado como esperado'};
   out.elapsedMs=Date.now()-start;
   return out;
  });
