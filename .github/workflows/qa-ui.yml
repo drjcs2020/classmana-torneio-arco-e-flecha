@@ -55,6 +55,8 @@ jobs:
           node scripts/qa-browser.mjs
       - name: Verificar JSONP real no navegador Chromium (sem alterar dados)
         run: node scripts/qa-online-browser.mjs
+      - name: Diagnóstico pontual POST no navegador (perfil A99 inexistente)
+        run: node scripts/qa-online-post-probe.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
