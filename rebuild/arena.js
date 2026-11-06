@@ -21,7 +21,7 @@ export class RebuiltArena {
   if(this.initialized)return;
   this.initialized=true;
   try{
-   const pc=await import('https://cdn.jsdelivr.net/npm/playcanvas@2.12.2/build/playcanvas.mjs');
+   const pc=await import('https://cdn.jsdelivr.net/npm/playcanvas@2.23.3/+esm');
    this.pc=pc;
    const app=new pc.Application(this.canvas,{graphicsDeviceOptions:{alpha:true,antialias:true}});
    this.app=app;app.start();
