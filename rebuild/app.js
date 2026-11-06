@@ -177,8 +177,9 @@ async function beginMatch(challenge=null){
    if(!tournament.apiVersion)throw Error('O servidor online ainda não está disponível. '+onlineError);
    if(challenge){
     id=tournament.user?.id;
-    if(challenge.recipient?.id!==id)throw Error('Este convite não pertence ao aluno selecionado.');
-    if(challenge.status!=='ACEITO')throw Error('Primeiro é necessário aceitar o desafio.');
+    const ownReply=challenge.recipient?.id===id&&challenge.status==='ACEITO';
+    const ownCreator=challenge.creator?.id===id&&challenge.status==='CRIADOR_JOGANDO';
+    if(!ownReply&&!ownCreator)throw Error('Este desafio não está disponível para iniciar com este aluno.');
     created=challenge;
    }else{
     await tournament.login(id);
