@@ -11,21 +11,29 @@ class ArcheryOnline {
  constructor(){this.url=ONLINE_API_URL;this.enabled=apiIsConfigured();this.token=sessionStorage.getItem(TOKEN_KEY)||'';this.user=null;this.roster=[];this.state='off';this.seq=0;this.loginPending=null;this.lastError=null;}
  async get(action,params={}){
   if(!this.enabled)throw Error('Servidor online ainda não publicado.');
-  let last;
-  // Alguns navegadores falham no redirecionamento do Apps Script. Tentar
-  // novamente não duplica desafios: GET faz apenas consultas.
-  const maxAttempts=4;
-  // O ContentService do Apps Script redireciona para googleusercontent.com;
-  // quedas intermitentes nesse segundo domínio não devem interromper a partida.
-  const delays=[0,800,2200,4500];
-  for(let attempt=0;attempt<maxAttempts;attempt++){
+  // Rotas equivalentes do Google podem falhar independentemente no salto
+  // ContentService (/exec) -> script.googleusercontent.com.
+  // GET é somente leitura; repetir não cria convites nem duplica resultados.
+  const alternate=this.url.replace('https://script.google.com/macros/s/','https://script.google.com/a/~/macros/s/');
+  const routes=[this.url,alternate,this.url,alternate,this.url];
+  const delays=[0,650,1800,3800,7000];
+  let last=null;
+  for(let attempt=0;attempt<routes.length;attempt++){
    if(delays[attempt])await wait(delays[attempt]);
-   try{return await this.getOnce(action,params)}catch(error){last=error;}
+   try{
+    const result=await this.getOnce(action,params,routes[attempt]);
+    this.lastNetworkRoute=routes[attempt]===this.url?'principal':'alternativa';
+    return result;
+   }catch(error){
+    last=error;
+    // A resposta real do Google é eventualmente 404 após um 302.
+    // Alternar a rota fornece uma nova URL de resposta sem alterar o backend.
+    console.warn('ClassMana: tentativa de leitura '+(attempt+1)+'/'+routes.length+' falhou ('+(routes[attempt]===this.url?'principal':'alternativa')+').',error?.message||error);
+   }
   }
-  throw Error('Consulta '+action+' falhou após '+maxAttempts+' tentativas. '+(last?.message||'Sem resposta da rede.'));
-
+  throw Error('Falha ao consultar '+action+' em '+routes.length+' tentativas. O Google não entregou a resposta ao navegador após o redirecionamento; tente RECONETAR ou outra rede. '+(last?.message||''));
  }
- async getOnce(action,params={}){
+ async getOnce(action,params={},route=this.url){
   const name='cmArcApi_'+(++this.seq)+'_'+randomId().slice(0,10);
   return await new Promise((resolve,reject)=>{
    let settled=false,script=document.createElement('script');
@@ -34,10 +42,11 @@ class ArcheryOnline {
     try{delete window[name]}catch{window[name]=undefined}
     if(error)reject(error);else resolve(data);
    };
-   const timer=setTimeout(()=>close(Error('A consulta online não respondeu em 12 segundos.')),12000);
+   const timer=setTimeout(()=>close(Error('Tempo limite de 15 segundos para o Google responder.')),15000);
    window[name]=(data)=>close(null,data);
-   script.onerror=()=>close(Error('Falha na resposta do Apps Script (redirecionamento Google). Verifique a conexão com script.googleusercontent.com.'));
-   script.src=this.url+'?'+new URLSearchParams({action,callback:name,...params,_:Date.now()});
+   script.onerror=()=>close(Error('Falha ao carregar resposta JSONP do Google (possível erro 404 no redirecionamento, bloqueio de rede ou navegador).'));
+   script.referrerPolicy='no-referrer';
+   script.src=route+'?'+new URLSearchParams({action,callback:name,...params,_:Date.now()});
    document.head.appendChild(script);
   });
  }
