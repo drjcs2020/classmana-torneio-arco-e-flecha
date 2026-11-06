@@ -254,7 +254,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.enabled||online.state!=='ready'){toast('⚠️ Desafios online aguardam a atualização do Apps Script pelo professor. Treine com o robô enquanto isso.');return}
+  if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'Desafios indisponíveis: atualize a implantação do Apps Script.'));return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
     if(!selected)return;
@@ -482,7 +482,7 @@ function showOnlineStatus(){
  $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🏹 Escolha seu nome na lista';
  $('online-banner').textContent=active?'🟢 PLACAR ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
  $('online-status').textContent=!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
-  !active&&online.state==='error'?'⚠️ Sistema de desafios precisa de atualização no servidor.':
+  !active&&online.state==='error'?'⚠️ '+(online.lastError||'Não foi possível conectar ao servidor de desafios.'):
   !active?'⏳ Verificando conexão...':user?'✅ Desafios disponíveis. Nenhuma senha ou PIN.':'✅ Placar conectado. Selecione seu nome.';
  $('logout').classList.toggle('hidden',!user);
  $('open-inbox').disabled=!active;
@@ -494,7 +494,7 @@ function showOnlineStatus(){
 async function loginStudent(){
  const id=$('player').value;
  if(!id||id==='guest'){toast('Escolha seu nome na lista.');return null;}
- if(!online.enabled||online.state!=='ready'){toast('⚠️ Desafios aguardam atualização do servidor pelo professor.');return null;}
+ if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'Aguardando atualização do servidor de desafios.'));return null;}
  if(online.user?.id===id)return online.user;
  try{
   const user=await online.login(id);
@@ -576,10 +576,11 @@ async function onInboxAction(e){
  }catch(error){toast('⚠️ '+error.message);button.disabled=false;}
 }
 async function startOnlineClient(){
+ online.lastError=null;
  showOnlineStatus();
  if(!online.enabled)return;
  try{
-  await online.connect();showOnlineStatus();
+  await online.connect();online.lastError=null;showOnlineStatus();
   try{await online.list()}catch(err){console.warn('Lista online indisponível; usando nomes cadastrados no jogo:',err)}
   const remembered=localStorage.getItem('cm_arco_nome');
   if(!online.user&&/^[ABC]\d{2}$/.test(remembered||'')){
@@ -593,9 +594,10 @@ async function startOnlineClient(){
   }catch(error){console.warn('Convites temporariamente indisponíveis:',error)}
   renderRanking();
  }catch(error){
-  online.state='error';showOnlineStatus();
-  $('online-status').textContent='⚠️ Desafios online aguardam atualização do servidor pelo professor.';
-  $('online-status').title=error.message;
+  online.state='error';
+  online.lastError=String(error?.message||'Falha de conexão');
+  showOnlineStatus();
+  $('online-status').title=online.lastError;
   console.warn('ClassMana API:',error);
  }
 }
