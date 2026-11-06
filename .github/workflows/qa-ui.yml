@@ -57,6 +57,8 @@ jobs:
         run: node scripts/qa-bridge-browser.mjs
       - name: Verificar JSONP real no navegador Chromium (sem alterar dados)
         run: node scripts/qa-online-browser.mjs
+      - name: Verificar POST REAL com perfil inexistente (sem criar desafios)
+        run: node scripts/qa-online-post-probe.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
