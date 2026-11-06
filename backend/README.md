@@ -1,54 +1,46 @@
-# ClassMana — Ativar os desafios online (sem PIN)
+# ClassMana — Corrigir e ativar a Arena Online (API v9)
 
-Este jogo é independente do Painel das Casas, disponível em:
-https://drjcs2020.github.io/classmana-torneio-arco-e-flecha/
+**Repositório único, branch `main`**, independente do Painel das Casas.
 
-**A planilha existente é mantida**:
+Jogo: https://drjcs2020.github.io/classmana-torneio-arco-e-flecha/
+
+Servidor do torneio: https://script.google.com/macros/s/AKfycbzJ5MB-NWFLJKyh0kaj2Isaiv2H_KK32v8FNuKVltmKiEwpuEeHHNAJBbNfNlc-0jLkTw/exec
+
+Planilha **existente**, que NÃO deve ser recriada:
 https://docs.google.com/spreadsheets/d/1LLfPMMB7LMmRv8jeHqUHUpj3U-uX0j4Y6kW6lDtmREY/edit
 
-## Correção do erro 302/404 — API v8 com ponte HTML (06/11/2026)
+## Problema identificado no navegador em 06/11/2026
 
-O Google Apps Script ContentService devolve HTTP 302 para script.googleusercontent.com.
-Um defeito do próprio Google pode fazer a segunda etapa responder HTTP 404,
-mesmo quando a planilha funciona e os testes por Node passam.
+A interface antiga dependia de dois canais problemáticos do Apps Script:
 
-**O jogo recebeu uma alternativa em HTMLService (sem redirect ContentService)**:
-respostas GET e POST por iframe e postMessage com ID aleatório, origem do
-portal validada e confirmação de gravação. O antigo JSONP permanece apenas
-como alternativa quando o servidor ainda não estiver na v8.
+1. ContentService / JSONP: redireciona 302 para `script.googleusercontent.com`, que pode responder 404.
+2. HtmlService carregado **dentro** de iframe no GitHub Pages: pode ser bloqueado por `X-Frame-Options` / `frame-ancestors`.
 
-**ATENÇÃO:** o GitHub Pages não publica o Google Apps Script. O arquivo
-backend/Code.gs no GitHub já está na v8, mas é necessário atualizar a
-implantação do Apps Script para a correção chegar ao servidor.
+A API **v9** inverte a montagem: a página principal é o Apps Script e o **jogo (somente interface)** fica no iframe do Google. Assim, as leituras e as gravações usam `google.script.run`, sem JSONP e sem iframe externo de Apps Script.
 
-Apenas uma atualização da implantação existente:
-1. Abra a planilha e depois **Extensões → Apps Script**.
-2. No editor, substitua o arquivo `Code.gs` pelo arquivo atualizado
+Ao escolher um desafio online no GitHub Pages, o jogador é encaminhado automaticamente para a Arena Online; Casa, tipo de partida e aluno selecionado são mantidos. **Treino/robô continuam no GitHub Pages.**
+
+## Publicação obrigatória (somente uma implantação, SEM nova branch)
+
+O GitHub não atualiza sozinho a implantação pública do Apps Script. É necessário fazer uma única atualização pelo editor da conta proprietária do script.
+
+1. Abra a planilha acima → **Extensões → Apps Script**.
+2. Substitua o conteúdo de **`Code.gs`** pelo arquivo da `main`:
    https://github.com/drjcs2020/classmana-torneio-arco-e-flecha/blob/main/backend/Code.gs
-3. Salve e escolha **Implantar → Gerenciar implantações → Editar (lápis)**.
-4. Escolha **Nova versão → Implantar**, sem trocar a URL /exec.
-5. No jogo, a conexão HTML deve funcionar sem o redirecionamento JSONP.
+3. Salve e clique em **Implantar → Gerenciar implantações → lápis da implantação já existente → Versão: Nova versão → Implantar**.
+4. Mantenha **Executar como: eu** e **Quem tem acesso: qualquer pessoa**. Autorize quando solicitado. Não execute `setupOnce()`.
+5. Abra diretamente a URL **/exec** acima. Com a v9 ativa, ela deve **abrir o jogo completo**, em vez de mostrar JSON.
+6. No GitHub Pages, escolha uma Casa e **Desafiar colega**. A aplicação abrirá esse mesmo portal.
 
-*Não execute setupOnce, não crie outra planilha e não gere um segundo deployment.*
+**Se a página /exec mostrar JSON ou erro de autorização, a v9 ainda NÃO está na implantação pública.** O código no GitHub não substitui essa etapa.
 
-Os testes em memória cobrem chamadas de ponte, login, convites e resultados.
-A confirmação na implantação pública depende da etapa acima.
+## Teste honesto (antes de declarar resolvido)
 
-## Referência de implantação
+- QA local/CI: `node scripts/qa-static.mjs`, `node scripts/qa-backend.mjs`, `node scripts/qa-portal.mjs` (sem escritas reais). 
+- QA remoto: `node scripts/qa-online.mjs` verifica HTML do portal público; só passa após a publicação da v9.
+- Teste real em dois navegadores: perfil A01 abre desafio para A02; salva 5 flechas; A02 vê convite, aceita, joga 5 flechas; verificar **Desafios**, **Disparos**, **Ranking** na mesma planilha. Repetir com equipe e interclasses.
 
-A versão antiga exigia PIN. A interface atual não exige mais senha nem PIN.
-Se a v8 ainda não foi publicada, atualize a implantação **sem criar outra planilha**:
-
-1. Abra a planilha acima, depois **Extensões → Apps Script**.
-2. Substitua o conteúdo de `Code.gs` pelo código atualizado em
-   https://github.com/drjcs2020/classmana-torneio-arco-e-flecha/blob/main/backend/Code.gs
-3. Salve. **Não execute `setupOnce`**; no novo fluxo não é necessário.
-4. Clique **Implantar → Gerenciar implantações**. Edite a implantação web existente.
-5. Em Versão, escolha **Nova versão**, mantenha **Executar como eu** e **Acesso: qualquer pessoa** e implante.
-6. A URL `/exec` normalmente permanece a mesma quando a implantação existente é atualizada.
-   O endereço público já está em `online-config.js`.
-7. Verifique [a implantação pública com `?action=ping`](https://script.google.com/macros/s/AKfycbzJ5MB-NWFLJKyh0kaj2Isaiv2H_KK32v8FNuKVltmKiEwpuEeHHNAJBbNfNlc-0jLkTw/exec?action=ping). A resposta deve conter `"api":8` quando a v8 estiver publicada.
-   Uma versão anterior será recusada pelo jogo para evitar erro de PIN.
+Não declare "desafios online funcionando" apenas com ping ou testes simulados.
 
 ## Como os alunos jogam
 
@@ -82,14 +74,8 @@ Treinos e partidas contra robô não alteram o ranking oficial. A classificaçã
 individual agrega desafios concluídos; a de equipes considera disputas entre
 equipes; a de turmas considera interclasses.
 
-## Testes antes do uso em sala
+## Verificações pendentes
 
-- Confirme `"api":8` no endpoint após publicar. **Se aparecer `"api":7`, a ponte HTML ainda não está no servidor.**
-- Faça uma rodada como A01 no circuito Aprendiz e salve cinco flechas.
-- Em outro navegador, selecione A02: o convite deve aparecer.
-- Aceite, conclua os cinco tiros e verifique as abas Desafios, Disparos e Ranking.
-- Repita com circuito Lendário: os disparos devem ir de 30 m a 150 m.
-- Verifique que a mesma sequência foi usada nos dois lados da disputa.
-- No GitHub Actions, acompanhe **Verificar API online do torneio**: o teste só fica verde depois de implantar a API v7 na URL /exec existente.
-
-**Importante:** o Apps Script público foi confirmado na v7 nos testes anteriores; a ponte HTML exige v8 e sua publicação precisa ser confirmada. O GitHub Pages não atualiza o Apps Script.
+- Confirmar implantação pública v9 e navegador real com google.script.run.
+- Executar rodada completa entre dois estudantes reais supervisionados.
+- Verificar escrita e leitura dos resultados sem duplicar convites.
