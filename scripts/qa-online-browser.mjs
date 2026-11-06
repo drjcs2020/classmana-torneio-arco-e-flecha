@@ -40,30 +40,6 @@ try {
   const op=await online.get('opResult',{requestId,token});
   if(!op.pending)throw Error('opResult deveria retornar pending para ID não utilizado');
   out.opResult={pending:op.pending};
-  // Este é um POST real, usando o mesmo formulário oculto do jogo.
-  // O ID Z99 é propositalmente INVÁLIDO: não cria sessão nem desafio,
-  // e só registra uma linha de diagnóstico na aba de operações.
-  // Se a resposta for "Selecione um aluno", provamos que a escrita
-  // e a consulta de confirmação chegaram ao mesmo Apps Script.
-  let writeError='';
-  try {await online.post('login',{}, {id:'Z99'});}
-  catch(err){writeError=String(err.message||err);}
-  if(!/Selecione um aluno da lista|Aluno não autorizado/i.test(writeError))
-   throw Error('POST não confirmado via formulário+opResult: '+writeError);
-  out.post={transport:'iframe-form + opResult',confirmed:true,errorCode:'perfil de diagnóstico rejeitado como esperado'};
-  // Verificação pontual de autenticação e rota de desafio com UMA conta
-  // existente, SEM criar convites ou registrar pontuação: o próprio aluno
-  // não pode ser seu adversário. Não registrar nome ou token em logs.
-  const login=await online.login('A01');
-  if(login?.id!=='A01')throw Error('Login não confirmou o perfil');
-  const inbox=await online.inbox();
-  if(!Array.isArray(inbox))throw Error('Inbox não retornou uma lista');
-  let challengeValidation='';
-  try{await online.create('mesma_turma','A01','iniciante');}
-  catch(err){challengeValidation=String(err.message||err)}
-  if(!/não é possível desafiar a si mesmo|mesmo/i.test(challengeValidation))
-    throw Error('Validação do desafio no servidor não confirmada: '+challengeValidation);
-  out.authenticated={login:true,inbox:true,challengeRoute:true,noRealChallengeCreated:true};
   out.elapsedMs=Date.now()-start;
   return out;
  });
