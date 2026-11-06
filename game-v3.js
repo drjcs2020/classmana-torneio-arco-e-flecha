@@ -2,7 +2,7 @@ import {initScene} from './scene-v3.js?v=23';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
-import {online} from './online-client.js?v=htmlbridge8diagnostic2';
+import {online} from './online-client.js?v=portal9b';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
@@ -163,6 +163,9 @@ function selectHouse(k){
  if(view==='inicio')setLobbyStep('heroi');
 }
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
+function goOnlinePortal(mode=$('mode').value,inbox=false){
+ window.location.assign(online.portalUrl({house,mode,player:$('player').value,inbox}));
+}
 function duelKind(mode){return mode==='challenge_same'?'mesma_turma':mode==='challenge_team'?'entre_equipes':'interclasses'}
 function duelMode(kind){return kind==='mesma_turma'?'challenge_same':kind==='entre_equipes'?'challenge_team':'challenge'}
 function updateMode(){
@@ -256,7 +259,8 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'Desafios indisponíveis: atualize a implantação do Apps Script.'));return}
+  if(!online.gatewayReady&&window.parent===window){goOnlinePortal(mode);return}
+  if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'A Arena Online não conseguiu conectar ao Apps Script.'));return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
     if(!selected)return;
@@ -511,13 +515,13 @@ function showOnlineStatus(){
  $('online-status').classList.toggle('ok',active);
  $('online-status').classList.toggle('error',!active);
  $('online-account-name').textContent=user?'🏹 '+user.name+' · 4º '+user.house+' · '+user.team:'🏹 Escolha seu nome na lista';
- $('online-banner').textContent=active?'🟢 PLACAR ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
- $('online-status').textContent=!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
+ $('online-banner').textContent=active?'🟢 PLACAR ONLINE':online.state==='portal'?'⚔️ ENTRAR NA ARENA ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
+ $('online-status').textContent=online.state==='portal'?'⚔️ Escolha um desafio para abrir a Arena Online conectada ao Google Sheets.':!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
   !active&&online.state==='error'?'⚠️ '+(online.lastError||'Não foi possível conectar ao servidor de desafios.'):
   !active?'⏳ Verificando conexão...':user?'✅ Desafios disponíveis. Nenhuma senha ou PIN.':'✅ Placar conectado. Selecione seu nome.';
  $('logout').classList.toggle('hidden',!user);
- $('open-inbox').disabled=!active;
- const retry=$('retry-online');if(retry)retry.classList.toggle('hidden',active||!online.enabled);
+ $('open-inbox').disabled=!active&&online.state!=='portal';
+ const retry=$('retry-online');if(retry){retry.classList.toggle('hidden',active||!online.enabled);retry.textContent=online.state==='portal'?'⚔️ ABRIR ARENA ONLINE':'↻ RECONECTAR';}
  if(user&&($('player').value!==user.id||house!==user.house)){
   selectHouse(user.house);$('player').value=user.id;fillRivals();
  }
@@ -587,6 +591,7 @@ async function refreshInbox(){
  renderInbox();return onlineInbox;
 }
 async function openInbox(){
+ if(online.state==='portal'&&window.parent===window){goOnlinePortal($('mode').value,true);return}
  if(!online.user){const selected=await loginStudent();if(!selected){toast('Escolha seu nome para abrir seus desafios.');return;}}
  $('online-inbox').classList.remove('hidden');
  $('inbox-status').textContent='⏳ Consultando convites recebidos...';
@@ -612,9 +617,12 @@ async function startOnlineClient(){
  showOnlineStatus();
  if(!online.enabled)return;
  try{
-  await online.connect();online.lastError=null;showOnlineStatus();
+  const connected=await online.connect();online.lastError=null;showOnlineStatus();
+  if(!connected)return;
   try{await online.list()}catch(err){console.warn('Lista online indisponível; usando nomes cadastrados no jogo:',err)}
-  const remembered=localStorage.getItem('cm_arco_nome');
+  const request=new URLSearchParams(location.search);
+  const requestedPlayer=request.get('hosted')==='1'?request.get('player'):null;
+  const remembered=/^[ABC]\d{2}$/.test(requestedPlayer||'')?requestedPlayer:localStorage.getItem('cm_arco_nome');
   if(!online.user&&/^[ABC]\d{2}$/.test(remembered||'')){
    selectHouse(remembered[0]);$('player').value=remembered;await loginStudent();
   }
@@ -624,6 +632,7 @@ async function startOnlineClient(){
     toast('🔔 Você foi desafiado! Aceite ou recuse quando quiser.');await openInbox();
    }
   }catch(error){console.warn('Convites temporariamente indisponíveis:',error)}
+  if(request.get('inbox')==='1'&&online.user){await openInbox()}
   renderRanking();
  }catch(error){
   online.state='error';
@@ -665,13 +674,13 @@ updateSoundButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
 applyEquipment();
 $('mode').addEventListener('change',updateMode);
-$('player').addEventListener('change',()=>{fillRivals();if(online.enabled&&$('player').value!=='guest')loginStudent().catch(console.warn)});
+$('player').addEventListener('change',()=>{fillRivals();if(online.state==='ready'&&$('player').value!=='guest')loginStudent().catch(console.warn)});
 $('team-scope').addEventListener('change',updateMode);
 $('opponent-house').addEventListener('change',fillRivals);
 $('opponent-team').addEventListener('change',fillRivals);
 $('my-team').addEventListener('change',()=>{
  const mate=choices(house).find(p=>TEAMS[p.id]===$('my-team').value);
- if(mate){$('player').value=mate.id;if(online.enabled)loginStudent().catch(console.warn)}
+ if(mate){$('player').value=mate.id;if(online.state==='ready')loginStudent().catch(console.warn)}
  fillRivals();
 });$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{
  if(document.body.dataset.page==='arena'){
@@ -685,6 +694,7 @@ document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||matc
 setInterval(()=>{if(holding&&!match?.paused){scene?.setPower(chargePower());uiHud()}},60);
 
 $('retry-online')?.addEventListener('click',async()=>{
+ if(window.parent===window){goOnlinePortal();return}
  const button=$('retry-online');button.disabled=true;
  try{await startOnlineClient()}
  finally{button.disabled=false}
@@ -713,6 +723,14 @@ spriteHud=mountSpriteHUD({
  onPause:toggleArenaPause
 });
 selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');
+const hostedParams=new URLSearchParams(location.search);
+if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
+ const hostHouse=hostedParams.get('house'),hostMode=hostedParams.get('mode'),hostPlayer=hostedParams.get('player');
+ if(['A','B','C'].includes(hostHouse))selectHouse(hostHouse);
+ if(['challenge_same','challenge_team','challenge'].includes(hostMode)){$('mode').value=hostMode;updateMode()}
+ if(/^[ABC]\d{2}$/.test(hostPlayer||'')&&hostPlayer[0]===house){$('player').value=hostPlayer;fillRivals()}
+ setLobbyStep('partida');
+}
 // A abertura duplicada foi removida. O fluxo começa na escolha da Casa.
 $('cm-lobby-back')?.addEventListener('click',()=>{
  const step=$('view-inicio')?.dataset.step;
@@ -722,7 +740,9 @@ document.querySelectorAll('[data-play-mode]').forEach(button=>{
  button.addEventListener('click',()=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
-  $('mode').value=chosen;updateMode();setLobbyStep('partida');
+  $('mode').value=chosen;updateMode();
+  if(isDuel(chosen)&&window.parent===window){goOnlinePortal(chosen);return}
+  setLobbyStep('partida');
  });
 });
 function restoreArena(){
