@@ -2,7 +2,7 @@ import {initScene} from './scene-v3.js?v=23';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
-import {online} from './online-client.js?v=htmlbridge8';
+import {online} from './online-client.js?v=htmlbridge8diagnostic2';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
