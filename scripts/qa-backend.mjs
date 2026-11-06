@@ -44,6 +44,8 @@ const app={
   computeDigest:(_alg,s)=>[...createHash('sha256').update(String(s)).digest()],
   getUuid:()=>randomUUID()
  },
+ HtmlService:{XFrameOptionsMode:{ALLOWALL:'ALLOWALL'},
+  createHtmlOutput:html=>({html,setXFrameOptionsMode(){return this}})},
  ContentService:{MimeType:{JSON:'application/json',JAVASCRIPT:'application/javascript'},
   createTextOutput:s=>({text:s,setMimeType(){return this}})},
  console,Date,Math,JSON,Number,String,Error,Array,Boolean,RegExp,
@@ -65,8 +67,18 @@ for(const [id,token] of Object.entries(sessions)){
  assert.equal(logged.ok,true,'login '+id+': '+logged.error);
  assert.equal(logged.user.id,id);
 }
-assert.equal(get('ping').api,7);
+assert.equal(get('ping').api,8);
 assert.equal(get('roster').players.length,5);
+const bridgeId='f'.repeat(48);
+const bridgePing=context.doGet({parameter:{action:'ping',bridge:'1',rid:bridgeId}});
+assert(bridgePing.html.includes('classmana-html-bridge-v1'));
+assert(bridgePing.html.includes('"api":8'));
+assert(bridgePing.html.includes('https://drjcs2020.github.io'));
+const bridgeParams={action:'login',id:'A01',bridge:'1',rid:bridgeId,token:'a'.repeat(48),requestId:'f'.repeat(48),payload:'{}'};
+const bridgePost=context.doPost({parameter:bridgeParams});
+assert(bridgePost.html.includes('classmana-html-bridge-v1'));
+assert(bridgePost.html.includes('"ok":true'));
+
 const shots=(bow='classico',dx=0)=>Array.from({length:5},(_,i)=>({dx,dy:0,power:.9,time:1+i,bow}));
 function challenge(creator,to,kind){
  const x=post('challenge',sessions[creator],{kind,to,level:'iniciante'});
@@ -110,4 +122,4 @@ assert.equal(invalid.ok,false);
 assert(/Casa rival|turma/i.test(invalid.error));
 assert.equal(sheet.Desafios.rows.length,4);
 assert.equal(sheet.Disparos.rows.length,7*5); // 3 duelos completos (6 rodadas) + criador do duelo recusado
-console.log('✅ BACKEND v7: login, convites, aceite/recusa, 5+5 disparos, três tipos de desafio, placar por turmas e equipes.');
+console.log('✅ BACKEND v8: login, convites, aceite/recusa, 5+5 disparos, três tipos de desafio, placar por turmas e equipes.');
