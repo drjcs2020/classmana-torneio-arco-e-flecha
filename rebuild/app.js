@@ -18,7 +18,7 @@ let roster=[];
 let rankTab='players',toastTimer=null;
 const allScreens=[...document.querySelectorAll('.screen')];
 const urlParams=new URLSearchParams(location.search);
-if(urlParams.has('qa'))window.classmanaQA={getScreen:()=>screen,getMatch:()=>match,getTransport:()=>tournament.mode};
+if(urlParams.has('qa'))window.classmanaQA={getScreen:()=>screen,getMatch:()=>match,getTransport:()=>tournament.mode,getEngine:()=>arena?.engine||null};
 function show(name){
  if(!allScreens.find(x=>x.dataset.view===name))throw Error('Tela inválida: '+name);
  if(name!==screen&&name!=='arena'&&name!=='results')lastScreen=screen;
