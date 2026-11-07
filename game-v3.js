@@ -259,7 +259,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.gatewayReady&&window.parent===window){goOnlinePortal(mode);return}
+  /* API direta: o duelo acontece no GitHub Pages, sem portal Apps Script. */
   if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'A Arena Online não conseguiu conectar ao Apps Script.'));return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
@@ -591,7 +591,7 @@ async function refreshInbox(){
  renderInbox();return onlineInbox;
 }
 async function openInbox(){
- if(online.state==='portal'&&window.parent===window){goOnlinePortal($('mode').value,true);return}
+ /* API direta: caixa de desafios usa o servidor HTTP. */
  if(!online.user){const selected=await loginStudent();if(!selected){toast('Escolha seu nome para abrir seus desafios.');return;}}
  $('online-inbox').classList.remove('hidden');
  $('inbox-status').textContent='⏳ Consultando convites recebidos...';
