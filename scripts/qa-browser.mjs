@@ -203,6 +203,12 @@ if(engine==='playcanvas'){
  await shot(mobile,'08-desafio-mobile');
  await mobile.locator('[data-play-mode="practice"]').click();
  assert.equal(await mobile.locator('#view-inicio').getAttribute('data-step'),'partida');
+ const fields=await mobile.locator('#view-inicio[data-step="partida"] .setup-fields>label:not(.hidden) select').evaluateAll(els=>els.map(el=>{
+  const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+  return {width:r.width,height:r.height,color:cs.color,background:cs.backgroundColor};
+ }));
+ assert(fields.length>=3,'Preparation labels missing');
+ assert(fields.every(x=>x.width>=300&&x.height>=40),'Mobile preparation fields must be full-width and legible: '+JSON.stringify(fields));
  await shot(mobile,'09-preparar-mobile');
  await mobile.locator('#start-game').click();
  await mobile.waitForURL('**/arena.html',{timeout:18000});

@@ -369,3 +369,62 @@ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm
   min-width:124px!important;width:124px!important;height:52px!important;min-height:52px!important;
  }
 }
+
+/* Preparation: compact, readable fantasy controls instead of stretched navy bars. */
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+ display:grid!important;flex:0 0 auto!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-rows:max-content!important;align-content:start!important;align-items:start!important;
+ width:min(900px,94vw)!important;max-width:900px!important;
+ gap:clamp(12px,2vh,23px) clamp(12px,2vw,28px)!important;
+ margin:clamp(12px,2.4vh,23px) auto 0!important;
+ padding:0 3px!important;box-sizing:border-box!important;
+ min-height:0!important;max-height:none!important;overflow:visible!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label:not(.hidden){
+ justify-content:flex-start!important;align-items:stretch!important;
+ width:100%!important;height:auto!important;min-height:0!important;
+ gap:5px!important;padding:0!important;
+ font:900 clamp(13px,1.2vw,16px)/1.22 'Nunito',sans-serif!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ display:block!important;box-sizing:border-box!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ height:clamp(45px,6.7vh,53px)!important;min-height:45px!important;
+ padding:8px 13px!important;margin:0!important;appearance:auto!important;
+ background:#f7e4b8!important;background-image:linear-gradient(180deg,#fff6dc,#e9c686)!important;
+ border:3px ridge #e2aa48!important;border-radius:11px!important;
+ color:#32200c!important;font:900 clamp(14px,1.2vw,17px)/1.25 'Nunito',sans-serif!important;
+ text-shadow:none!important;box-shadow:0 4px 0 #82531c,0 6px 13px #0009!important;
+ opacity:1!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select option{
+ background:#fff4d8!important;color:#34200e!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select:disabled{
+ opacity:1!important;background:#e8d6ae!important;color:#5b3a18!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{
+ margin-top:auto!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ flex:0 0 auto!important;margin:8px auto 0!important;
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+  grid-template-columns:1fr!important;grid-auto-rows:max-content!important;
+  width:min(94vw,380px)!important;gap:9px!important;
+  margin:clamp(7px,1.5vh,13px) auto 0!important;
+  padding:0 3px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label:not(.hidden){
+  grid-column:1/-1!important;font-size:13px!important;gap:3px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+  height:41px!important;min-height:41px!important;
+  font-size:14px!important;padding:7px 10px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+  margin-top:auto!important;height:56px!important;
+ }
+}
