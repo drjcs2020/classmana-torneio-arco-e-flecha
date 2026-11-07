@@ -149,9 +149,24 @@ await shot(desktop,'04-preparar-desktop');
 await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});
 await desktop.locator('#view-arena.active').waitFor({timeout:12000});
 await desktop.waitForTimeout(4500);
+for(const model of [
+  'models3d/arco_aguia_dourada.glb',
+  'models3d/arco_leao_de_fogo.glb',
+  'models3d/arco_dragao_de_esmeralda.glb',
+  'models3d/flecha_aguia_dourada.glb',
+  'models3d/flecha_leao_de_fogo.glb',
+  'models3d/flecha_dragao_de_esmeralda.glb',
+  'models3d/alvo_suspenso_sem_cavalete.glb']){
+  const res=await desktop.request.get(base+model);
+  assert.equal(res.status(),200,'Missing approved 3D asset: '+model);
+ }
 const engine=await desktop.locator('#stage').getAttribute('data-scene-engine');
 console.log('ENGINE3D_DIAGNOSTIC',engine);
 if(engine==='playcanvas'){
+ await desktop.waitForFunction(()=>{
+  const p=document.querySelector('#stage');
+  return p?.dataset.glbBow==='ready'&&p?.dataset.glbTarget==='ready'&&p?.dataset.glbArrow==='ready';
+ },null,{timeout:18000});
  const r=await desktop.locator('#stage').boundingBox();
  for(const pos of [[.33,.35],[.66,.58],[.49,.42]]){
   await desktop.mouse.move(r.x+r.width*pos[0],r.y+r.height*pos[1]);
