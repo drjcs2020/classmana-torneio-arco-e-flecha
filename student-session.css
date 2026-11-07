@@ -1,0 +1,35 @@
+/* ClassMana: persistent student session controls on the challenge selection page. */
+body[data-page="lobby"] #view-inicio:not([data-step="desafio"]) .cm-active-session-controls{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-active-session-controls{
+ position:absolute!important;right:clamp(14px,3vw,45px)!important;top:16%!important;
+ z-index:20!important;display:flex!important;align-items:center!important;
+ gap:9px!important;flex-wrap:wrap!important;justify-content:flex-end!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-active-session-controls [hidden]{display:none!important}
+body[data-page="lobby"] .cm-session-button{
+ cursor:pointer!important;min-height:42px!important;padding:8px 15px!important;
+ border:2px solid #edc268!important;border-radius:12px!important;
+ background:linear-gradient(180deg,#54372c,#251d20)!important;
+ color:#fff1cc!important;font:900 13px/1.2 'Nunito',sans-serif!important;
+ box-shadow:0 4px 0 #160c0b,0 5px 14px #0008!important;
+}
+body[data-page="lobby"] .cm-session-exit{
+ background:linear-gradient(180deg,#743f32,#3c2025)!important;
+}
+body[data-page="lobby"] .cm-session-button:focus-visible{
+ outline:3px solid #fff2bc!important;outline-offset:3px!important
+}
+body[data-page="lobby"] #cm-quick-challenges-count{
+ display:inline-block!important;min-width:18px!important;margin-left:4px!important;
+ padding:2px 6px!important;border-radius:12px!important;
+ background:#c74138!important;color:#fff!important;
+ font:900 12px 'Nunito',sans-serif!important;
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-active-session-controls{
+  top:12%!important;right:8px!important;gap:5px!important;
+ }
+ body[data-page="lobby"] .cm-session-button{
+  font-size:11px!important;min-height:36px!important;padding:5px 8px!important;
+ }
+}
