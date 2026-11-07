@@ -1,5 +1,5 @@
 /** ClassMana - API do duelo via HTTP, sem portal Apps Script. */
-import { ONLINE_API_URL } from './online-config.js';
+import { ONLINE_API_URL } from './online-config.js?v=api10';
 const KEY='classmana_duelo_api_token_v1';
 const rid=()=>crypto.randomUUID();
 class Online {
