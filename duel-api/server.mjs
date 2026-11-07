@@ -57,7 +57,7 @@ const server=http.createServer(async(req,res)=>{
   if(!['GET','POST'].includes(req.method))fail('Método inválido',405);
   let raw='';if(req.method==='POST')for await(const chunk of req){raw+=chunk;if(raw.length>64000)fail('Pedido grande demais',413)}
   const data=raw?JSON.parse(raw):{},action=url.searchParams.get('action')||'';
-  if(req.method==='POST'&&action!=='login'){
+  if(req.method==='POST'&&!['login','ping'].includes(action)){
     const player=requirePlayer(req),id=String(data.requestId||'');if(!/^[\w-]{10,128}$/.test(id))fail('ID do pedido inválido');
     const previous=sql.operation.get(player.id,id);if(previous){send(res,200,JSON.parse(previous.response),origin);return}
     db.exec('BEGIN IMMEDIATE');
