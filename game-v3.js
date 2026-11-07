@@ -45,6 +45,16 @@ function chooseEquipment(key,value){
 let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false,startMatchPending=false;
 let identifiedPlayerId='';
 const CM_ACTIVE_STUDENT='cm_active_student_v1';
+const CM_INTERNAL_RETURN='cm_internal_duel_return_v1';
+function cmMarkInternalReturn(){try{sessionStorage.setItem(CM_INTERNAL_RETURN,'1')}catch{}}
+function cmCanContinue(){
+ try{
+  const nav=performance.getEntriesByType('navigation')[0];
+  const internal=sessionStorage.getItem(CM_INTERNAL_RETURN)==='1';
+  sessionStorage.removeItem(CM_INTERNAL_RETURN);
+  return internal&&nav?.type!=='reload';
+ }catch{return false}
+}
 function cmSessionId(){try{return sessionStorage.getItem(CM_ACTIVE_STUDENT)||''}catch{return ''}}
 function cmSaveStudent(id){try{sessionStorage.setItem(CM_ACTIVE_STUDENT,id)}catch{}}
 function cmForgetStudent(){try{sessionStorage.removeItem(CM_ACTIVE_STUDENT);sessionStorage.removeItem('cm_active_archery_match_v1')}catch{}}
@@ -58,7 +68,7 @@ function toast(s){const t=$('toast');t.textContent=s;t.classList.add('show');cle
 function openView(name){
  if(name==='inicio'&&document.body.dataset.page==='arena'){
   try{sessionStorage.removeItem('cm_active_archery_match_v1')}catch{}
-  window.location.assign('./');return;
+  cmMarkInternalReturn();window.location.assign('./');return;
  }
  // Two separate HTML pages: lobby and arena. Ranking and rules are overlays.
  if(name!=='arena'&&view==='arena'&&match?.running){
@@ -75,10 +85,19 @@ function setLobbyStep(step){
  if(!['perfil','reino','heroi','desafio','partida'].includes(step))return;
  const el=$('view-inicio');if(!el)return;
  el.dataset.step=step;
+ cmShowActiveSession();
  document.querySelectorAll('[data-lobby-step]').forEach(button=>{
   const active=button.dataset.lobbyStep===step;
   button.classList.toggle('chosen',active);button.setAttribute('aria-selected',String(active));
  });
+}
+function cmShowActiveSession(){
+ const panel=$('cm-previous-session');if(!panel)return;
+ const id=identifiedPlayerId||cmSessionId(),player=id&&choices(id[0]).find(p=>p.id===id);
+ const valid=Boolean(player);
+ panel.hidden=!valid;
+ const label=$('cm-previous-session-name');
+ if(label)label.textContent=valid?'Sessão atual: '+player.name+' · 4º '+id[0]:'';
 }
 function drawCourse(){
  const el=$('lobby-course');if(!el)return;
@@ -801,8 +820,15 @@ async function startOnlineClient(){
   if(!connected)return;
   try{await online.list()}catch(err){console.warn('Lista online indisponível; usando nomes cadastrados no jogo:',err)}
   const request=new URLSearchParams(location.search);
-  // A session remains bound to the same student until the explicit logout button is used.
-  const sessionId=cmSessionId();
+  // Only a deliberate return from the arena preserves identity.
+  // Reloading or reopening the lobby always releases the prior student's account.
+  const sessionId=cmCanContinue()?cmSessionId():'';
+  if(document.body.dataset.page==='lobby'&&!sessionId){
+   online.logout();cmForgetStudent();identifiedPlayerId='';
+   $('player').disabled=false;$('player').value='guest';
+   setLobbyStep('reino');
+   showOnlineStatus();
+  }
   if(document.body.dataset.page==='lobby'&&/^[ABC][0-9]{2}$/.test(sessionId)&&(!online.user||online.user.id===sessionId)){
    if(!online.user){try{await online.login(sessionId)}catch(err){console.warn('Não foi possível reconectar o aluno:',err);cmForgetStudent();return;}}
    identifiedPlayerId=sessionId;
@@ -858,7 +884,7 @@ $('cm-confirm-identity')?.addEventListener('click',()=>{
  const id=$('cm-identity-player')?.value||'';
  if(!/^[ABC][0-9]{2}$/.test(id)||id[0]!==house){toast('Escolha seu nome no 4º '+house+'.');$('cm-identity-player')?.focus();return;}
  if(identifiedPlayerId&&identifiedPlayerId!==id){toast('Encerre a sessão atual para trocar de jogador.');return;}
- identifiedPlayerId=id;cmSaveStudent(id);
+ identifiedPlayerId=id;cmSaveStudent(id);cmShowActiveSession();
  $('player').value=id;fillPlayer(id);fillRivals();
  $('player').disabled=true;
  setLobbyStep('heroi');
@@ -925,7 +951,7 @@ $('my-team').addEventListener('change',()=>{
 });$('start-game').addEventListener('click',startMatch);$('rank-play').addEventListener('click',()=>openView('inicio'));$('rules-play').addEventListener('click',()=>openView('inicio'));$('leave-arena').addEventListener('click',()=>{if(match?.running&&!confirm('Abandonar a rodada atual e começar uma nova depois?'))return;openView('inicio')});$('play-again').addEventListener('click',()=>{
  if(document.body.dataset.page==='arena'){
   try{sessionStorage.removeItem('cm_active_archery_match_v1')}catch{}
-  window.location.assign('./?continuar=1');return;
+  cmMarkInternalReturn();window.location.assign('./?continuar=1');return;
  }
  if(match)match.running=false;
  setLobbyStep('desafio');
@@ -946,9 +972,10 @@ $('online-inbox').addEventListener('click',e=>{if(e.target===$('online-inbox'))$
 $('inbox-list').addEventListener('click',onInboxAction);
 function cmEndSession(){
  if(match?.running){toast('Finalize ou abandone a partida antes de encerrar a sessão.');return}
- if(!confirm('Encerrar a sessão deste aluno? A próxima pessoa poderá escolher sua Casa e seu nome.'))return;
+ const person=choices(identifiedPlayerId?.[0]||house).find(p=>p.id===identifiedPlayerId);
+ if(!confirm('Encerrar a sessão de '+(person?.name||online.user?.name||'jogador atual')+'?'))return;
  online.logout();cmForgetStudent();identifiedPlayerId='';onlineInbox=[];cmNoticePlayer='';
- $('player').disabled=false;$('player').value='guest';
+ $('player').disabled=false;$('player').value='guest';cmShowActiveSession();
  if($('cm-identity-player'))$('cm-identity-player').value='';
  fillRivals();cmUpdateBell();showOnlineStatus();
  const endBtn=$('cm-end-session');if(endBtn)endBtn.hidden=true;
@@ -956,6 +983,8 @@ function cmEndSession(){
 }
 $('logout').addEventListener('click',cmEndSession);
 $('cm-end-session')?.addEventListener('click',cmEndSession);
+$('cm-previous-session-exit')?.addEventListener('click',cmEndSession);
+$('cm-ranking-choice')?.addEventListener('click',()=>openView('ranking'));
 $('cm-open-challenges')?.addEventListener('click',()=>openInbox());
 document.querySelectorAll('[data-rank]').forEach(btn=>btn.addEventListener('click',()=>{
  scoreTab=btn.dataset.rank;document.querySelectorAll('[data-rank]').forEach(x=>x.classList.toggle('active',x===btn));renderRanking();
