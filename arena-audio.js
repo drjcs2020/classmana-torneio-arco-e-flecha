@@ -89,13 +89,21 @@ function unlockMusic(){
  if(bgm.paused)bgm.play().then(musicLevel).catch(err=>console.warn('[ClassMana] MP3 indisponível:',err.message));
  else musicLevel();
 }
-document.addEventListener('pointerdown',unlockMusic,{passive:true});
-document.addEventListener('keydown',unlockMusic);
-document.addEventListener('touchstart',unlockMusic,{passive:true});
+function unlockOnGeneralGesture(event){
+ // Sound buttons have their own click handler. Avoid starting on pointerdown
+ // and then immediately muting from the subsequent click of the same gesture.
+ const target=event.target;
+ if(target instanceof Element&&target.closest('#cm-lobby-sound,#arena-sound'))return;
+ unlockMusic();
+}
+document.addEventListener('pointerdown',unlockOnGeneralGesture,{passive:true});
+document.addEventListener('keydown',unlockOnGeneralGesture);
+document.addEventListener('touchstart',unlockOnGeneralGesture,{passive:true});
 
 export const arenaAudio={
  get enabled(){return enabled},
  get playing(){return enabled&&unlocked&&!bgm.paused},
+ get musicState(){return {playing:this.playing,readyState:bgm.readyState,volume:bgm.volume,source:bgm.currentSrc||bgm.src}},
  start(){unlockMusic();return this.playing},
  setHouse(k){house=['A','B','C'].includes(k)?k:'A'},
  setActive(value){active=!!value;ambience();musicLevel()},
