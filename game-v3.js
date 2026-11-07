@@ -1,6 +1,6 @@
 import {initScene} from './scene-v3.js?v=ground43';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=cinema44';
+import {arenaAudio} from './arena-audio.js?v=autoplay47';
 import {cinematics} from './classmana-cinematics.js?v=embers46';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
 import {online} from './online-client.js?v=api10';
@@ -953,9 +953,9 @@ function updateSoundButton(){
 }
 function updateLobbyAudioButton(){
  const button=$('cm-lobby-sound');if(!button)return;
- button.textContent=!arenaAudio.enabled?'🔇 Som desligado':arenaAudio.playing?'🔊 Música e sons':'▶ Ativar trilha sonora';
- button.setAttribute('aria-pressed',String(arenaAudio.enabled&&arenaAudio.playing));
- button.setAttribute('aria-label',!arenaAudio.enabled?'Ativar música e efeitos':arenaAudio.playing?'Desativar música e efeitos':'Iniciar trilha sonora');
+ button.textContent=!arenaAudio.enabled?'🔇 Som desligado':arenaAudio.playing?'🔊 Música e sons':'🔊 Música ligada · toque para ouvir';
+ button.setAttribute('aria-pressed',String(arenaAudio.enabled));
+ button.setAttribute('aria-label',!arenaAudio.enabled?'Ativar música e efeitos':arenaAudio.playing?'Desativar música e efeitos':'Música ativada, toque para iniciar reprodução');
 }
 function audioControl(){
  if(arenaAudio.enabled&&!arenaAudio.playing)arenaAudio.start();
