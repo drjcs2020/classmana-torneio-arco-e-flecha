@@ -1,7 +1,7 @@
 name: QA visual ClassMana
 on:
   push:
-    branches: [main, revisao-32-classmana]
+    branches: [main]
   workflow_dispatch:
 jobs:
   qa:
@@ -42,6 +42,8 @@ jobs:
           node --check online-client.js
           node scripts/qa-static.mjs
           node scripts/qa-media.mjs
+      - name: Testar desafios entre dois alunos em banco temporário (sem dados reais)
+        run: node scripts/qa-duel-endtoend.mjs
       - name: Validate deployed independent duel API and live ranking (read-only)
         run: node scripts/qa-duel-api.mjs
       - name: Install browser test runner
