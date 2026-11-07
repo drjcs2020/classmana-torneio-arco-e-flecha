@@ -610,8 +610,16 @@ function renderInbox(){
  $('inbox-status').textContent=online.user?
   'Os desafios ficam gravados. Você pode aceitar hoje ou em outra data; os cinco disparos do adversário serão reproduzidos.':
   'Selecione seu nome na lista para consultar os desafios recebidos.';
- if(!onlineInbox.length){list.innerHTML='<div class="empty">Nenhum desafio para esta conta.</div>';return;}
- for(const ch of onlineInbox){
+ if(!onlineInbox.length){list.innerHTML='<div class="empty">Nenhum desafio para este perfil.</div>';return;}
+ // Separate received invitations from sent challenges: neither is a self-challenge.
+ const mineId=online.user?.id;
+ const received=onlineInbox.filter(c=>c.recipient?.id===mineId&&c.creator?.id!==mineId);
+ const sent=onlineInbox.filter(c=>c.creator?.id===mineId&&c.recipient?.id!==mineId);
+ for(const [group,items] of [['🔔 RECEBIDOS',received],['🏹 ENVIADOS',sent]]){
+  const heading=document.createElement('h3');heading.className='cm-inbox-group';
+  heading.textContent=group+' ('+items.length+')';list.appendChild(heading);
+  if(!items.length){const empty=document.createElement('p');empty.className='cm-inbox-empty';empty.textContent=group.includes('RECEBIDOS')?'Nenhum desafio recebido.':'Nenhum desafio enviado.';list.appendChild(empty)}
+  for(const ch of items){
   if(ch.creator?.id===ch.recipient?.id)continue; // Never display a self-challenge.
   const opponent=ch.creator.id===online.user?.id?ch.recipient:ch.creator;
   const mine=ch.creator.id===online.user?.id,score=mine?ch.creatorScore:ch.creatorScore;
@@ -639,6 +647,7 @@ function renderInbox(){
    item.appendChild(result);
   }else{const state=document.createElement('small');state.textContent=ch.status==='PENDENTE'?'⏳ Aguardando o colega responder.':ch.status==='RECUSADO'?'🚫 Convite recusado.':'⏳ Aguardando a rodada do adversário.';item.appendChild(state)}
   if(buttons.children.length)item.appendChild(buttons);list.appendChild(item);
+  }
  }
 }
 const CM_NOTICES_PREFIX='cm-duel-notices-v2-';
