@@ -1,0 +1,30 @@
+/* ClassMana — anúncio de alternância do duelo, sem obstruir a mira. */
+#view-arena #stage .cm-duel-turn{
+ position:absolute!important;left:50%!important;top:43%!important;
+ transform:translate(-50%,-50%)!important;z-index:35!important;
+ pointer-events:none!important;
+ width:max-content!important;max-width:min(86%,600px)!important;
+ min-height:70px!important;box-sizing:border-box!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:16px clamp(22px,4vw,42px)!important;
+ color:#fff3c7!important;background:linear-gradient(145deg,rgba(4,24,52,.97),rgba(12,58,92,.97))!important;
+ border:3px solid #ffda7b!important;border-radius:17px!important;
+ box-shadow:inset 0 0 0 2px #fff4b42e,0 13px 36px #000c,0 0 22px #ffd36b70!important;
+ font:900 clamp(21px,3vw,38px)/1.15 'Cinzel',Georgia,serif!important;
+ text-align:center!important;text-shadow:0 2px 5px #000!important;
+ letter-spacing:.015em!important;animation:cmTurnEntrance .26s ease-out both!important;
+}
+#view-arena #stage .cm-duel-turn[data-turn="result"]{
+ top:48%!important;min-height:54px!important;
+ background:linear-gradient(145deg,rgba(6,44,36,.97),rgba(8,90,66,.97))!important;
+ font-size:clamp(17px,2.3vw,28px)!important;
+}
+#view-arena #stage .cm-duel-turn.hidden{display:none!important}
+@keyframes cmTurnEntrance{
+ from{opacity:0;transform:translate(-50%,-44%) scale(.94)}
+ to{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+@media(max-width:620px){
+ #view-arena #stage .cm-duel-turn{top:45%!important;width:85%!important;min-height:66px!important;padding:11px!important;font-size:clamp(18px,5vw,27px)!important}
+}
+@media(prefers-reduced-motion:reduce){#view-arena #stage .cm-duel-turn{animation:none!important}}
