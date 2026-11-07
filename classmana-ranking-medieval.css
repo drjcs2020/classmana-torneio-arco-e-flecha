@@ -230,3 +230,123 @@ body.cm-art-on #view-arena #leave-arena:focus-visible{
    width:112px!important;max-height:64px!important;
  }
 }
+
+/* Revision: compact hero confirmation; 3D artwork stays untouched. */
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{
+ width:clamp(220px,26vw,310px)!important;
+ height:clamp(58px,9vh,78px)!important;
+ max-width:310px!important;max-height:78px!important;
+ aspect-ratio:auto!important;flex:none!important;
+ align-self:center!important;justify-self:center!important;
+ padding:0!important;margin:6px auto!important;
+ background:none!important;border:0!important;
+ box-shadow:none!important;filter:drop-shadow(0 5px 8px #0008)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer img{
+ width:100%!important;height:100%!important;object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer:hover{
+ filter:brightness(1.12) drop-shadow(0 7px 10px #000b)!important;
+}
+/* Player identification — landscape parchment panel, no inner scrollbar on desktop.
+   The tournament crest remains above the card, never underneath it. */
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{
+ position:absolute!important;
+ inset:clamp(116px,19vh,170px) 3% 3%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:0!important;overflow:visible!important;
+ z-index:12!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel{
+ position:relative!important;
+ box-sizing:border-box!important;width:min(90vw,880px)!important;
+ max-width:880px!important;max-height:100%!important;
+ height:auto!important;overflow:visible!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;
+ gap:clamp(5px,.75vh,9px)!important;
+ padding:clamp(13px,1.8vh,20px) clamp(24px,4vw,54px)!important;
+ border:4px ridge #f3c45d!important;border-radius:20px!important;
+ background:linear-gradient(160deg,rgba(9,41,49,.95),rgba(9,67,46,.94))!important;
+ box-shadow:0 14px 29px #0009,inset 0 0 0 2px #87551e,inset 0 0 35px #e3ad4b21!important;
+ color:#fff3d8!important;text-align:center!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-logo{
+ display:block!important;width:clamp(170px,19vw,240px)!important;
+ height:clamp(48px,8vh,70px)!important;max-height:70px!important;
+ margin:0 auto 0!important;object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel h2{
+ margin:0!important;
+ font:900 clamp(24px,3.2vw,39px)/1.12 'Cinzel',Georgia,serif!important;
+ color:#ffdfa0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel p{
+ margin:0!important;font-size:clamp(12px,1.3vw,16px)!important;line-height:1.22!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel label{
+ font-size:clamp(13px,1.35vw,17px)!important;line-height:1.22!important;margin:0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-player{
+ width:min(100%,720px)!important;min-height:clamp(45px,6.5vh,55px)!important;
+ height:clamp(45px,6.5vh,55px)!important;
+ padding:8px 18px!important;background:#fff6de!important;color:#2b261d!important;
+ border:3px solid #e7b75a!important;border-radius:11px!important;
+ font-size:clamp(15px,1.5vw,19px)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-confirm-identity{
+ width:min(100%,420px)!important;
+ min-height:clamp(48px,7vh,59px)!important;height:clamp(48px,7vh,59px)!important;
+ padding:6px 15px!important;
+ background:linear-gradient(180deg,#ffe38f,#d99a2f)!important;
+ font-size:clamp(16px,1.6vw,22px)!important;
+ border:3px solid #ffe3a1!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+ position:absolute!important;left:clamp(12px,1.5vw,22px)!important;
+ top:clamp(12px,1.6vh,20px)!important;
+ min-width:140px!important;min-height:39px!important;
+ padding:6px 12px!important;
+ background:linear-gradient(180deg,#0c5f44,#073c31)!important;
+ border:2px solid #f3c86b!important;color:#fff0c9!important;
+ z-index:15!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-previous-session:not([hidden]){
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex-wrap:wrap!important;gap:8px!important;
+ width:min(100%,720px)!important;min-height:0!important;
+ margin:1px auto!important;padding:5px 10px!important;
+ border:2px ridge #d6ac54!important;border-radius:9px!important;
+ background:#103f33!important;color:#fff1d5!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-previous-session-exit{
+ min-height:33px!important;padding:5px 11px!important;
+ background:linear-gradient(#137047,#07512f)!important;color:#fff2d9!important;
+}
+@media(max-width:700px){
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{
+  inset:clamp(80px,14vh,125px) 2% 2%!important;
+  overflow-y:auto!important;align-items:flex-start!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel{
+  flex:0 0 auto!important;width:96vw!important;max-height:none!important;
+  margin:auto!important;padding:64px 14px 18px!important;gap:8px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+  left:12px!important;top:10px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{
+  width:clamp(185px,58vw,265px)!important;height:60px!important;
+ }
+}
+/* Ranking tile uses the exact ornamented SVG; override inherited hidden sprite labels. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice{
+ background-image:url("assets/ui/buttons/botao-ranking-classmana.svg")!important;
+ background-size:100% 100%!important;background-position:center!important;
+ background-repeat:no-repeat!important;background-color:transparent!important;
+ min-width:0!important;border:0!important;box-shadow:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice span.cm-ranking-label,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice span.cm-ranking-emblem{
+ display:inline-block!important;visibility:visible!important;opacity:1!important;
+}
