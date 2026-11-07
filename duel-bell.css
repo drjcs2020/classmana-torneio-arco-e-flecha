@@ -68,3 +68,13 @@
  #online-inbox .cm-duel-stat strong{font-size:23px!important}
  #online-inbox .cm-duel-stat span{font-size:10px!important}
 }
+
+/* Recusados são encerrados, não contam como partidas disputadas. */
+#online-inbox .cm-duel-summary{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+#online-inbox .cm-stat-declined{background:#f3eded!important;border-color:#92818c!important;color:#624950!important}
+#online-inbox .cm-challenge.cm-duel-declined{
+ border-color:#b39da5!important;background:#f4eff0!important;opacity:.92!important
+}
+@media(max-width:600px){
+ #online-inbox .cm-duel-summary{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
