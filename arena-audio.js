@@ -22,7 +22,7 @@ function init(){
  try{
   if(!ctx){
    ctx=new AudioContextCtor();
-   bus=ctx.createGain();bus.gain.value=.20;bus.connect(ctx.destination);
+   bus=ctx.createGain();bus.gain.value=.52;bus.connect(ctx.destination);
    musicGain=ctx.createGain();musicGain.gain.value=0;musicGain.connect(bus);
   }
   if(ctx.state==='suspended')ctx.resume().catch(()=>{});
@@ -70,20 +70,20 @@ function musicTick(){
  const osc=ctx.createOscillator(),amp=ctx.createGain();
  osc.type='triangle';osc.frequency.setValueAtTime(hz,now);
  amp.gain.setValueAtTime(.0001,now);
- amp.gain.exponentialRampToValueAtTime(.11,now+.018);
+ amp.gain.exponentialRampToValueAtTime(.20,now+.018);
  amp.gain.exponentialRampToValueAtTime(.0001,now+.70);
  osc.connect(amp);amp.connect(musicGain);osc.start(now);osc.stop(now+.72);
  if(musicStep%4===1){
   const bass=ctx.createOscillator(),g=ctx.createGain();
   bass.type='sine';bass.frequency.value=hz/2;
-  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.07,now+.05);
+  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.13,now+.05);
   g.gain.exponentialRampToValueAtTime(.0001,now+1.1);
   bass.connect(g);g.connect(musicGain);bass.start(now);bass.stop(now+1.12);
  }
 }
 function musicLevel(){
  if(!musicGain||!ctx)return;
- const volume=enabled&&unlocked&&!document.hidden?(active?.09:.62):0;
+ const volume=enabled&&unlocked&&!document.hidden?(active?.16:.92):0;
  musicGain.gain.setTargetAtTime(volume,ctx.currentTime,.40);
 }
 function unlockMusic(){
@@ -94,15 +94,18 @@ function unlockMusic(){
 }
 document.addEventListener('pointerdown',unlockMusic,{passive:true});
 document.addEventListener('keydown',unlockMusic);
+document.addEventListener('touchstart',unlockMusic,{passive:true});
 
 export const arenaAudio={
  get enabled(){return enabled&&!!AudioContextCtor},
+ get playing(){return enabled&&unlocked&&ctx?.state==='running'},
+ start(){unlockMusic();return this.playing},
  setHouse(k){house=['A','B','C'].includes(k)?k:'A'},
  setActive(value){active=!!value;ambience();musicLevel()},
  toggle(){
   enabled=!enabled;localStorage.setItem('cm_arena_sound',enabled?'on':'off');
   if(!enabled){clearInterval(timer);timer=null;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);musicLevel();}
-  else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.20,ctx.currentTime,.05);ambience();unlockMusic();musicLevel()}
+  else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.52,ctx.currentTime,.05);ambience();unlockMusic();musicLevel()}
   return enabled;
  },
  play(effect,score=0){
