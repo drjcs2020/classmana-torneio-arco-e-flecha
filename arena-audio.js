@@ -14,7 +14,16 @@ bgm.addEventListener('loadedmetadata',()=>{
 addEventListener('pagehide',()=>{
  try{if(Number.isFinite(bgm.currentTime))sessionStorage.setItem(AUDIO_TIME_KEY,String(bgm.currentTime));}catch{}
 });
+// Music is ON by default for new visitors. An explicit mute persists.
 let enabled=localStorage.getItem('cm_arena_sound')!=='off';
+// Try autoplay on entry; browsers that forbid sound before interaction are
+// handled by unlockOnGeneralGesture without changing the saved preference.
+bgm.autoplay=enabled;
+if(enabled){
+ bgm.play().then(()=>{unlocked=true;musicLevel();}).catch(()=>{
+  // Expected in Chrome/Safari/Firefox when no user gesture exists.
+ });
+}
 const clips={};
 function soundClip(name){
  if(!enabled)return;
