@@ -173,7 +173,7 @@ await shot(desktop,'04-preparar-desktop');
    return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,selectBottom:select?.bottom};
  }));
  assert(teamFields.length>=6,'Missing team challenge fields');
- assert(teamFields.every(x=>x.left>=0&&x.right<=innerWidth+1&&x.selectBottom<=x.bottom),'Team fields clipped');
+ assert(teamFields.every(x=>x.left>=0&&x.right<=1367&&x.selectBottom<=x.bottom),'Team fields clipped');
  await shot(desktop,'04b-desafiar-equipe-desktop');
  await desktop.locator('#mode').selectOption('bot');
  await desktop.locator('#start-game').click();
