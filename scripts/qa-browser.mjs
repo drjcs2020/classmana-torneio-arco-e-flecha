@@ -28,15 +28,15 @@ try{
  assert.equal(logoResponse.status(),200,'Official ClassMana logo must load');
  await desktop.locator('#cm-lobby-sound').click();
  await desktop.waitForFunction(async()=>{
-  const mod=await import('./arena-audio.js?v=media38');
+  const mod=await import('./arena-audio.js?v=cinema44');
   return mod.arenaAudio.musicState.playing;
  },null,{timeout:8000});
  await desktop.waitForFunction(async()=>{
-  const mod=await import('./arena-audio.js?v=media38');
+  const mod=await import('./arena-audio.js?v=cinema44');
   return mod.arenaAudio.musicState.volume>=.20;
  },null,{timeout:10000});
  const soundtrack=await desktop.evaluate(async()=>{
-  const mod=await import('./arena-audio.js?v=media38');
+  const mod=await import('./arena-audio.js?v=cinema44');
   return mod.arenaAudio.musicState;
  });
  assert(soundtrack.volume>=.20,'Lobby soundtrack must have audible volume');
