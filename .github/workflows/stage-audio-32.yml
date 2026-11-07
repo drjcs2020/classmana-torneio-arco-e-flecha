@@ -1,0 +1,32 @@
+name: Instalar mídia fornecida para revisão do ClassMana
+on:
+  push:
+    branches: [revisao-32-classmana]
+    paths:
+      - '.classmana-staging/transport/**'
+permissions:
+  contents: write
+jobs:
+  importar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruir o MP3 fornecido sem obter conteúdo externo
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/sounds
+          cat $(find .classmana-staging/transport -name 'part-*.b64' | LC_ALL=C sort) \
+            | tr -d '\r\n' \
+            | base64 --decode > assets/sounds/kulakovka-epic-medieval-614879.mp3
+          echo "7b8e8a371ed93aecdf850708fa9ae2ac7b42f324ed63577851d370b02f289cf5  assets/sounds/kulakovka-epic-medieval-614879.mp3" | sha256sum --check
+          test "$(stat -c %s assets/sounds/kulakovka-epic-medieval-614879.mp3)" -eq 3299369
+      - name: Manter MP3 original, remover arquivos de transporte
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sounds/kulakovka-epic-medieval-614879.mp3
+          git rm -r .classmana-staging/transport
+          git rm .github/workflows/stage-audio-32.yml
+          git commit -m "assets: instalar MP3 original do usuário com hash conferido [skip ci]"
+          git push origin HEAD:revisao-32-classmana

@@ -1,11 +1,19 @@
 /**
- * ClassMana Arena — original synthesized SFX, no external audio or autoplay.
+ * ClassMana Arena — MP3 oficial escolhido pelo professor + efeitos 3D leves.
  * The first user gesture unlocks Web Audio. Players may mute at any time.
  */
 const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
 let ctx=null,bus=null,active=false,timer=null,house='A';
-let musicGain=null,musicTimer=null,musicStep=0,unlocked=false;
-const scoreNotes=[220,329.63,392,493.88,440,329.63,293.66,392,261.63,329.63,440,523.25,392,293.66,329.63,246.94];
+let unlocked=false,musicFade=0;
+const MUSIC_FILE='assets/sounds/kulakovka-epic-medieval-614879.mp3';
+const bgm=new Audio(MUSIC_FILE);bgm.loop=true;bgm.preload='auto';bgm.volume=0;
+const AUDIO_TIME_KEY='classmana-music-position-v1';
+bgm.addEventListener('loadedmetadata',()=>{
+ try{const time=Number(sessionStorage.getItem(AUDIO_TIME_KEY));if(Number.isFinite(time)&&time>0&&time<bgm.duration)bgm.currentTime=time;}catch{}
+});
+addEventListener('pagehide',()=>{
+ try{if(Number.isFinite(bgm.currentTime))sessionStorage.setItem(AUDIO_TIME_KEY,String(bgm.currentTime));}catch{}
+});
 let enabled=localStorage.getItem('cm_arena_sound')!=='off';
 const clips={};
 function soundClip(name){
@@ -23,7 +31,6 @@ function init(){
   if(!ctx){
    ctx=new AudioContextCtor();
    bus=ctx.createGain();bus.gain.value=.52;bus.connect(ctx.destination);
-   musicGain=ctx.createGain();musicGain.gain.value=0;musicGain.connect(bus);
   }
   if(ctx.state==='suspended')ctx.resume().catch(()=>{});
   return ctx;
@@ -63,48 +70,38 @@ function ambience(){
  timer=setInterval(()=>{if(active&&enabled&&!document.hidden)chirp()},5800);
 }
 
-// Original repeating fantasy melody: lightly plucked notes, no copyrighted audio.
-function musicTick(){
- if(!enabled||!unlocked||document.hidden||!musicGain||!ctx)return;
- const hz=scoreNotes[musicStep++%scoreNotes.length],now=ctx.currentTime;
- const osc=ctx.createOscillator(),amp=ctx.createGain();
- osc.type='triangle';osc.frequency.setValueAtTime(hz,now);
- amp.gain.setValueAtTime(.0001,now);
- amp.gain.exponentialRampToValueAtTime(.20,now+.018);
- amp.gain.exponentialRampToValueAtTime(.0001,now+.70);
- osc.connect(amp);amp.connect(musicGain);osc.start(now);osc.stop(now+.72);
- if(musicStep%4===1){
-  const bass=ctx.createOscillator(),g=ctx.createGain();
-  bass.type='sine';bass.frequency.value=hz/2;
-  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.13,now+.05);
-  g.gain.exponentialRampToValueAtTime(.0001,now+1.1);
-  bass.connect(g);g.connect(musicGain);bass.start(now);bass.stop(now+1.12);
- }
-}
+
+// Real recording supplied by the teacher. The synthetic placeholder is removed.
 function musicLevel(){
- if(!musicGain||!ctx)return;
- const volume=enabled&&unlocked&&!document.hidden?(active?.16:.92):0;
- musicGain.gain.setTargetAtTime(volume,ctx.currentTime,.40);
+ const target=enabled&&unlocked&&!document.hidden?(active?.045:.28):0;
+ if(musicFade)cancelAnimationFrame(musicFade);
+ const initial=bgm.volume,started=performance.now(),duration=700;
+ function step(now){
+  const t=Math.min(1,(now-started)/duration);
+  bgm.volume=clamp(initial+(target-initial)*(t*t*(3-2*t)),0,1);
+  if(t<1)musicFade=requestAnimationFrame(step);else musicFade=0;
+ }
+ musicFade=requestAnimationFrame(step);
 }
 function unlockMusic(){
- if(!enabled)return;
- const audio=init();if(!audio)return;
- unlocked=true;musicLevel();
- if(!musicTimer){musicTick();musicTimer=setInterval(musicTick,440)}
+ if(!enabled||document.hidden)return;
+ init();unlocked=true;
+ if(bgm.paused)bgm.play().then(musicLevel).catch(err=>console.warn('[ClassMana] MP3 indisponível:',err.message));
+ else musicLevel();
 }
 document.addEventListener('pointerdown',unlockMusic,{passive:true});
 document.addEventListener('keydown',unlockMusic);
 document.addEventListener('touchstart',unlockMusic,{passive:true});
 
 export const arenaAudio={
- get enabled(){return enabled&&!!AudioContextCtor},
- get playing(){return enabled&&unlocked&&ctx?.state==='running'},
+ get enabled(){return enabled},
+ get playing(){return enabled&&unlocked&&!bgm.paused},
  start(){unlockMusic();return this.playing},
  setHouse(k){house=['A','B','C'].includes(k)?k:'A'},
  setActive(value){active=!!value;ambience();musicLevel()},
  toggle(){
   enabled=!enabled;localStorage.setItem('cm_arena_sound',enabled?'on':'off');
-  if(!enabled){clearInterval(timer);timer=null;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);musicLevel();}
+  if(!enabled){clearInterval(timer);timer=null;bgm.pause();unlocked=false;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);musicLevel();}
   else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.52,ctx.currentTime,.05);ambience();unlockMusic();musicLevel()}
   return enabled;
  },
@@ -155,4 +152,4 @@ export const arenaAudio={
   }catch(error){console.warn('[ClassMana] Falha ao emitir efeito sonoro:',error)}
  }
 };
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(timer);timer=null}else ambience();musicLevel()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(timer);timer=null;bgm.pause()}else{ambience();if(unlocked&&enabled)bgm.play().catch(()=>{})}musicLevel()});
