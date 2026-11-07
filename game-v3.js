@@ -837,12 +837,8 @@ async function startOnlineClient(){
   // Only a deliberate return from the arena preserves identity.
   // Reloading or reopening the lobby always releases the prior student's account.
   const sessionId=cmResumeSameStudent?cmSessionId():'';
-  if(document.body.dataset.page==='lobby'&&!sessionId){
-   online.logout();cmForgetStudent();identifiedPlayerId='';
-   $('player').disabled=false;$('player').value='guest';
-   setLobbyStep('reino');
-   showOnlineStatus();
-  }
+  // Initial identity is already cleared synchronously at module start.
+  // Never force the lobby back to Casa after a student has begun choosing a character.
   if(document.body.dataset.page==='lobby'&&/^[ABC][0-9]{2}$/.test(sessionId)&&(!online.user||online.user.id===sessionId)){
    if(!online.user){try{await online.login(sessionId)}catch(err){console.warn('Não foi possível reconectar o aluno:',err);cmForgetStudent();return;}}
    identifiedPlayerId=sessionId;
@@ -850,7 +846,7 @@ async function startOnlineClient(){
    $('player').value=sessionId;$('player').disabled=true;updateMode();
    setLobbyStep('desafio');
    const endBtn=$('cm-end-session');if(endBtn)endBtn.hidden=false;
-  }else if(document.body.dataset.page==='lobby'&&online.user&&sessionId!==online.user.id){
+  }else if(document.body.dataset.page==='lobby'&&!identifiedPlayerId&&online.user&&sessionId!==online.user.id){
    online.logout();cmForgetStudent();identifiedPlayerId='';
   }
   if(document.body.dataset.page!=='lobby'&&!online.user){
