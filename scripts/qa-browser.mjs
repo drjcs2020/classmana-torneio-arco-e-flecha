@@ -89,8 +89,24 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
  assert.equal(tileSizes.length,6,'Expected five play modes and ranking');
  assert(Math.max(...tileSizes.map(x=>x.h))-Math.min(...tileSizes.map(x=>x.h))<2,'Tiles must have the same height');
  assert(Math.max(...tileSizes.map(x=>x.w))-Math.min(...tileSizes.map(x=>x.w))<2,'Tiles must have the same width');
+ const rankingTile=await desktop.locator('#cm-ranking-choice').evaluate(el=>getComputedStyle(el).backgroundImage);
+ assert(rankingTile.includes('botao-ranking-classmana.svg'),'Ranking needs the approved blue-and-gold artwork');
  await desktop.locator('#cm-ranking-choice').click();
  assert(await desktop.locator('#view-ranking.active').isVisible(),'Ranking button must open the standings');
+ await desktop.waitForFunction(()=>{
+  const status=document.querySelector('#ranking-status')?.textContent||'';
+  return status.includes('duelos concluídos')||status.includes('⚠️');
+ },null,{timeout:16000});
+ const rankingLegibility=await desktop.locator('#view-ranking').evaluate(root=>{
+  const panel=root.querySelector('.ranking-panel');
+  const title=root.querySelector('.ranking-panel h2');
+  const line=root.querySelector('.rankline b');
+  return {panel:getComputedStyle(panel).backgroundImage,title:getComputedStyle(title).color,line:line?getComputedStyle(line).color:null};
+ });
+ assert(rankingLegibility.panel.includes('gradient'),'Ranking cards must have a parchment texture');
+ assert(rankingLegibility.title==='rgb(255, 237, 189)','Ranking header contrast incorrect');
+ if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(37, 24, 14)','Ranking text must be dark on parchment');
+ await shot(desktop,'03b-ranking-desktop');
  await desktop.locator('#rank-play').click();
  assert(await desktop.locator('#view-inicio.active').isVisible(),'Closing ranking must return to game');
 await shot(desktop,'03-desafio-desktop');
@@ -109,6 +125,10 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
  await desktop.waitForTimeout(600);
  assert(await desktop.locator('#world').isVisible());
+ await desktop.waitForFunction(()=>document.body.classList.contains('cm-art-on'),null,{timeout:11000});
+ const backBox=await desktop.locator('#leave-arena').boundingBox();
+ assert(backBox&&backBox.x<100&&backBox.y<100&&backBox.width>=110&&backBox.height>=50,
+  'Back button must be readable at top-left of the arena: '+JSON.stringify(backBox));
  assert.equal(await desktop.locator('#stage').getAttribute('data-level'),'lendario');
  await shot(desktop,'05-arena-desktop');
 await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});
