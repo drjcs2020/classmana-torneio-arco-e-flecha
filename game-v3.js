@@ -352,7 +352,7 @@ async function fire(power){
  // Round scores online are calculated again by Apps Script using these normalized offsets.
  const activeBow=(!match.online||Number(match.online.rules)>=7)?(match.bow||equipment.bow):'classico';
  const tuning=BOW_RULES[activeBow]||BOW_RULES.classico;
- if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power,time:match.freezeTime,bow:match.bow||equipment.bow});
+ /* Guardar coordenadas do impacto final, não da mira inicial. */
  const distanceFactor=distanceDifficulty(match.distance);
  const drift=match.wind*tuning.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
  const jitter=match.online?0:(1-power)*t.r*.14*Math.min(2,distanceFactor);
@@ -369,6 +369,7 @@ async function fire(power){
  const norm=Math.hypot(landingX,landingY)*tuning.ring;
  const base=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
  const score=base>0?Math.min(10,base+tuning.bonus):0;
+ if(currentMatch.online)currentMatch.onlineShots.push({dx:landingX,dy:landingY,impactDx:landingX,impactDy:landingY,blocked,power,time:match.freezeTime,bow:activeBow});
  match.freezeTime=null; // The target keeps moving while the arrow flies.
  $('stage').classList.add('firing');arenaAudio.play('fly');
  try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
