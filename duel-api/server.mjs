@@ -5,7 +5,11 @@ import {readFileSync,mkdirSync} from 'node:fs';
 import {dirname,resolve} from 'node:path';
 
 const roster=JSON.parse(readFileSync(new URL('./roster.json',import.meta.url),'utf8'));
-const players=Object.entries(roster).flatMap(([house,names])=>names.map((name,i)=>({id:house+String(i+1).padStart(2,'0'),name,house,team:''})));
+const teamMembership=JSON.parse(readFileSync(new URL('./teams.json',import.meta.url),'utf8'));
+const players=Object.entries(roster).flatMap(([house,names])=>names.map((name,i)=>{
+ const id=house+String(i+1).padStart(2,'0');
+ return {id,name,house,team:teamMembership[id]||''};
+}));
 const known=new Map(players.map(p=>[p.id,p]));
 const dbFile=resolve(process.env.DB_PATH||'/data/classmana.sqlite');
 mkdirSync(dirname(dbFile),{recursive:true});
@@ -30,7 +34,31 @@ function auth(request){const token=(request.headers.authorization||'').replace(/
 function requirePlayer(request){return auth(request)||fail('Selecione um perfil antes de entrar no duelo.',401)}
 function publicDuel(d){return {id:d.id,creator:known.get(d.creator),recipient:known.get(d.recipient),kind:d.kind,level:d.level,created:d.created,status:d.status,creatorShots:d.creator_shots?JSON.parse(d.creator_shots):[],recipientShots:d.recipient_shots?JSON.parse(d.recipient_shots):[],creatorScore:d.creator_score,recipientScore:d.recipient_score,rules:10}}
 function shotsOf(shots){if(!Array.isArray(shots)||shots.length!==5)fail('Exatamente cinco flechas são necessárias');return shots.map((s,i)=>{if(!s||typeof s!=='object')fail('Dados inválidos');const dx=Number(s.dx),dy=Number(s.dy),power=Number(s.power),time=Number(s.time),bow=s.bow||'classico';if(![dx,dy,power,time].every(Number.isFinite)||Math.abs(dx)>100||Math.abs(dy)>100||power<0||power>1||time<0||time>7200||!['classico','real','vento'].includes(bow))fail('Flecha inválida');const blocked=s.blocked===true;const n=Math.hypot(dx,dy)*(bow==='real'?1.12:1),points=blocked||n>1?0:Math.max(1,10-Math.floor(n*10));return {dx,dy,impactDx:dx,impactDy:dy,blocked,power,time,bow,score:Math.min(10,points+(bow==='real'&&points>0?1:0)),number:i+1}})}
-function leaderboard(){const data=db.prepare("SELECT creator,recipient,creator_score,recipient_score FROM duels WHERE status='CONCLUIDO'").all();const rows=new Map(players.map(p=>[p.id,{...p,plays:0,wins:0,total:0}]));for(const d of data){for(const [id,own,other] of [[d.creator,d.creator_score,d.recipient_score],[d.recipient,d.recipient_score,d.creator_score]]){const p=rows.get(id);p.plays++;p.total+=own;if(own>other)p.wins++}}const classes=['A','B','C'].map(h=>{const own=[...rows.values()].filter(x=>x.house===h);return {name:h,members:own.length,plays:own.reduce((a,x)=>a+x.plays,0),wins:own.reduce((a,x)=>a+x.wins,0)}}).sort((a,b)=>b.wins-a.wins);return {games:data.length,classes,teams:[],players:[...rows.values()].filter(x=>x.plays).sort((a,b)=>b.wins-a.wins||b.total-a.total)}}
+function leaderboard(){
+ const data=db.prepare("SELECT creator,recipient,creator_score,recipient_score FROM duels WHERE status='CONCLUIDO' AND creator_score IS NOT NULL AND recipient_score IS NOT NULL").all();
+ const rows=new Map(players.map(p=>[p.id,{...p,plays:0,wins:0,losses:0,draws:0,total:0}]));
+ for(const duel of data){
+  for(const [id,own,other] of [[duel.creator,duel.creator_score,duel.recipient_score],[duel.recipient,duel.recipient_score,duel.creator_score]]){
+   const player=rows.get(id);if(!player)continue;
+   player.plays++;player.total+=own;
+   if(own>other)player.wins++;else if(own<other)player.losses++;else player.draws++;
+  }
+ }
+ const rank=(a,b)=>b.wins-a.wins||b.total-a.total||b.plays-a.plays||a.name.localeCompare(b.name,'pt-BR');
+ const all=[...rows.values()];
+ const summarize=(name,members)=>({
+  name,members:members.length,
+  plays:members.reduce((n,p)=>n+p.plays,0),
+  wins:members.reduce((n,p)=>n+p.wins,0),
+  losses:members.reduce((n,p)=>n+p.losses,0),
+  draws:members.reduce((n,p)=>n+p.draws,0),
+  total:members.reduce((n,p)=>n+p.total,0)
+ });
+ const classes=['A','B','C'].map(h=>summarize(h,all.filter(p=>p.house===h))).sort(rank);
+ const names=[...new Set(all.map(p=>p.team).filter(Boolean))];
+ const teams=names.map(name=>summarize(name,all.filter(p=>p.team===name))).sort(rank);
+ return {games:data.length,classes,teams,players:all.filter(p=>p.plays>0).sort(rank)};
+}
 function route(request,action,data,query){
  if(action==='ping')return {api:10,persistent:true};
  if(action==='roster')return {players};
