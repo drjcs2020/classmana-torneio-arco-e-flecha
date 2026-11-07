@@ -1,0 +1,101 @@
+/* ClassMana — painel de preparação sem barra de rolagem interna.
+   Regras restritas ao lobby / etapa partida para não alterar arena nem convites. */
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{
+ top:16%!important;bottom:2%!important;
+ left:7%!important;right:7%!important;
+ width:auto!important;height:auto!important;max-height:none!important;
+ min-height:0!important;overflow:visible!important;
+ display:flex!important;flex-direction:column!important;
+ gap:clamp(4px,.7vh,8px)!important;
+ padding:0!important;margin:0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{
+ flex:0 0 auto!important;min-height:0!important;max-height:none!important;
+ padding:4px 8px!important;gap:7px!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account .cm-identity-warning{
+ display:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head{
+ flex:0 0 auto!important;min-height:0!important;max-height:none!important;
+ padding:3px 8px!important;margin:0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{
+ font-size:clamp(19px,2.2vw,31px)!important;line-height:1.1!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+ flex:1 1 auto!important;min-height:0!important;max-height:none!important;
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ grid-auto-flow:row!important;grid-auto-rows:minmax(0,1fr)!important;
+ align-content:stretch!important;align-items:stretch!important;
+ gap:clamp(5px,.8vh,10px) clamp(11px,2vw,22px)!important;
+ padding:4px 3px!important;margin:0!important;
+ overflow:visible!important;overflow-x:visible!important;overflow-y:visible!important;
+ scrollbar-width:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields::-webkit-scrollbar{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label:not(.hidden){
+ min-width:0!important;min-height:0!important;height:auto!important;
+ display:flex!important;flex-direction:column!important;justify-content:center!important;
+ gap:clamp(2px,.5vh,5px)!important;
+ padding:2px 3px!important;margin:0!important;
+ color:#fff6de!important;
+ font:900 clamp(13px,1.12vw,17px)/1.2 'Nunito',sans-serif!important;
+ text-shadow:0 2px 5px #000!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label.hidden{
+ display:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ box-sizing:border-box!important;width:100%!important;
+ min-width:0!important;min-height:38px!important;height:clamp(38px,5.6vh,46px)!important;
+ margin:0!important;padding:5px 11px!important;
+ color:#fff7df!important;background:#092e4f!important;
+ border:2px solid #e7bb65!important;border-radius:11px!important;
+ font:800 clamp(13px,1.18vw,17px)/1.2 'Nunito',sans-serif!important;
+ box-shadow:0 3px 0 #68471d!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select:focus-visible{
+ outline:3px solid #fff4b8!important;outline-offset:2px!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{
+ flex:0 0 auto!important;min-height:0!important;max-height:none!important;
+ height:auto!important;padding:3px 8px!important;gap:2px!important;
+ display:flex!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .course-node{
+ min-height:24px!important;padding:2px!important;
+ font-size:clamp(10px,.9vw,13px)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ flex:0 0 auto!important;margin:2px auto 0!important;
+ width:min(50vw,440px)!important;height:clamp(52px,8vh,70px)!important;
+ min-height:52px!important;
+}
+@media(max-height:700px) and (min-width:781px){
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{top:13%!important;bottom:1%!important;gap:3px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head{padding:1px 5px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-head h2{font-size:21px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .online-account{padding:2px 7px!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{height:58px!important}
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup{
+  top:13%!important;bottom:1%!important;left:3%!important;right:3%!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  column-gap:8px!important;row-gap:5px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields > label:not(.hidden){
+  font-size:clamp(11px,2.5vw,14px)!important;padding:1px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+  font-size:12px!important;min-height:33px!important;height:36px!important;padding:3px 6px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="partida"] .course-preview{display:none!important}
+ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+  width:min(85vw,430px)!important;height:56px!important;
+ }
+}
