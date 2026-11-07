@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="student-session.css?v=session26">
 <link rel="stylesheet" href="classmana-audio-ui.css?v=music28">
 <link rel="stylesheet" href="identity-navigation-fix.css?v=identity30">
-<link rel="stylesheet" href="duel-buttons-proportions.css?v=buttons33">
+<link rel="stylesheet" href="duel-buttons-proportions.css?v=buttons34">
 </head>
 <body data-page="lobby">
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -48,6 +48,10 @@
      <button id="cm-identity-back" type="button" class="cm-identity-back" aria-label="Voltar para escolher outra Casa">← VOLTAR ÀS CASAS</button>
      <img class="cm-identity-logo" src="assets/images/arte-002.webp" alt="Logotipo oficial ClassMana">
      <h2>QUEM VAI JOGAR?</h2>
+     <div id="cm-previous-session" class="cm-previous-session" hidden>
+       <span id="cm-previous-session-name"></span>
+       <button type="button" id="cm-previous-session-exit">🚪 Encerrar sessão atual</button>
+     </div>
      <p>Escolha seu nome na turma da Casa selecionada.</p>
      <label for="cm-identity-player">SEU NOME NA TURMA</label>
      <select id="cm-identity-player"><option value="">Selecione seu nome</option></select>
@@ -104,6 +108,7 @@
      <button type="button" class="cm-duel-mode" data-play-mode="challenge_same" aria-label="Desafiar um aluno da mesma turma"><img src="assets/ui/buttons/botao-desafiar-aluno.png" alt=""><span>Colega da Mesma Turma</span></button>
      <button type="button" class="cm-duel-mode" data-play-mode="challenge_team" aria-label="Desafio de equipes da mesma turma ou interclasses"><img src="assets/ui/buttons/botao-desafiar-equipe.png" alt=""><span>Entre Equipes</span></button>
      <button type="button" class="cm-duel-mode" data-play-mode="challenge" aria-label="Desafiar um aluno de outra turma"><img src="assets/ui/hud/botao-iniciar-duelo.png" alt=""><span>Duelo Interclasses</span></button>
+     <button type="button" id="cm-ranking-choice" class="cm-duel-mode cm-ranking-choice" aria-label="Abrir ranking do torneio"><span aria-hidden="true" class="cm-ranking-emblem">🏆</span><span class="cm-ranking-label">RANKING</span></button>
    </div>
  </section>
  <div class="setup" id="setup">
@@ -215,7 +220,7 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=music32"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=sessionranking34"></script>
 <script type="module" src="wind-panel-restored.js?v=wind20"></script>
 </body>
 </html>
