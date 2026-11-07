@@ -216,3 +216,17 @@ body.cm-art-on #view-arena #leave-arena:focus-visible{
    width:105px!important;height:47px!important;min-width:105px!important;min-height:47px!important;
  }
 }
+
+/* Keep the tournament crest clear of the enlarged BACK button. */
+@media(min-width:761px){
+ body.cm-art-on #view-arena .stage.cm-art-ready .cm-visual-logo{
+   left:clamp(175px,15vw,214px)!important;top:6px!important;
+   right:auto!important;
+ }
+}
+@media(max-width:760px){
+ body.cm-art-on #view-arena .stage.cm-art-ready .cm-visual-logo{
+   top:auto!important;left:6px!important;right:auto!important;bottom:53px!important;
+   width:112px!important;max-height:64px!important;
+ }
+}
