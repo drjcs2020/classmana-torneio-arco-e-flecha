@@ -1,6 +1,7 @@
 import {initScene} from './scene-v3.js?v=ground43';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=media38';
+import {arenaAudio} from './arena-audio.js?v=cinema44';
+import {cinematics} from './classmana-cinematics.js?v=cinema44';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
 import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
@@ -324,6 +325,13 @@ async function startMatch(accepted=null){
     toast('Escolha um adversário válido para este tipo de desafio.');return;
    }
   }else if(fromInbox.recipient.id!==userId&&fromInbox.creator.id!==userId){toast('Esse desafio não pertence à sua conta.');return;}
+  // Cinematic VS runs before the API creates a challenge. Cancel never leaves a ghost invite.
+  const versusAccepted=await cinematics.versus({
+   player:nameOf(userId),house:userId[0],gender:archerGender(),
+   rival:byId(rivalId),rivalHouse:rivalId?.[0],
+   sound:effect=>arenaAudio.play(effect)
+  });
+  if(!versusAccepted)return;
   const requestedAt=Date.now(),kind=duelKind(mode),level=$('challenge-level').value;
   try{
    onlineLoading=true;
@@ -364,6 +372,11 @@ async function startMatch(accepted=null){
   rivalId,scores:[],running:true,locked:false,bow:equipment.bow,wind:0,distance:10,level:challenge?.level||$('challenge-level').value,shift:0,freezeTime:null,stageStartedAt:performance.now(),incoming:null,
   online:challenge,onlineShots:[],onlineReplay:challenge?.recipient.id===userId?challenge.creatorShots:[],
   onlineReplayPoints:0,seed:Math.floor(rand(100000,999999))};
+ if(mode==='bot'){
+  const go=await cinematics.versus({player:match.player,house:match.house,gender:archerGender(),
+   rival:'ROBÔ ARQUEIRO',rivalHouse:'C',mode:'bot',sound:effect=>arenaAudio.play(effect)});
+  if(!go){match=null;return;}
+ }
  reticle={x:.50,y:.45};$('finish').classList.add('hidden');
  $('instruction').textContent='MOVA A MIRA DO ARCO • SEGURE PARA PUXAR • SOLTE PARA ATIRAR';
  if(document.body.dataset.page==='lobby'){
@@ -442,6 +455,7 @@ async function fire(power){
  match.scores.push(score);$('hud-score').textContent=match.scores.reduce((a,b)=>a+b,0);
  try{if(document.body.dataset.page==='arena')sessionStorage.setItem('cm_active_archery_match_v1',JSON.stringify(match))}catch{}
  showHit(score,ix/w,iy/h,blocked);
+ cinematics.impactSparkle($('stage'),ix/w,iy/h,score,match.house);
  if(blocked){arenaAudio.play('block');toast('🛡️ O ESCUDO DEFENDEU O ALVO!');}
  else if(score>=8){arenaAudio.play('applause');toast(score===10?'🎯 ACERTO PERFEITO! +10 pontos':'👏 A TORCIDA VIBROU!');}
  else if(score===0){arenaAudio.play('boo');toast('📣 A TORCIDA REAGIU! Tente novamente.');}
@@ -458,6 +472,7 @@ async function fire(power){
   if(!await duelTurnPause(1500,currentMatch)){hideDuelTurn();return;}
   turnPanel.classList.add('hidden');
   if(match!==currentMatch||!currentMatch.running)return;
+  arenaAudio.play('rival-shot');
   const px=(t.x+ghost.impactDx*t.r)/w,py=(t.y+ghost.impactDy*t.r)/h;
   try{await Promise.race([scene?.fire?.({x:px,y:py,power:ghost.power||1}),new Promise(resolve=>setTimeout(resolve,1700))]);}
   catch(e){console.warn('Replay:',e)}
@@ -537,6 +552,9 @@ async function finishMatch(){
    if(title.includes('VITÓRIA'))arenaAudio.play('victory');
    else if(rival!==null&&total<rival)arenaAudio.play('defeat');
    renderFinishScore(total,rival===null?'AGUARDANDO':rival);
+   cinematics.resultView({player:match.player,house:match.house,
+    rival:isCreator?ch.recipient.name:ch.creator.name,rivalHouse:match.rivalId?.[0]||'A',
+    ownShots:response.shots||[],rivalShots:(isCreator?ch.recipientShots:ch.creatorShots)||[],opponent:rival===null?'—':rival});
    $('share-help').textContent='✅ Resultado registrado no servidor do torneio.';
    $('hud-score').textContent=total;$('hud-rival').textContent=rival===null?'—':rival;
    refreshInbox().catch(console.warn);renderRanking().catch(console.warn);
@@ -559,6 +577,10 @@ async function finishMatch(){
  $('finish-title').textContent=title;
  $('finish-desc').textContent='Sua pontuação: '+total+' de 50 pontos nesta rodada.';
  renderFinishScore(total,rivalScore===undefined?'—':rivalScore,rivalScore===undefined?'TREINO LIVRE':'ROBÔ');
+ cinematics.resultView({player:match.player,house:match.house,rival:match.mode==='bot'?'ROBÔ ARQUEIRO':'SEU RECORDE',
+  rivalHouse:match.mode==='bot'?'C':match.house,ownShots:match.scores,rivalShots:bot,
+  opponent:rivalScore===undefined?'—':rivalScore});
+ if(match.mode==='bot')arenaAudio.play(total>rivalScore?'victory':total<rivalScore?'defeat':'banner');
  $('share-help').textContent='Treino e partidas com robô ficam neste navegador; somente desafios validados entram no ranking oficial.';
  if(match.playerId!=='guest')persist({house:match.house,id:match.playerId,score:total,mode:match.mode,win:rivalScore===undefined?null:total>rivalScore});
  uiHud();
@@ -918,6 +940,7 @@ document.querySelector('.studio-carousel')?.addEventListener('keydown',event=>{
   $(event.key==='ArrowLeft'?'archer-prev':'archer-next').focus();
  }
 });
+cinematics.bindMenuSound(effect=>arenaAudio.play(effect));
 const soundButton=$('arena-sound');
 function updateSoundButton(){
  if(!soundButton)return;

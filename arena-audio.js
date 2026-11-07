@@ -118,6 +118,13 @@ export const arenaAudio={
  play(effect,score=0){
   if(!enabled||document.hidden)return;
   try{
+   if(effect==='click'){tone(580,790,.065,.025,'triangle');tone(920,1070,.07,.018,'sine',.035);}
+   if(effect==='select'){tone(440,740,.13,.05,'triangle');tone(690,870,.10,.032,'sine',.075);}
+   if(effect==='back'){tone(530,285,.18,.043,'triangle');}
+   if(effect==='banner'){tone(392,510,.17,.055,'triangle');tone(523,780,.22,.06,'triangle',.12);}
+   if(effect==='versus'){tone(300,500,.25,.07,'sawtooth');tone(650,980,.20,.06,'triangle',.15);noise(.2,.05,1600,.08);}
+   if(effect==='rival-shot'){noise(.25,.09,1900);tone(490,195,.26,.045,'triangle');}
+   if(effect==='coin'){tone(1200,1640,.10,.06,'sine');tone(1700,2100,.13,.05,'sine',.07);}
    if(effect==='draw'){tone(185,260,.34,.035,'triangle');noise(.23,.016,400);}
    if(effect==='release'){noise(.26,.16,2500);tone(410,150,.20,.07,'triangle');}
    if(effect==='fly'){noise(.35,.055,3400);tone(760,360,.24,.018,'sine');}
