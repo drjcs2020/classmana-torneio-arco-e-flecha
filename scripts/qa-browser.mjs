@@ -122,8 +122,10 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
   return {panel:getComputedStyle(panel).backgroundImage,title:getComputedStyle(title).color,line:line?getComputedStyle(line).color:null};
  });
  assert(rankingLegibility.panel.includes('gradient'),'Ranking cards must have a parchment texture');
- assert(rankingLegibility.title==='rgb(255, 237, 189)','Ranking header contrast incorrect');
- if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(37, 24, 14)','Ranking text must be dark on parchment');
+ const rankOverflow=await desktop.locator('#view-ranking .ranking-panel').evaluateAll(els=>els.map(el=>getComputedStyle(el).overflowY));
+ assert(rankOverflow.every(x=>x==='visible'),'Ranking should not hide players inside nested scrolling lists');
+ assert(rankingLegibility.title==='rgb(255, 238, 189)','Ranking header contrast incorrect');
+ if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(38, 25, 14)','Ranking text must be dark on parchment');
  await shot(desktop,'03b-ranking-desktop');
  await desktop.locator('#rank-play').click();
  assert(await desktop.locator('#view-inicio.active').isVisible(),'Closing ranking must return to game');
@@ -133,10 +135,21 @@ await shot(desktop,'03-desafio-desktop');
  await desktop.locator('#challenge-level').selectOption('lendario');
  await desktop.locator('#difficulty').selectOption('hard');
  assert.match(await desktop.locator('#lobby-course').getAttribute('aria-label'),/150/);
- const setupPanels=await desktop.evaluate(()=>['.setup','.online-account','.setup-head','.course-preview'].map(selector=>{
- const style=getComputedStyle(document.querySelector(selector));return {selector,background:style.backgroundImage};
-}));
-assert(setupPanels.every(x=>x.background==='none'),'Preparação não pode cobrir cenário: '+JSON.stringify(setupPanels));
+ const setupVisual=await desktop.evaluate(()=>{
+  const head=document.querySelector('#view-inicio[data-step="partida"] .setup-head');
+  const items=[...document.querySelectorAll('#view-inicio[data-step="partida"] .setup-fields>label:not(.hidden)')];
+  const start=document.querySelector('#start-game').getBoundingClientRect();
+  return {
+    headerBackground:getComputedStyle(head).backgroundImage,
+    labels:items.map(x=>({width:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height,
+      background:getComputedStyle(x).backgroundImage,selectWidth:x.querySelector('select')?.getBoundingClientRect().width})),
+    startBottom:start.bottom,viewport:window.innerHeight
+  };
+ });
+ assert(setupVisual.headerBackground.includes('gradient'),'Preparation needs a decorated fantasy title');
+ assert(setupVisual.labels.length>=4&&setupVisual.labels.every(x=>x.width>300&&x.height>=78&&x.background.includes('gradient')),
+ 'Preparation controls must use consistent framed cards: '+JSON.stringify(setupVisual));
+ assert(setupVisual.startBottom<=setupVisual.viewport+6,'Start game is clipped below viewport');
 await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#start-game').click();
  await desktop.waitForURL('**/arena.html',{timeout:18000});
