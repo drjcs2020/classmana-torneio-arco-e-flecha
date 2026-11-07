@@ -265,6 +265,7 @@ export function initScene(canvas, getSettings) {
     const suspendedY=2.05-(setting.verticalShift||0)*h/units;
     targetRoot.setLocalPosition(x,moving?suspendedY:fixedY,-9);
     if(targetStand)targetStand.enabled=!moving;
+    parent.dataset.targetStand=moving?'suspended':'standing';
     if(movingRail)movingRail.enabled=moving;
   }
   function buildWorld(){
@@ -386,8 +387,18 @@ export function initScene(canvas, getSettings) {
       model.setLocalScale(1.22,1.22,1.22);
       model.setLocalPosition(0,0,.06);
       holder.addChild(model);
-      targetVisual.enabled=false; // Fixed mode still displays the stand; floating mode never does.
+      // The GLB has no stand. Keep the physical wooden tripod as a sibling of
+      // the target mesh, so fixed targets never float after model loading.
+      if(targetStand&&targetStand.parent===targetVisual){
+        holder.addChild(targetStand);
+      }
+      if(targetStand){
+        const moving=setting.level==='avancado'||setting.level==='lendario';
+        targetStand.enabled=!moving;
+      }
+      targetVisual.enabled=false;
       parent.dataset.glbTarget='ready';
+      parent.dataset.targetStand=targetStand?.enabled?'standing':'suspended';
     });
   }
   function loadArrowModel(owner){
