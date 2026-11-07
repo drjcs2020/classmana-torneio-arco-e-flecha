@@ -978,6 +978,8 @@ if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
  if(/^[ABC]\d{2}$/.test(hostPlayer||'')&&hostPlayer[0]===house){$('player').value=hostPlayer;fillRivals()}
  setLobbyStep('partida');
 }
+// A seleção de jogador sempre pode voltar à escolha da Casa.
+$('cm-identity-back')?.addEventListener('click',()=>setLobbyStep('reino'));
 // A abertura duplicada foi removida. O fluxo começa na escolha da Casa.
 $('cm-lobby-back')?.addEventListener('click',()=>{
  const step=$('view-inicio')?.dataset.step;
