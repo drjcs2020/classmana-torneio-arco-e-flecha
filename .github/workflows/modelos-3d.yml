@@ -1,0 +1,40 @@
+name: Gerar modelos 3D do ClassMana
+on:
+  push:
+    branches: [modelos-3d-reconstruidos]
+    paths:
+      - 'models3d/criar_modelos.py'
+      - '.github/workflows/modelos-3d.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check numpy trimesh
+      - run: python models3d/criar_modelos.py
+      - name: Verificar os sete modelos
+        run: |
+          python - <<'PY'
+          import trimesh,glob
+          paths=glob.glob('models3d/*.glb')
+          assert len(paths)==7, paths
+          for path in paths:
+              scene=trimesh.load(path,force='scene')
+              assert len(scene.geometry)>0, path
+              print(path,len(scene.geometry))
+          PY
+      - name: Salvar GLBs na branch de trabalho
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add models3d/*.glb
+          if ! git diff --cached --quiet; then
+            git commit -m "build(models): add seven valid GLB assets"
+            git push
+          fi
