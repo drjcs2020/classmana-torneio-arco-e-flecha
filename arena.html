@@ -24,6 +24,34 @@ body[data-page="arena"] #view-arena.active {
 <link rel="stylesheet" href="wind-panel-restored.css?v=wind20">
 <link rel="stylesheet" href="duel-bell.css?v=bell23">
 <link rel="stylesheet" href="student-session.css?v=session26">
+<style id="cm-arena-scene-no-flash">
+/* Arena starts with the actual battle background, never old castle/card art. */
+body[data-page="arena"] #stage.stage {
+ --scene:url("assets/scenes/aguia.webp")!important;
+ --cm-game-background:url("assets/scenes/aguia.webp");
+ background-color:#102f28!important;
+}
+body[data-page="arena"] #stage.stage.house-a {
+ --scene:url("assets/scenes/aguia.webp")!important;
+ --cm-game-background:url("assets/scenes/aguia.webp");
+}
+body[data-page="arena"] #stage.stage.house-b {
+ --scene:url("assets/scenes/leao.webp")!important;
+ --cm-game-background:url("assets/scenes/leao.webp");
+}
+body[data-page="arena"] #stage.stage.house-c {
+ --scene:url("assets/scenes/dragao.webp")!important;
+ --cm-game-background:url("assets/scenes/dragao.webp");
+}
+body[data-page="arena"] #stage.stage::before {
+ background-image:var(--cm-game-background)!important;
+ background-position:center center!important;
+ background-size:cover!important;
+ background-repeat:no-repeat!important;
+ filter:none!important;
+ opacity:1!important;
+}
+</style>
 </head>
 <body data-page="arena">
 <!-- A arena é a view inicial. A seleção antiga nunca é exibida durante o carregamento. -->
