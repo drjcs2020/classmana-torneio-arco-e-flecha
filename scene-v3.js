@@ -18,7 +18,7 @@ export function initScene(canvas, getSettings) {
   let pc=null, app=null, gl=null, camera=null, bowRoot=null, bowHandle=null, bowString=null, sightAnchor=null,
       arrowLoaded=null, targetRoot=null, impactMarks=[], currentHouse='A', ready=false, destroyed=false,
       aimX=.5, aimY=.46, power=.3, projectile=null, pendingShot=null, animT=0,
-      equipment={bow:'classico',arrow:'rubi'},terrainElement=null,ambientProps=[],backdropMode=false,targetStand=null,movingRail=null;
+      equipment={bow:'classico',arrow:'rubi'},terrainElement=null,ambientProps=[],backdropMode=false,targetStand=null,movingRail=null,targetVisual=null,modelAssets={};
   // O fallback 2D não pode aparecer antes do PlayCanvas: antes ele causava a
   // troca perceptível de arte após alguns segundos.
   const ctx=canvas.getContext('2d', {alpha:true});
@@ -93,7 +93,7 @@ export function initScene(canvas, getSettings) {
     if(ready)colorBow();
   }
   function setHouse(k){currentHouse=palettes[k]?k:'A';parent.classList.remove('house-a','house-b','house-c');parent.classList.add('house-'+currentHouse.toLowerCase());
-    if(ready){colorBow();colorTarget();}}
+    if(ready){colorBow();colorTarget();loadBowModel();}}
   function setTargetShift(){if(ready){moveTarget();for(const old of impactMarks)old.destroy();impactMarks=[];}}
   // Keep the bow, arrow and the bow's own sight fully inside the camera.
   // Moving the mouse to the edge must not push the bow out of the viewport.
@@ -270,7 +270,7 @@ export function initScene(canvas, getSettings) {
   function buildWorld(){
     const metals={wood:material('#634124',{rough:.8}),woodlight:material('#a2703f',{rough:.8}),rope:material('#d5ae64',{rough:.89}),iron:material('#1d2329',{metal:.73,rough:.31}),silver:material('#c8d2d7',{metal:.82,rough:.19}),red:material('#da332d'),white:material('#f4f2e7')};
     targetRoot=new pc.Entity('Target assembly');root().addChild(targetRoot);moveTarget();
-    const d=targetRoot;
+    const d=new pc.Entity('Competition target visual');targetRoot.addChild(d);targetVisual=d;
     targetStand=new pc.Entity('Removable target ground stand');
     d.addChild(targetStand);
     // Cavaletes permanecem apenas no alvo FIXO. O alvo suspenso usa trilho,
@@ -327,6 +327,7 @@ export function initScene(canvas, getSettings) {
     }
     // Set house color and look immediately.
     buildBow();colorBow();colorTarget();
+    loadTargetModel();
   }
   function buildBow(){
     bowRoot=new pc.Entity('Modern competition recurve bow');
@@ -362,6 +363,72 @@ export function initScene(canvas, getSettings) {
     }
     // String gets physical tension by shifting central guide while aiming.
     bowString=tube('tensioned carbon cord',[[0,-1.51,.03],[-.11,0,.45],[0,1.51,.03]],[.004,.004,.004],dark,bowRoot,7);
+    bowRoot.__fallbacks=[...bowRoot.children];
+    loadBowModel();
+  }
+  // Use the approved GLB assets; keep the procedural geometry only as a WebGL fallback.
+  const houseModelNames={A:'aguia_dourada',B:'leao_de_fogo',C:'dragao_de_esmeralda'};
+  function loadModel(url,then){
+    if(!app||destroyed)return;
+    if(modelAssets[url]){then(null,modelAssets[url]);return;}
+    app.assets.loadFromUrl(url,'container',(err,asset)=>{
+      if(destroyed)return;
+      if(!err&&asset?.resource){modelAssets[url]=asset.resource;then(null,asset.resource);}
+      else{console.warn('[ClassMana] GLB fallback:',url,err);then(err||new Error('GLB missing'));}
+    });
+  }
+  function loadTargetModel(){
+    const holder=targetRoot;
+    loadModel('models3d/alvo_suspenso_sem_cavalete.glb',(err,resource)=>{
+      if(err||holder!==targetRoot||!targetVisual)return;
+      const model=resource.instantiateRenderEntity();
+      model.name='Approved floating target GLB';
+      model.setLocalScale(1.22,1.22,1.22);
+      model.setLocalPosition(0,0,.06);
+      holder.addChild(model);
+      targetVisual.enabled=false; // Fixed mode still displays the stand; floating mode never does.
+      parent.dataset.glbTarget='ready';
+    });
+  }
+  function loadArrowModel(owner){
+    const filename='models3d/flecha_'+houseModelNames[currentHouse]+'.glb';
+    const identity=currentHouse;
+    loadModel(filename,(err,resource)=>{
+      if(err||!owner||owner!==bowRoot||identity!==currentHouse||!arrowLoaded)return;
+      const arrow=arrowLoaded;
+      if(arrow.__mesh3d)arrow.__mesh3d.destroy();
+      const entity=resource.instantiateRenderEntity();
+      entity.name='Approved House arrow GLB';
+      entity.setLocalScale(.42,.42,.42);
+      entity.setLocalEulerAngles(0,180,0); // GLB +Z tip becomes in-game -Z tip.
+      arrow.addChild(entity);
+      for(const child of arrow.children){if(child!==entity)child.enabled=false;}
+      arrow.__mesh3d=entity;
+      parent.dataset.glbArrow='ready';
+    });
+  }
+  function loadBowModel(){
+    const owner=bowRoot,identity=currentHouse;
+    if(!owner)return;
+    if(owner.__mesh3d){owner.__mesh3d.destroy();owner.__mesh3d=null;}
+    for(const child of owner.__fallbacks||[])child.enabled=true;
+    parent.dataset.glbBow='loading';
+    const filename='models3d/arco_'+houseModelNames[identity]+'.glb';
+    loadModel(filename,(err,resource)=>{
+      if(err||owner!==bowRoot||identity!==currentHouse)return;
+      const model=resource.instantiateRenderEntity();
+      model.name='Approved House bow and sight GLB';
+      model.setLocalScale(1,1,1);
+      model.setLocalPosition(-.54,.19,0);
+      model.setLocalEulerAngles(0,180,0);
+      owner.addChild(model);
+      owner.__mesh3d=model;
+      for(const child of owner.__fallbacks||[]){
+        if(child!==arrowLoaded)child.enabled=false;
+      }
+      parent.dataset.glbBow='ready';
+      loadArrowModel(owner);
+    });
   }
 
   function updateBowAim(){
@@ -425,7 +492,17 @@ export function initScene(canvas, getSettings) {
     for(let i=0;i<3;i++){let a=i*Math.PI*2/3;
       tube('projectile feathers '+i,[[0,0,.3],[Math.cos(a)*.09,Math.sin(a)*.09,.21],[0,0,.11]],[.01,.024,.01],i===1?white:red,e,5);
     }
-    root().addChild(e);return e;
+    root().addChild(e);
+    const resource=modelAssets['models3d/flecha_'+houseModelNames[currentHouse]+'.glb'];
+    if(resource){
+      const model=resource.instantiateRenderEntity();
+      model.name='Approved flying arrow GLB';
+      model.setLocalScale(.42,.42,.42);
+      model.setLocalEulerAngles(0,180,0);
+      e.addChild(model);
+      for(const child of e.children){if(child!==model)child.enabled=false;}
+    }
+    return e;
   }
   async function fire({x=.5,y=.45,power:shotPower=1}={}){
     if(destroyed)return;
