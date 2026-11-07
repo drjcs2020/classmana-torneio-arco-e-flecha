@@ -1,6 +1,6 @@
 import {initScene} from './scene-v3.js?v=ballistic27';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=5';
+import {arenaAudio} from './arena-audio.js?v=music28';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
 import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
@@ -509,6 +509,7 @@ async function finishMatch(){
    }
    $('finish-title').textContent=title;$('finish-desc').textContent=desc;
    if(title.includes('VITÓRIA'))arenaAudio.play('victory');
+   else if(rival!==null&&total<rival)arenaAudio.play('defeat');
    renderFinishScore(total,rival===null?'AGUARDANDO':rival);
    $('share-help').textContent='✅ Resultado registrado no servidor do torneio.';
    $('hud-score').textContent=total;$('hud-rival').textContent=rival===null?'—':rival;
@@ -883,8 +884,15 @@ function updateSoundButton(){
  soundButton.setAttribute('aria-pressed',String(on));
  soundButton.setAttribute('aria-label',on?'Desativar sons da arena':'Ativar sons da arena');
 }
-soundButton?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton()});
-updateSoundButton();
+function updateLobbyAudioButton(){
+ const button=$('cm-lobby-sound');if(!button)return;
+ button.textContent=arenaAudio.enabled?'🔊 Música e sons':'🔇 Som desligado';
+ button.setAttribute('aria-pressed',String(arenaAudio.enabled));
+ button.setAttribute('aria-label',arenaAudio.enabled?'Desativar música e efeitos':'Ativar música e efeitos');
+}
+soundButton?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton();updateLobbyAudioButton()});
+$('cm-lobby-sound')?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton();updateLobbyAudioButton()});
+updateSoundButton();updateLobbyAudioButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
 applyEquipment();
 $('mode').addEventListener('change',updateMode);
