@@ -614,7 +614,7 @@ function showOnlineStatus(){
  if($('player'))$('player').disabled=Boolean(identifiedPlayerId);
  const exitBtn=$('cm-end-session');if(exitBtn)exitBtn.hidden=!Boolean(identifiedPlayerId);
  $('online-banner').textContent=active?'🟢 PLACAR ONLINE':online.state==='portal'?'⚔️ ENTRAR NA ARENA ONLINE':'⚠️ TORNEIO ONLINE INDISPONÍVEL';
- $('online-status').textContent=online.state==='portal'?'⚔️ Escolha um desafio para abrir a Arena Online conectada ao Google Sheets.':!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
+ $('online-status').textContent=online.state==='portal'?'⚔️ Escolha um desafio para entrar na Arena Online do ClassMana.':!online.enabled?'⚠️ Desafios online aguardam a configuração do professor.':
   !active&&online.state==='error'?'⚠️ '+(online.lastError||'Não foi possível conectar ao servidor de desafios.'):
   !active?'⏳ Verificando conexão...':user?'✅ Desafios disponíveis. Nenhuma senha ou PIN.':'✅ Placar conectado. Selecione seu nome.';
  $('logout').classList.toggle('hidden',!user);

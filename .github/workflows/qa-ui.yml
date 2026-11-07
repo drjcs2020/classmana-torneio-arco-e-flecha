@@ -56,6 +56,8 @@ jobs:
           node scripts/qa-browser.mjs
       # JSONP e iframe cross-site de Apps Script foram substituídos pelo portal v9.
       # Teste de rede /exec separado: scripts/qa-online.mjs (não cria desafios).
+      - name: Testar dois navegadores independentes, notificações e ranking (dados isolados)
+        run: node scripts/qa-duel-two-browsers.mjs
       - name: Testar do zero os 2 competidores, convite, aceite e 10 disparos
         run: |
           node --check rebuild/api.js
