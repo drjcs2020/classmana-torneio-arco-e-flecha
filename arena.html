@@ -5,6 +5,16 @@
 <meta name="theme-color" content="#d6f9e9">
 <meta name="description" content="Torneio de Arco e Flecha das três Casas ClassMana: Águia Dourada, Leão de Fogo e Dragão de Esmeralda.">
 <title>ClassMana — Arena de Arco e Flecha</title>
+<style id="cm-arena-no-legacy-flash">
+/* A página arena.html nunca pode mostrar a seleção de Reinos do HTML legado. */
+body[data-page="arena"] #view-inicio,
+body[data-page="arena"] #view-inicio.active {
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+}
+body[data-page="arena"] #view-arena.active {
+  visibility:visible!important;
+}
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Cinzel:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
@@ -27,7 +37,7 @@
 </header>
 
 <main>
-<section id="view-inicio" class="view" data-step="reino" aria-label="Página 1 — Preparar o torneio">
+<section id="view-inicio" class="view" aria-hidden="true" inert data-step="reino" aria-label="Página 1 — Preparar o torneio">
  <div class="section-title kingdom-title"><div><small>⚔️ TORNEIO DAS TRÊS CASAS</small><h1>Escolha seu Reino</h1></div><p>3 Casas · 6 arqueiros · 1 grande aventura</p></div>
  <div class="lobby-steps" id="lobby-steps" role="tablist" aria-label="Preparação do torneio">
   <button type="button" class="lobby-step chosen" data-lobby-step="reino" role="tab" aria-selected="true">1 · Reino</button>
