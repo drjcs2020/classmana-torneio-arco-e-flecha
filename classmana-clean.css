@@ -286,3 +286,42 @@ body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select o
  background-color:#175ac6!important;
  color:#ffffff!important;
 }
+
+/* Correção do fluxo de duelo: seleção visível ANTES dos botões de modo. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-player-choice{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ gap:7px!important;position:relative!important;z-index:30!important;
+ width:min(94%,570px)!important;margin:6px auto 14px!important;padding:0!important;
+ background:transparent!important;border:0!important;box-shadow:none!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-player-choice label{
+ display:block!important;color:#fff4c8!important;
+ font:900 clamp(16px,2vw,23px)/1.2 'Cinzel',Georgia,serif!important;
+ text-shadow:0 2px 6px #000,0 0 16px #000!important;letter-spacing:.02em
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-quick-player{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ width:100%!important;max-width:570px!important;min-height:54px!important;
+ padding:10px 40px 10px 16px!important;border:3px solid #ffe099!important;
+ border-radius:13px!important;background:#102e52!important;color:#fff7e0!important;
+ font:800 clamp(16px,1.5vw,20px) 'Nunito',sans-serif!important;
+ box-shadow:0 4px 0 #59401c,0 4px 18px #0008!important;
+ cursor:pointer!important;pointer-events:auto!important
+}
+#cm-quick-player option{background:#102e52!important;color:#fff!important}
+#cm-quick-player:focus-visible,#cm-quick-player.cm-needs-player{
+ outline:3px solid #fff6a1!important;outline-offset:3px!important
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-quick-help{
+ display:block!important;color:#fff3d6!important;line-height:1.2!important;
+ font:800 13px 'Nunito',sans-serif!important;text-shadow:0 2px 5px #000!important;
+ text-align:center!important
+}
+@media(max-width:700px){
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-player-choice{
+  margin:2px auto 8px!important;gap:4px!important
+ }
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-quick-player{
+  min-height:47px!important;font-size:15px!important
+ }
+}
