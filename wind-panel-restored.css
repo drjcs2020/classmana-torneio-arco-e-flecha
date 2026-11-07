@@ -1,0 +1,58 @@
+/* Painel de vento recuperado e independente do HUD de flechas/distância. */
+#view-arena .stage #wind.cm-wind-restored{
+ position:absolute!important;z-index:24!important;
+ top:clamp(115px,16vh,150px)!important;
+ right:clamp(100px,11vw,165px)!important;
+ left:auto!important;bottom:auto!important;
+ transform:none!important;
+ width:clamp(190px,20vw,260px)!important;height:auto!important;min-height:100px!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;gap:6px!important;
+ padding:10px 13px!important;margin:0!important;
+ background:linear-gradient(145deg,rgba(4,26,57,.96),rgba(5,51,82,.96))!important;
+ border:3px solid #efc36d!important;border-radius:16px!important;
+ box-shadow:0 7px 23px #000b,inset 0 0 0 2px #ffd98c45!important;
+ color:#fff2ce!important;pointer-events:none!important;filter:none!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-caption{
+ position:static!important;display:flex!important;align-items:center!important;
+ flex-direction:column!important;gap:2px!important;padding:0!important;margin:0!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-caption span{
+ display:block!important;color:#ffdb8b!important;
+ font:900 13px/1.2 'Nunito',sans-serif!important;letter-spacing:.12em!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-speed{
+ display:block!important;white-space:nowrap!important;
+ font:900 clamp(21px,2.15vw,29px)/1.15 'Nunito',sans-serif!important;
+ color:#fff8dc!important;text-shadow:0 2px 5px #000!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-main{
+ position:static!important;display:flex!important;flex-direction:row!important;
+ align-items:center!important;justify-content:center!important;
+ gap:9px!important;padding:0!important;width:100%!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-arrow{
+ display:block!important;width:50px!important;height:28px!important;
+ color:#ffe28a!important;flex:none!important;
+ transform:none!important;transition:transform .2s ease!important;
+}
+#view-arena .stage #wind.cm-wind-restored.wind-left .wind-arrow{
+ transform:rotate(180deg)!important;
+}
+#view-arena .stage #wind.cm-wind-restored.wind-calm .wind-arrow{opacity:.35!important}
+#view-arena .stage #wind.cm-wind-restored .wind-direction-text{
+ display:block!important;font:900 12px/1.25 'Nunito',sans-serif!important;
+ color:#ffdf91!important;text-shadow:0 1px 4px #000!important;
+}
+@media(max-width:760px){
+ #view-arena .stage #wind.cm-wind-restored{
+  top:clamp(85px,18vh,135px)!important;right:70px!important;
+  width:160px!important;min-height:76px!important;padding:5px 8px!important;gap:3px!important;
+  border-width:2px!important;
+ }
+ #view-arena .stage #wind.cm-wind-restored .wind-caption span{font-size:10px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-speed{font-size:17px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-arrow{width:31px!important;height:19px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-direction-text{font-size:9px!important}
+}
