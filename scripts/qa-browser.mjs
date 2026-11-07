@@ -42,6 +42,12 @@ try{
  await desktop.locator('#cm-identity-player').selectOption('B01');
  await desktop.locator('#cm-confirm-identity').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
+ await desktop.reload({waitUntil:'domcontentloaded'});
+ assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'reino','Reload must end previous pupil session');
+ await desktop.locator('button.house[data-house="B"]').click();
+ await desktop.locator('#cm-identity-player').selectOption('B01');
+ await desktop.locator('#cm-confirm-identity').click();
+ assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
  assert.equal(await desktop.locator('button.house[data-house="B"]').getAttribute('aria-pressed'),'true');
  const panelsHero=await desktop.evaluate(()=>['.studio-character','.studio-equipment','.studio-carousel'].map(selector=>{
  const style=getComputedStyle(document.querySelector(selector));return {selector,background:style.backgroundImage,color:style.backgroundColor};
@@ -58,6 +64,16 @@ await shot(desktop,'02-arqueiro-desktop');
  const duelPanels=await desktop.evaluate(()=>[...document.querySelectorAll('.cm-duel-mode[data-play-mode]')].map(x=>getComputedStyle(x).backgroundImage));
 assert(duelPanels.every(x=>x==='none'),'Botões ilustrados não podem ter painéis atrás');
 assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut not visible');
+ const tileSizes=await desktop.locator('.cm-duel-mode').evaluateAll(els=>els.map(el=>{
+  const r=el.getBoundingClientRect();return {w:r.width,h:r.height};
+ }));
+ assert.equal(tileSizes.length,6,'Expected five play modes and ranking');
+ assert(Math.max(...tileSizes.map(x=>x.h))-Math.min(...tileSizes.map(x=>x.h))<2,'Tiles must have the same height');
+ assert(Math.max(...tileSizes.map(x=>x.w))-Math.min(...tileSizes.map(x=>x.w))<2,'Tiles must have the same width');
+ await desktop.locator('#cm-ranking-choice').click();
+ assert(await desktop.locator('#view-ranking.active').isVisible(),'Ranking button must open the standings');
+ await desktop.locator('#rank-play').click();
+ assert(await desktop.locator('#view-inicio.active').isVisible(),'Closing ranking must return to game');
 await shot(desktop,'03-desafio-desktop');
  await desktop.locator('[data-play-mode="bot"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'partida');
