@@ -626,8 +626,10 @@ function renderInbox(){
   const item=document.createElement('article');item.className='cm-challenge';
   const title=document.createElement('strong');title.textContent=(mine?'📤 Você desafiou ':'🔔 Você foi desafiado por ')+opponent.name;
   const type={mesma_turma:'Mesma turma',entre_equipes:'Entre equipes',interclasses:'Interclasses'}[ch.kind]||ch.kind;
-  const sub=document.createElement('small');sub.textContent=type+' · '+ch.status+' · '+new Date(ch.created).toLocaleDateString('pt-BR');
-  const desc=document.createElement('p');desc.textContent=score===null?
+  const statusLabel={CRIADOR_JOGANDO:'Aguardando suas cinco flechas',PENDENTE:'Convite enviado — aguardando resposta',ACEITO:'Desafio aceito',RECUSADO:'Desafio recusado',CONCLUIDO:'Duelo concluído'}[ch.status]||ch.status;
+  const sub=document.createElement('small');sub.textContent=type+' · '+statusLabel+' · '+new Date(ch.created).toLocaleDateString('pt-BR');
+  const desc=document.createElement('p');desc.textContent=ch.status==='CRIADOR_JOGANDO'&&mine?
+    'Complete suas 5 flechas para liberar o convite ao colega.':score===null?
     'Pontuação inicial ainda não enviada.':
     'Pontuação do primeiro arqueiro: '+score+' pontos (5 flechas).';
   if(cmAlertable(ch,online.user?.id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch))item.classList.add('cm-challenge-new');
