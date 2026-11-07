@@ -39,7 +39,7 @@ assert(game.includes('cm_active_archery_match_v1'),'Match handoff missing');
 assert(game.includes('mountSpriteHUD'),'Visual HUD hookup missing');
 assert(read('scene-v3.js').includes('projectile.lookAt'),'Arrow pitch update missing');
 assert(read('sprite-hud.js').includes('onPowerRelease'),'Shot release HUD missing');
-assert(read('arena-audio.js').includes('function musicTick'),'Audio engine missing');
+assert(read('arena-audio.js').includes('const bgm=new Audio(MUSIC_FILE)'),'Approved MP3 player missing');
 assert(client.includes("Number(ping.api)!==10"),'Current API v10 check missing');
 assert(game.includes('online.ranking()'),'Real ranking request missing');
 for(const imp of [...game.matchAll(/from '\.\/(.*?)'/g)])
