@@ -738,7 +738,8 @@ async function startOnlineClient(){
   const request=new URLSearchParams(location.search);
   // A session remains bound to the same student until the explicit logout button is used.
   const sessionId=cmSessionId();
-  if(document.body.dataset.page==='lobby'&&online.user&&online.user.id===sessionId){
+  if(document.body.dataset.page==='lobby'&&/^[ABC][0-9]{2}$/.test(sessionId)&&(!online.user||online.user.id===sessionId)){
+   if(!online.user){try{await online.login(sessionId)}catch(err){console.warn('Não foi possível reconectar o aluno:',err);cmForgetStudent();return;}}
    identifiedPlayerId=sessionId;
    selectHouse(sessionId[0]);fillPlayer(sessionId);populateIdentityOptions();
    $('player').value=sessionId;$('player').disabled=true;updateMode();
