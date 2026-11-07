@@ -177,6 +177,14 @@ await shot(desktop,'04-preparar-desktop');
  await shot(desktop,'04b-desafiar-equipe-desktop');
  await desktop.locator('#mode').selectOption('bot');
  await desktop.locator('#start-game').click();
+ await desktop.locator('#cm-vs-overlay').waitFor({timeout:15000});
+ assert.equal(await desktop.locator('.cm-vs-fighter').count(),2,'VS screen requires two comic archer portraits');
+ assert.equal(await desktop.locator('.cm-ember').count(),22,'VS embers must rise with real animated elements');
+ await shot(desktop,'04c-versus-gibi-desktop');
+ await desktop.locator('#cm-vs-cancel').click();
+ assert.equal(await desktop.locator('#cm-vs-overlay').count(),0,'Cancel must return to setup');
+ await desktop.locator('#start-game').click();
+ await desktop.locator('#cm-vs-start').click();
  await desktop.waitForURL('**/arena.html',{timeout:18000});
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
  await desktop.waitForTimeout(600);
@@ -189,6 +197,16 @@ await shot(desktop,'04-preparar-desktop');
  assert(desktopWind&&desktopWind.x<55&&desktopWind.y>=200&&desktopWind.width<=190,
   'Wind gauge must be compact below arrows at the left edge: '+JSON.stringify(desktopWind));
  assert.equal(await desktop.locator('#stage').getAttribute('data-level'),'lendario');
+ await desktop.evaluate(async()=>{
+  const {cinematics}=await import('./classmana-cinematics.js?v=cinema44');
+  cinematics.resultView({player:'Jogador Teste',house:'A',rival:'Robô',rivalHouse:'C',
+   ownShots:[9,8,7,6,10],rivalShots:[7,7,8,5,6],opponent:33});
+ });
+ assert.equal(await desktop.locator('#finish .cm-final-player').count(),2,
+  'Comic result must present two character cards');
+ assert.equal(await desktop.locator('#finish .cm-final-shots span').count(),10,
+  'Comic result must display all ten shots without modifying backend');
+ await shot(desktop,'05a-resultado-gibi-render');
  await shot(desktop,'05-arena-desktop');
 await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});
 await desktop.locator('#view-arena.active').waitFor({timeout:12000});
@@ -252,6 +270,9 @@ if(engine==='playcanvas'){
  assert(fields.every(x=>x.width>=300&&x.height>=40),'Mobile preparation fields must be full-width and legible: '+JSON.stringify(fields));
  await shot(mobile,'09-preparar-mobile');
  await mobile.locator('#start-game').click();
+ await mobile.locator('#cm-vs-overlay').waitFor({timeout:15000});
+ await shot(mobile,'09b-versus-gibi-mobile');
+ await mobile.locator('#cm-vs-start').click();
  await mobile.waitForURL('**/arena.html',{timeout:18000});
  await mobile.locator('#view-arena.active').waitFor({timeout:12000});
  await mobile.waitForFunction(()=>document.querySelector('#stage')?.dataset.glbTarget==='ready',null,{timeout:20000});
