@@ -59,3 +59,34 @@
 #finish.cm-cinematic-result .cm-score-cell{background:linear-gradient(155deg,#0b315e,#061530)!important;color:#fff3ce!important;border:3px ridge #d7a64e!important;border-radius:11px!important;box-shadow:0 4px 10px #0006!important;padding:9px!important}
 #finish.cm-cinematic-result .cm-score-label,#finish.cm-cinematic-result .cm-score-unit{color:#f7d897!important}
 #finish.cm-cinematic-result .cm-score-value{color:#ffe5ac!important;font:900 clamp(26px,3.2vw,44px)/1 Georgia,serif!important}
+
+/* House-aware rising embers in the playable landscape and opening.
+   These are visual particles, not background screenshot layers. */
+#view-inicio, #stage{isolation:isolate}
+#view-inicio > .cm-ambient-embers{
+ position:absolute!important;inset:0!important;z-index:2!important;
+ opacity:.68;pointer-events:none!important;overflow:hidden!important;
+}
+#stage > .cm-ambient-embers{
+ position:absolute!important;inset:0!important;z-index:5!important;
+ opacity:.46;pointer-events:none!important;overflow:hidden!important;
+}
+.cm-ambient-embers .cm-ember{
+ will-change:transform,opacity;
+}
+#view-inicio[data-house="B"] > .cm-ambient-embers{
+ opacity:.91;
+}
+#stage.house-b > .cm-ambient-embers{opacity:.68}
+#view-inicio[data-house="A"] > .cm-ambient-embers,
+#stage.house-a > .cm-ambient-embers{opacity:.54}
+#view-inicio[data-house="C"] > .cm-ambient-embers,
+#stage.house-c > .cm-ambient-embers{opacity:.62}
+@media(max-width:680px){
+ #view-inicio > .cm-ambient-embers,
+ #stage > .cm-ambient-embers{opacity:.4}
+}
+@media(prefers-reduced-motion:reduce){
+ #view-inicio > .cm-ambient-embers,
+ #stage > .cm-ambient-embers{display:none!important}
+}
