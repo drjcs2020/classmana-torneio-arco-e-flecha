@@ -615,51 +615,95 @@ async function loginStudent(){
  }catch(error){toast('⚠️ Não foi possível selecionar o perfil: '+error.message);return null;}
 }
 function renderInbox(){
- const list=$('inbox-list');list.innerHTML='';
- $('inbox-status').textContent=online.user?
-  'Os desafios ficam gravados. Você pode aceitar hoje ou em outra data; os cinco disparos do adversário serão reproduzidos.':
-  'Selecione seu nome na lista para consultar os desafios recebidos.';
- if(!onlineInbox.length){list.innerHTML='<div class="empty">Nenhum desafio para este perfil.</div>';return;}
- // Separate received invitations from sent challenges: neither is a self-challenge.
- const mineId=online.user?.id;
- const received=onlineInbox.filter(c=>c.recipient?.id===mineId&&c.creator?.id!==mineId);
- const sent=onlineInbox.filter(c=>c.creator?.id===mineId&&c.recipient?.id!==mineId);
- for(const [group,items] of [['🔔 RECEBIDOS',received],['🏹 ENVIADOS',sent]]){
-  const heading=document.createElement('h3');heading.className='cm-inbox-group';
-  heading.textContent=group+' ('+items.length+')';list.appendChild(heading);
-  if(!items.length){const empty=document.createElement('p');empty.className='cm-inbox-empty';empty.textContent=group.includes('RECEBIDOS')?'Nenhum desafio recebido.':'Nenhum desafio enviado.';list.appendChild(empty)}
-  for(const ch of items){
-  if(ch.creator?.id===ch.recipient?.id)continue; // Never display a self-challenge.
-  const opponent=ch.creator.id===online.user?.id?ch.recipient:ch.creator;
-  const mine=ch.creator.id===online.user?.id,score=mine?ch.creatorScore:ch.creatorScore;
-  const item=document.createElement('article');item.className='cm-challenge';
-  const title=document.createElement('strong');title.textContent=(mine?'📤 Você desafiou ':'🔔 Você foi desafiado por ')+opponent.name;
-  const type={mesma_turma:'Mesma turma',entre_equipes:'Entre equipes',interclasses:'Interclasses'}[ch.kind]||ch.kind;
-  const statusLabel={CRIADOR_JOGANDO:'Aguardando suas cinco flechas',PENDENTE:'Convite enviado — aguardando resposta',ACEITO:'Desafio aceito',RECUSADO:'Desafio recusado',CONCLUIDO:'Duelo concluído'}[ch.status]||ch.status;
-  const sub=document.createElement('small');sub.textContent=type+' · '+statusLabel+' · '+new Date(ch.created).toLocaleDateString('pt-BR');
-  const desc=document.createElement('p');desc.textContent=ch.status==='CRIADOR_JOGANDO'&&mine?
-    'Complete suas 5 flechas para liberar o convite ao colega.':score===null?
-    'Pontuação inicial ainda não enviada.':
-    'Pontuação do primeiro arqueiro: '+score+' pontos (5 flechas).';
-  if(cmAlertable(ch,online.user?.id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch))item.classList.add('cm-challenge-new');
-  item.append(title,sub,desc);
-  const buttons=document.createElement('div');buttons.className='cm-challenge-actions';
-  function action(label,kind,reject=false){
-   const b=document.createElement('button');b.type='button';b.className='cm-challenge-btn'+(reject?' reject':'');
-   b.textContent=label;b.dataset.id=ch.id;b.dataset.action=kind;buttons.appendChild(b);
-  }
-  if(!mine&&ch.status==='PENDENTE'){action('✅ ACEITAR DESAFIO','accept');action('❌ RECUSAR','decline',true)}
-  else if(!mine&&ch.status==='ACEITO'){action('🏹 JOGAR MINHAS 5 FLECHAS','play')}
-  else if(mine&&ch.status==='CRIADOR_JOGANDO'){action('🏹 RETOMAR MINHA RODADA','play')}
-  else if(ch.status==='CONCLUIDO'){
-   const result=document.createElement('p');
-   const own=mine?ch.creatorScore:ch.recipientScore,other=mine?ch.recipientScore:ch.creatorScore;
-   result.textContent='🏆 Resultado oficial: '+own+' × '+other+' pontos. '+(own>other?'Vitória!':own===other?'Empate!':'Derrota.');
-   item.appendChild(result);
-  }else{const state=document.createElement('small');state.textContent=ch.status==='PENDENTE'?'⏳ Aguardando o colega responder.':ch.status==='RECUSADO'?'🚫 Convite recusado.':'⏳ Aguardando a rodada do adversário.';item.appendChild(state)}
-  if(buttons.children.length)item.appendChild(buttons);list.appendChild(item);
-  }
+ const list=$('inbox-list');if(!list)return;
+ list.replaceChildren();
+ const id=online.user?.id;
+ $('inbox-status').textContent=id?
+  'Seus desafios em aberto aparecem primeiro. Resultados anteriores ficam no histórico.':
+  'Escolha um jogador para consultar os desafios.';
+ if(!id){list.innerHTML='<div class="empty">Selecione seu jogador.</div>';return}
+ const rows=onlineInbox.filter(ch=>ch?.id&&ch.creator?.id!==ch.recipient?.id&&
+   (ch.creator?.id===id||ch.recipient?.id===id));
+ const finished=rows.filter(ch=>ch.status==='CONCLUIDO');
+ const archived=rows.filter(ch=>ch.status==='RECUSADO');
+ const open=rows.filter(ch=>!['CONCLUIDO','RECUSADO'].includes(ch.status));
+ const score=(ch,mine)=>Number(mine?ch.creatorScore:ch.recipientScore);
+ const otherScore=(ch,mine)=>Number(mine?ch.recipientScore:ch.creatorScore);
+ const wins=finished.filter(ch=>{const mine=ch.creator.id===id;return score(ch,mine)>otherScore(ch,mine)}).length;
+ const losses=finished.filter(ch=>{const mine=ch.creator.id===id;return score(ch,mine)<otherScore(ch,mine)}).length;
+ const draws=finished.length-wins-losses;
+ const summary=document.createElement('div');summary.className='cm-duel-summary';
+ for(const [name,count,cls] of [['Em aberto',open.length,'open'],['Vitórias',wins,'win'],['Derrotas',losses,'loss'],['Empates',draws,'draw']]){
+  const cell=document.createElement('div');cell.className='cm-duel-stat cm-stat-'+cls;
+  const n=document.createElement('strong');n.textContent=String(count);
+  const label=document.createElement('span');label.textContent=name;cell.append(n,label);summary.appendChild(cell);
  }
+ list.appendChild(summary);
+ const priority={PENDENTE:0,ACEITO:1,CRIADOR_JOGANDO:2};
+ const time=ch=>Date.parse(ch.created)||0;
+ open.sort((a,b)=>(priority[a.status]??3)-(priority[b.status]??3)||time(b)-time(a));
+ finished.sort((a,b)=>time(b)-time(a));archived.sort((a,b)=>time(b)-time(a));
+ function card(ch){
+  const mine=ch.creator.id===id,opponent=mine?ch.recipient:ch.creator;
+  const item=document.createElement('article');item.className='cm-challenge';
+  if(ch.status==='CONCLUIDO'){
+   const own=score(ch,mine),other=otherScore(ch,mine);
+   item.classList.add(own>other?'cm-duel-win':own<other?'cm-duel-loss':'cm-duel-draw');
+  }else if(ch.status==='RECUSADO'){item.classList.add('cm-duel-declined')}
+  else{item.classList.add('cm-duel-open')}
+  if(cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch))item.classList.add('cm-challenge-new');
+  const title=document.createElement('strong');title.textContent=(mine?'📤 Você desafiou ':'🔔 Você foi desafiado por ')+(opponent?.name||'Colega');
+  const type={mesma_turma:'Mesma turma',entre_equipes:'Entre equipes',interclasses:'Interclasses'}[ch.kind]||ch.kind;
+  const statusLabel={CRIADOR_JOGANDO:'Termine suas 5 flechas',PENDENTE:'Aguardando aceite',ACEITO:'Desafio aceito',RECUSADO:'Recusado',CONCLUIDO:'Concluído'}[ch.status]||ch.status;
+  const sub=document.createElement('small');sub.textContent=type+' · '+statusLabel+' · '+new Date(ch.created).toLocaleDateString('pt-BR');
+  item.append(title,sub);
+  if(ch.status==='CONCLUIDO'){
+   const own=score(ch,mine),other=otherScore(ch,mine);
+   const result=document.createElement('p');result.className='cm-duel-result';
+   result.textContent=(own>other?'🏆 VITÓRIA':own<other?'⚔️ DERROTA':'🤝 EMPATE')+' · '+own+' × '+other+' pontos';
+   item.appendChild(result);
+  }else{
+   const desc=document.createElement('p');
+   desc.textContent=ch.status==='CRIADOR_JOGANDO'&&mine?'Faça suas cinco flechas para enviar o convite.':
+     ch.status==='PENDENTE'&&mine?'Seu colega já pode aceitar o desafio.':
+     ch.status==='PENDENTE'?'Você recebeu um convite. Aceite ou recuse.':
+     ch.status==='ACEITO'&&mine?'Aguardando a rodada do colega.':
+     ch.status==='ACEITO'?'Sua rodada está disponível.':'Convite recusado.';
+   item.appendChild(desc);
+  }
+  const actions=document.createElement('div');actions.className='cm-challenge-actions';
+  function action(label,kind,reject=false){
+   const button=document.createElement('button');button.type='button';button.className='cm-challenge-btn'+(reject?' reject':'');
+   button.textContent=label;button.dataset.id=ch.id;button.dataset.action=kind;actions.appendChild(button);
+  }
+  if(!mine&&ch.status==='PENDENTE'){action('✅ ACEITAR','accept');action('❌ RECUSAR','decline',true)}
+  else if(!mine&&ch.status==='ACEITO')action('🏹 JOGAR MINHAS 5 FLECHAS','play');
+  else if(mine&&ch.status==='CRIADOR_JOGANDO')action('🏹 RETOMAR MINHA RODADA','play');
+  if(actions.childElementCount)item.appendChild(actions);
+  return item;
+ }
+ function heading(text,count){
+  const h=document.createElement('h3');h.className='cm-inbox-group';h.textContent=text+' ('+count+')';return h;
+ }
+ const openSection=document.createElement('section');openSection.className='cm-inbox-section';
+ openSection.appendChild(heading('⚔️ DESAFIOS EM ABERTO',open.length));
+ if(!open.length){const note=document.createElement('p');note.className='cm-inbox-empty';note.textContent='Nenhum desafio em aberto.';openSection.appendChild(note)}
+ for(const [label,predicate] of [
+  ['🔔 Recebidos',ch=>ch.recipient?.id===id],
+  ['🏹 Propostos',ch=>ch.creator?.id===id]]){
+  const items=open.filter(predicate);
+  openSection.appendChild(heading(label,items.length));
+  for(const ch of items)openSection.appendChild(card(ch));
+ }
+ list.appendChild(openSection);
+ const history=document.createElement('details');history.className='cm-duel-history';
+ const historyTitle=document.createElement('summary');historyTitle.textContent='📜 HISTÓRICO — '+finished.length+' concluídos · '+archived.length+' recusados';
+ history.appendChild(historyTitle);
+ for(const [label,items] of [['✅ Duelos concluídos',finished],['🚫 Convites recusados',archived]]){
+  history.appendChild(heading(label,items.length));
+  for(const ch of items)history.appendChild(card(ch));
+ }
+ list.appendChild(history);
 }
 const CM_NOTICES_PREFIX='cm-duel-notices-v2-';
 let cmNoticePlayer='',cmNoticeSnapshot={};
