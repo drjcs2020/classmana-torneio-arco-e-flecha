@@ -22,6 +22,22 @@ try{
  desktop.on('pageerror',e=>errors.push('desktop: '+e.message));
  await desktop.goto(base,{waitUntil:'domcontentloaded'});await desktop.waitForTimeout(750);
  assert.equal(await desktop.locator('body').getAttribute('data-page'),'lobby');
+ const musicResponse=await desktop.request.get(base+'assets/sounds/kulakovka-epic-medieval-614879.mp3');
+ assert.equal(musicResponse.status(),200,'Official MP3 must be accessible');
+ const logoResponse=await desktop.request.get(base+'assets/images/logo-classmana-oficial.webp');
+ assert.equal(logoResponse.status(),200,'Official ClassMana logo must load');
+ await desktop.locator('#cm-lobby-sound').click();
+ await desktop.waitForFunction(async()=>{
+  const mod=await import('./arena-audio.js?v=revision32media1');
+  return mod.arenaAudio.musicState.playing;
+ },null,{timeout:8000});
+ await desktop.waitForTimeout(750);
+ const soundtrack=await desktop.evaluate(async()=>{
+  const mod=await import('./arena-audio.js?v=revision32media1');
+  return mod.arenaAudio.musicState;
+ });
+ assert(soundtrack.volume>=.20,'Lobby soundtrack must have audible volume');
+ assert(soundtrack.source.includes('kulakovka-epic-medieval-614879.mp3'),'Wrong soundtrack loaded');
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'reino','Must open on house selection');
  assert.equal(await desktop.locator('#cm-main-menu').count(),0,'Deprecated intro screen must not be rendered');
  await verifyPicture(desktop,'.cm-house-title');
@@ -40,6 +56,9 @@ try{
  await desktop.locator('button.house[data-house="B"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'perfil');
  await desktop.locator('#cm-identity-player').selectOption('B01');
+ await verifyPicture(desktop,'.cm-identity-logo');
+ const logoDimensions=await desktop.locator('.cm-identity-logo').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight}));
+ assert(logoDimensions.width>=1300&&logoDimensions.height>=480,'ClassMana logo is low-resolution');
  await desktop.locator('#cm-confirm-identity').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
  await desktop.reload({waitUntil:'domcontentloaded'});
