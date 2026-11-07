@@ -22,6 +22,10 @@ try{
  desktop.on('pageerror',e=>errors.push('desktop: '+e.message));
  await desktop.goto(base,{waitUntil:'domcontentloaded'});await desktop.waitForTimeout(750);
  assert.equal(await desktop.locator('body').getAttribute('data-page'),'lobby');
+ await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').first().waitFor();
+ assert.equal(await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').count(),26,
+  'Lobby must display genuine animated embers, not a static screenshot');
+ await desktop.locator('button.house[data-house="B"]').first().waitFor();
  const musicResponse=await desktop.request.get(base+'assets/sounds/kulakovka-epic-medieval-614879.mp3');
  assert.equal(musicResponse.status(),200,'Official MP3 must be accessible');
  const logoResponse=await desktop.request.get(base+'assets/images/logo-classmana-oficial.webp');
@@ -179,7 +183,8 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#start-game').click();
  await desktop.locator('#cm-vs-overlay').waitFor({timeout:15000});
  assert.equal(await desktop.locator('.cm-vs-fighter').count(),2,'VS screen requires two comic archer portraits');
- assert.equal(await desktop.locator('.cm-ember').count(),22,'VS embers must rise with real animated elements');
+ assert.equal(await desktop.locator('#cm-vs-overlay .cm-ember').count(),22,
+  'VS embers must rise with real animated elements');
  await desktop.waitForTimeout(950);
  await shot(desktop,'04c-versus-gibi-desktop');
  await desktop.locator('#cm-vs-cancel').click();
@@ -190,6 +195,8 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
  await desktop.waitForTimeout(600);
  assert(await desktop.locator('#world').isVisible());
+ assert.equal(await desktop.locator('#stage > .cm-ambient-embers .cm-ember').count(),20,
+  'Arena must have visible, non-interactive rising embers');
  await desktop.waitForFunction(()=>document.body.classList.contains('cm-art-on'),null,{timeout:11000});
  const backBox=await desktop.locator('#leave-arena').boundingBox();
  assert(backBox&&backBox.x<100&&backBox.y<100&&backBox.width>=110&&backBox.height>=50,
