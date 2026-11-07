@@ -205,6 +205,13 @@ await shot(desktop,'04-preparar-desktop');
   document.querySelector('#finish-desc').textContent='Resultado de demonstração visual. Nenhum dado foi salvo.';
   cinematics.resultView({player:'Jogador Teste',house:'A',rival:'Robô',rivalHouse:'C',
    ownShots:[9,8,7,6,10],rivalShots:[7,7,8,5,6],opponent:33});
+  const scores=document.querySelector('#finish-results');scores.replaceChildren();scores.classList.add('cm-score-grid');
+  for(const [label,pts] of [['VOCÊ',40],['ROBÔ',33]]){
+    const cell=document.createElement('div');cell.className='cm-score-cell';
+    const top=document.createElement('span');top.className='cm-score-label';top.textContent=label;
+    const score=document.createElement('strong');score.className='cm-score-value';score.textContent=String(pts);
+    cell.append(top,score);scores.append(cell);
+  }
  });
  assert.equal(await desktop.locator('#finish .cm-final-player').count(),2,
   'Comic result must present two character cards');
