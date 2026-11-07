@@ -59,6 +59,13 @@ function cmSessionId(){try{return sessionStorage.getItem(CM_ACTIVE_STUDENT)||''}
 function cmSaveStudent(id){try{sessionStorage.setItem(CM_ACTIVE_STUDENT,id)}catch{}}
 function cmForgetStudent(){try{sessionStorage.removeItem(CM_ACTIVE_STUDENT);sessionStorage.removeItem('cm_active_archery_match_v1')}catch{}}
 const TEAMS=window.CLASSMANA_TEAMS||{};
+const cmNavigationType=performance.getEntriesByType('navigation')[0]?.type;
+const cmIsLobby=document.body.dataset.page==='lobby';
+const cmResumeSameStudent=cmIsLobby&&cmCanContinue();
+if(cmIsLobby&&!cmResumeSameStudent){online.logout();cmForgetStudent();}
+if(document.body.dataset.page==='arena'&&cmNavigationType==='reload'){
+ online.logout();cmForgetStudent();location.replace('./');
+}
 
 const rand=(a,b)=>a+Math.random()*(b-a);
 function safeRead(){try{const a=JSON.parse(localStorage.getItem('classmana-archery-v2'));return Array.isArray(a)?a.filter(x=>x&&typeof x==='object').slice(-150):[]}catch{return []}}
@@ -829,7 +836,7 @@ async function startOnlineClient(){
   const request=new URLSearchParams(location.search);
   // Only a deliberate return from the arena preserves identity.
   // Reloading or reopening the lobby always releases the prior student's account.
-  const sessionId=cmCanContinue()?cmSessionId():'';
+  const sessionId=cmResumeSameStudent?cmSessionId():'';
   if(document.body.dataset.page==='lobby'&&!sessionId){
    online.logout();cmForgetStudent();identifiedPlayerId='';
    $('player').disabled=false;$('player').value='guest';
