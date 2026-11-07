@@ -1,0 +1,52 @@
+/* Arena HUD — compact wind indicator anchored to the periphery.
+   Prevents overlaying targets, bows and the strength control. */
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored{
+ position:absolute!important;
+ z-index:24!important;
+ top:clamp(239px,32vh,276px)!important;
+ left:clamp(9px,1.3vw,24px)!important;
+ right:auto!important;bottom:auto!important;
+ width:clamp(150px,14vw,185px)!important;
+ height:clamp(71px,9vh,82px)!important;min-width:0!important;min-height:0!important;
+ box-sizing:border-box!important;max-width:185px!important;
+ padding:5px 9px!important;gap:2px!important;margin:0!important;
+ background:linear-gradient(145deg,rgba(8,40,79,.95),rgba(6,29,66,.97))!important;
+ border:3px ridge #eabd68!important;border-radius:12px!important;
+ box-shadow:0 5px 13px #0009,inset 0 0 0 2px #efdba841!important;
+ pointer-events:none!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-caption{
+ display:flex!important;flex-direction:row!important;
+ align-items:center!important;justify-content:center!important;gap:8px!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-caption span{
+ font-size:10px!important;letter-spacing:.06em!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-speed{
+ font-size:clamp(15px,1.35vw,19px)!important;line-height:1!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-main{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;width:auto!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-arrow{
+ width:27px!important;height:17px!important;flex:0 0 27px!important;
+}
+body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-direction-text{
+ font-size:9px!important;line-height:1.1!important;
+}
+@media(max-width:760px){
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored{
+  top:auto!important;right:auto!important;left:8px!important;bottom:120px!important;
+  width:clamp(112px,32vw,134px)!important;max-width:134px!important;
+  height:64px!important;min-height:0!important;
+  padding:4px 5px!important;gap:1px!important;border-width:2px!important;
+ }
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-caption{
+  gap:3px!important;
+ }
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-caption span{font-size:9px!important}
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-speed{font-size:13px!important}
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-arrow{width:21px!important;height:13px!important;flex-basis:21px!important}
+ body[data-page="arena"] #view-arena .stage #wind.cm-wind-restored .wind-direction-text{font-size:8px!important}
+}
