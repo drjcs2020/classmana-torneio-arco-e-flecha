@@ -19,3 +19,13 @@
 @media(prefers-reduced-motion:reduce){
  #open-inbox.cm-bell-alert{animation:none!important}
 }
+#online-inbox .cm-inbox-group{
+ margin:18px 0 10px!important;padding:10px 14px!important;
+ color:#ffe4a1!important;background:#163a4b!important;
+ border:2px solid #b48a3e!important;border-radius:12px!important;
+ font:900 17px/1.25 'Nunito',sans-serif!important;
+}
+#online-inbox .cm-inbox-empty{
+ margin:0 0 10px!important;padding:10px 14px!important;color:#345067!important;
+ font:700 14px/1.4 'Nunito',sans-serif!important;
+}
