@@ -100,3 +100,103 @@
  #view-inicio > .cm-ambient-embers{opacity:.76!important}
  #stage > .cm-ambient-embers{opacity:.59!important}
 }
+
+/* VS v49 — shorter, centered illustrated duel cards.
+   Names are abbreviated; cards should emphasize the character, not empty panel area. */
+.cm-vs-shell{
+ width:min(100%,860px)!important;
+ gap:clamp(8px,1.4vh,14px)!important;
+}
+.cm-vs-fighters{
+ width:min(100%,770px)!important;
+ grid-template-columns:minmax(0,1fr) clamp(55px,9vw,100px) minmax(0,1fr)!important;
+ gap:clamp(8px,1.6vw,17px)!important;
+ margin:0 auto!important;
+}
+.cm-vs-fighter{
+ width:100%!important;
+ max-width:320px!important;
+ height:clamp(235px,45vh,345px)!important;
+ max-height:345px!important;
+ justify-self:center!important;
+ border:4px ridge #f6ca6a!important;
+ border-radius:17px!important;
+ box-shadow:0 0 0 2px #132d4b,0 9px 25px #000c,inset 0 0 22px #ffe5aa23!important;
+}
+.cm-vs-fighter img{
+ box-sizing:border-box!important;
+ display:block!important;
+ width:100%!important;
+ height:calc(100% - 70px)!important;
+ flex:1 1 auto!important;
+ min-height:0!important;
+ object-fit:cover!important;
+ object-position:center 32%!important;
+ background:radial-gradient(ellipse at center,#4273c54d,#03132b 78%)!important;
+}
+.cm-vs-fighter[data-house="B"] img{background:radial-gradient(ellipse at center,#e360354c,#2a091c 78%)!important}
+.cm-vs-fighter[data-house="C"] img{background:radial-gradient(ellipse at center,#3bb58b55,#042b27 78%)!important}
+.cm-vs-fighter-info{
+ padding:8px 7px 10px!important;
+ min-height:65px!important;
+ border-top:3px solid #edc571!important;
+ box-shadow:0 -7px 17px #051326b9!important;
+}
+.cm-vs-fighter-info strong{
+ font:900 clamp(15px,1.6vw,21px)/1.15 Georgia,serif!important;
+ letter-spacing:.015em!important;
+}
+.cm-vs-fighter-info small{
+ margin-top:4px!important;
+ font-size:clamp(9px,.9vw,12px)!important;
+ white-space:normal!important;
+}
+.cm-vs-mark{
+ font-size:clamp(44px,6.8vw,79px)!important;
+}
+.cm-vs-title{
+ width:min(94%,550px)!important;
+ padding:9px 16px!important;
+ font-size:clamp(20px,2.65vw,32px)!important;
+}
+.cm-vs-sub{font-size:clamp(11px,1.15vw,14px)!important}
+.cm-vs-actions{gap:10px!important}
+.cm-vs-actions button{
+ min-height:46px!important;
+ padding:8px 19px!important;
+ font-size:clamp(14px,1.45vw,19px)!important;
+}
+@media(max-width:680px){
+ .cm-vs-overlay{padding:7px!important}
+ .cm-vs-shell{gap:8px!important}
+ .cm-vs-fighters{
+  width:100%!important;
+  grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr)!important;
+  gap:5px!important;
+ }
+ .cm-vs-fighter{
+  min-width:0!important;
+  height:clamp(205px,37vh,260px)!important;
+  max-height:260px!important;
+  border-width:3px!important;
+  border-radius:12px!important;
+ }
+ .cm-vs-fighter img{
+  height:calc(100% - 61px)!important;
+  object-position:center 30%!important;
+ }
+ .cm-vs-fighter-info{
+  min-height:59px!important;
+  padding:7px 3px!important;
+ }
+ .cm-vs-fighter-info strong{font-size:clamp(12px,3.5vw,16px)!important}
+ .cm-vs-fighter-info small{font-size:9px!important}
+ .cm-vs-mark{font-size:36px!important}
+ .cm-vs-title{font-size:clamp(18px,5vw,23px)!important}
+ .cm-vs-actions button{min-height:43px!important;padding:8px 11px!important;font-size:13px!important}
+}
+@media(max-height:600px) and (min-width:681px){
+ .cm-vs-fighter{height:clamp(195px,43vh,260px)!important}
+ .cm-vs-shell{gap:6px!important}
+ .cm-vs-sub{margin:0!important}
+}
