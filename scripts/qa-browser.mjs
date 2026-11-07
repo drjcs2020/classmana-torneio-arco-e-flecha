@@ -1,7 +1,7 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-const base='http://127.0.0.1:8765/';
+const base='http://127.0.0.1:8000/';
 fs.mkdirSync('qa-screenshots',{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-gpu']});
 const errors=[];
@@ -97,6 +97,9 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
   const status=document.querySelector('#ranking-status')?.textContent||'';
   return status.includes('duelos concluídos')||status.includes('⚠️');
  },null,{timeout:16000});
+ assert.match(await desktop.locator('#ranking-status').textContent(),/duelos concluídos/,'Ranking must load live server data, not show an error');
+ assert((await desktop.locator('#rank-houses .rankline').count())>=3,'House ranking must contain three classes');
+ assert((await desktop.locator('#rank-players .rankline').count())>=1,'Player ranking must contain duel results');
  const rankingLegibility=await desktop.locator('#view-ranking').evaluate(root=>{
   const panel=root.querySelector('.ranking-panel');
   const title=root.querySelector('.ranking-panel h2');
