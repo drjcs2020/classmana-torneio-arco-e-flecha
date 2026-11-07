@@ -510,3 +510,33 @@ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-check{
 @media(prefers-reduced-motion:reduce){
  body[data-page="lobby"] #view-inicio[data-step="reino"] .house{transition:none!important}
 }
+
+/* Alinhamento uniforme das Casas: todas as séries na mesma linha. */
+@media(min-width:781px){
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-name,
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house-c .house-name{
+  position:absolute!important;
+  top:13.5%!important;
+  height:15%!important;min-height:0!important;
+  left:4%!important;right:4%!important;width:92%!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  margin:0!important;padding:0 5px!important;
+  font:900 clamp(18px,1.72vw,25px)/1.12 'Cinzel',Georgia,serif!important;
+  letter-spacing:-.045em!important;
+  text-align:center!important;
+  overflow-wrap:normal!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .house-grade,
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house-c .house-grade{
+  position:absolute!important;
+  top:29.5%!important;left:4%!important;right:4%!important;width:92%!important;
+  height:5.5%!important;min-height:18px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  margin:0!important;padding:0 5px!important;
+  font:900 clamp(10px,.88vw,12px)/1.2 'Nunito',sans-serif!important;
+  text-align:center!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="reino"] .house .cm-house-pair{
+  top:37%!important;bottom:13%!important;
+ }
+}
