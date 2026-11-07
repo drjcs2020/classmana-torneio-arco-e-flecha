@@ -1,7 +1,7 @@
 name: QA visual ClassMana
 on:
   push:
-    branches: [main]
+    branches: [main, revisao-32-classmana]
   workflow_dispatch:
 jobs:
   qa:
@@ -41,6 +41,7 @@ jobs:
           node --check scene-v3.js
           node --check online-client.js
           node scripts/qa-static.mjs
+          node scripts/qa-media.mjs
       - name: Validate deployed independent duel API and live ranking (read-only)
         run: node scripts/qa-duel-api.mjs
       - name: Install browser test runner
