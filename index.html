@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="setup-no-scroll.css?v=setup19">
 <link rel="stylesheet" href="wind-panel-restored.css?v=wind20">
 <link rel="stylesheet" href="duel-bell.css?v=bell23">
+<link rel="stylesheet" href="student-session.css?v=session25">
 </head>
 <body data-page="lobby">
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -85,6 +86,10 @@
   <button class="studio-continue cm-image-control" type="button" id="confirm-archer" aria-label="Confirmar arqueiro e arco e escolher desafio"><img src="assets/ui/buttons/classmana-confirmar.png" alt="" draggable="false"></button>
  </aside>
 </section>
+ <div class="cm-active-session-controls" id="cm-active-session-controls">
+   <button type="button" id="cm-open-challenges" class="cm-session-button">🔔 Meus desafios</button>
+   <button type="button" id="cm-end-session" class="cm-session-button cm-session-exit" hidden>🚪 Encerrar sessão</button>
+ </div>
  <section class="cm-duel-screen" id="duel-options" aria-label="Página 2 — Escolha do desafio">
    <img class="cm-duel-title" src="assets/ui/titles/titulo-escolha-desafio-novo.png" alt="Escolha o Desafio">
    <p class="cm-duel-guidance">Escolha como deseja jogar: treinar, enfrentar o robô ou desafiar um colega.</p>
@@ -104,7 +109,7 @@
     <div class="online-account-actions">
       <button class="cm-online-btn hidden" id="retry-online" type="button" aria-label="Verificar conexão do servidor">↻ RECONECTAR</button>
       <button class="cm-online-btn" id="open-inbox" type="button">🔔 Meus desafios <span class="online-unread" id="unread-count">0</span></button>
-      <button class="cm-online-btn hidden" id="logout" type="button">🔄 Trocar arqueiro</button>
+      <button class="cm-online-btn hidden" id="logout" type="button">🚪 Encerrar sessão</button>
     </div>
   </div>
   <div class="setup-head"><div><small>⚔️ PRONTO PARA COMPETIR?</small><h2>Prepare a partida</h2></div><span class="stamp">🎯 5 FLECHAS</span></div>
@@ -205,7 +210,7 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=bell24"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=session25"></script>
 <script type="module" src="wind-panel-restored.js?v=wind20"></script>
 </body>
 </html>
