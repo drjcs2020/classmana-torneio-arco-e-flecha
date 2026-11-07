@@ -7,9 +7,10 @@
 @keyframes cm-pulse-gold{50%{filter:brightness(1.26) drop-shadow(0 0 17px #ffcc6880)}}
 @keyframes cm-landing-spark{0%{transform:translateY(0) scale(.5);opacity:0}20%{opacity:1}100%{transform:translateY(-92px) scale(.12);opacity:0}}
 .cm-embers{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;contain:layout paint}
-.cm-ember{position:absolute;bottom:-10%;left:var(--ember-x);height:var(--ember-size);width:var(--ember-size);border-radius:50%;background:radial-gradient(circle at 25% 25%,#fff8cd,#ffc047 38%,#ef6124 75%,transparent);box-shadow:0 0 10px #ff8f2fb5;opacity:0;animation:cm-ember-rise var(--ember-duration) linear var(--ember-delay) infinite}
-.cm-embers[data-house="A"] .cm-ember{background:radial-gradient(circle,#fff8da,#a5edff 42%,#347bf7 80%,transparent);box-shadow:0 0 10px #63c3ffb9}
-.cm-embers[data-house="C"] .cm-ember{background:radial-gradient(circle,#ffffc2,#9cff9c 42%,#12aa75 80%,transparent);box-shadow:0 0 10px #32eaa2b9}
+.cm-ember{position:absolute;bottom:-10%;left:var(--ember-x);height:var(--ember-size);width:var(--ember-size);border-radius:50%;background:radial-gradient(circle at 25% 20%,#fffef0 0%,#ffe894 28%,#ffb52f 59%,#f07823 80%,transparent);box-shadow:0 0 12px #ffa325d8,0 0 22px #e9662259;opacity:0;animation:cm-ember-rise var(--ember-duration) linear var(--ember-delay) infinite}
+/* All houses use fiery gold sparks; house colors remain on UI and characters. */
+.cm-embers[data-house="A"] .cm-ember{background:radial-gradient(circle at 25% 20%,#fffdf1 0%,#ffe588 27%,#ffb535 58%,#e75a17 81%,transparent);box-shadow:0 0 11px #ffb62bd6,0 0 21px #ff87265e}
+.cm-embers[data-house="C"] .cm-ember{background:radial-gradient(circle at 25% 20%,#fffef5 0%,#ffeb93 28%,#ffc03b 58%,#ed721f 82%,transparent);box-shadow:0 0 11px #ffba36d6,0 0 21px #ff80295e}
 .cm-vs-overlay{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:clamp(10px,3vh,25px);box-sizing:border-box;overflow-y:auto;background:radial-gradient(ellipse at 30% 65%,#1f48956e,transparent 55%),radial-gradient(ellipse at 75% 65%,#b543275c,transparent 52%),linear-gradient(115deg,#05132cf2,#071d45ed 50%,#130e2aef);color:#fff3d1;font-family:Georgia,serif}
 .cm-vs-overlay[hidden]{display:none}
 .cm-vs-overlay .cm-embers{position:fixed}
@@ -89,4 +90,13 @@
 @media(prefers-reduced-motion:reduce){
  #view-inicio > .cm-ambient-embers,
  #stage > .cm-ambient-embers{display:none!important}
+}
+
+/* Denser golden flames rise from the bottom; no pointer interception. */
+#view-inicio > .cm-ambient-embers{opacity:.96!important}
+#stage > .cm-ambient-embers{opacity:.76!important}
+.cm-vs-overlay > .cm-embers{opacity:.94}
+@media(max-width:680px){
+ #view-inicio > .cm-ambient-embers{opacity:.76!important}
+ #stage > .cm-ambient-embers{opacity:.59!important}
 }
