@@ -23,6 +23,7 @@ body[data-page="arena"] #view-arena.active {
 <link rel="stylesheet" href="duel-turns.css?v=turns16">
 <link rel="stylesheet" href="wind-panel-restored.css?v=wind20">
 <link rel="stylesheet" href="duel-bell.css?v=bell23">
+<link rel="stylesheet" href="student-session.css?v=session25">
 </head>
 <body data-page="arena">
 <!-- A arena é a view inicial. A seleção antiga nunca é exibida durante o carregamento. -->
@@ -89,7 +90,7 @@ body[data-page="arena"] #view-arena.active {
     <div class="online-account-actions">
       <button class="cm-online-btn hidden" id="retry-online" type="button" aria-label="Verificar conexão do servidor">↻ RECONECTAR</button>
       <button class="cm-online-btn" id="open-inbox" type="button">🔔 Meus desafios <span class="online-unread" id="unread-count">0</span></button>
-      <button class="cm-online-btn hidden" id="logout" type="button">🔄 Trocar arqueiro</button>
+      <button class="cm-online-btn hidden" id="logout" type="button">🚪 Encerrar sessão</button>
     </div>
   </div>
   <div class="setup-head"><div><small>⚔️ PRONTO PARA COMPETIR?</small><h2>Prepare a partida</h2></div><span class="stamp">🎯 5 FLECHAS</span></div>
@@ -190,7 +191,7 @@ body[data-page="arena"] #view-arena.active {
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=bell24"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=session25"></script>
 <script type="module" src="wind-panel-restored.js?v=wind20"></script>
 </body>
 </html>
