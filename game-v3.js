@@ -2,7 +2,7 @@ import {initScene} from './scene-v3.js?v=23';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
-import {online} from './online-client.js?v=portal9b';
+import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
@@ -259,7 +259,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!online.gatewayReady&&window.parent===window){goOnlinePortal(mode);return}
+  /* API direta: o duelo acontece no GitHub Pages, sem portal Apps Script. */
   if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'A Arena Online não conseguiu conectar ao Apps Script.'));return}
   if(!online.user||online.user.id!==userId){
     const selected=await loginStudent();
@@ -352,7 +352,7 @@ async function fire(power){
  // Round scores online are calculated again by Apps Script using these normalized offsets.
  const activeBow=(!match.online||Number(match.online.rules)>=7)?(match.bow||equipment.bow):'classico';
  const tuning=BOW_RULES[activeBow]||BOW_RULES.classico;
- if(currentMatch.online)currentMatch.onlineShots.push({dx,dy,power,time:match.freezeTime,bow:match.bow||equipment.bow});
+ /* Guardar coordenadas do impacto final, não da mira inicial. */
  const distanceFactor=distanceDifficulty(match.distance);
  const drift=match.wind*tuning.wind*t.r*.040*distanceFactor,fall=(1-power)*t.r*.70*distanceFactor;
  const jitter=match.online?0:(1-power)*t.r*.14*Math.min(2,distanceFactor);
@@ -369,6 +369,7 @@ async function fire(power){
  const norm=Math.hypot(landingX,landingY)*tuning.ring;
  const base=blocked||norm>1?0:Math.max(1,10-Math.floor(norm*10));
  const score=base>0?Math.min(10,base+tuning.bonus):0;
+ if(currentMatch.online)currentMatch.onlineShots.push({dx:landingX,dy:landingY,impactDx:landingX,impactDy:landingY,blocked,power,time:match.freezeTime,bow:activeBow});
  match.freezeTime=null; // The target keeps moving while the arrow flies.
  $('stage').classList.add('firing');arenaAudio.play('fly');
  try{await Promise.race([scene?.fire?.({x:ix/w,y:iy/h,power}),new Promise(resolve=>setTimeout(resolve,1700))]);}
@@ -591,7 +592,7 @@ async function refreshInbox(){
  renderInbox();return onlineInbox;
 }
 async function openInbox(){
- if(online.state==='portal'&&window.parent===window){goOnlinePortal($('mode').value,true);return}
+ /* API direta: caixa de desafios usa o servidor HTTP. */
  if(!online.user){const selected=await loginStudent();if(!selected){toast('Escolha seu nome para abrir seus desafios.');return;}}
  $('online-inbox').classList.remove('hidden');
  $('inbox-status').textContent='⏳ Consultando convites recebidos...';
@@ -694,7 +695,7 @@ document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||matc
 setInterval(()=>{if(holding&&!match?.paused){scene?.setPower(chargePower());uiHud()}},60);
 
 $('retry-online')?.addEventListener('click',async()=>{
- if(window.parent===window){goOnlinePortal();return}
+ 
  const button=$('retry-online');button.disabled=true;
  try{await startOnlineClient()}
  finally{button.disabled=false}
@@ -741,7 +742,7 @@ document.querySelectorAll('[data-play-mode]').forEach(button=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
   $('mode').value=chosen;updateMode();
-  if(isDuel(chosen)&&window.parent===window){goOnlinePortal(chosen);return}
+  
   setLobbyStep('partida');
  });
 });
