@@ -28,6 +28,7 @@ body[data-page="lobby"] #cm-lobby-back{
  display:none!important;position:absolute!important;top:12px!important;left:11px!important;
  z-index:20!important;width:clamp(95px,13vw,170px)!important;height:clamp(48px,7.5vh,76px)!important
 }
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-lobby-back,
 body[data-page="lobby"] #view-inicio[data-step="heroi"] #cm-lobby-back,
 body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-lobby-back,
 body[data-page="lobby"] #view-inicio[data-step="partida"] #cm-lobby-back{display:block!important}
