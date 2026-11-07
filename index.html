@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Cinzel:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
-<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1"><link rel="stylesheet" href="lobby-fantasy.css?v=1"><link rel="stylesheet" href="classmana-rebuild.css?v=1"><link rel="stylesheet" href="classmana-clean.css?v=playerfix11">
+<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1"><link rel="stylesheet" href="lobby-fantasy.css?v=1"><link rel="stylesheet" href="classmana-rebuild.css?v=1"><link rel="stylesheet" href="classmana-clean.css?v=perfil12">
 </head>
 <body data-page="lobby">
 <div class="sky-sparkles" aria-hidden="true"></div>
@@ -23,7 +23,7 @@
 </header>
 
 <main>
-<section id="view-inicio" class="view active" data-step="reino" aria-label="Página 1 — Escolha sua Casa e seu arqueiro">
+<section id="view-inicio" class="view active" data-step="perfil" aria-label="Identificação, Casa, arqueiro e desafio">
 
  <button type="button" id="cm-lobby-back" class="cm-sprite-button cm-lobby-back" aria-label="Voltar à tela anterior"><img src="assets/ui/buttons/classmana-voltar.png" alt=""></button>
  <div class="section-title kingdom-title"><div><h1>ClassMana — Torneio das Três Casas</h1></div></div>
@@ -33,6 +33,17 @@
   <button type="button" class="lobby-step" data-lobby-step="heroi" role="tab" aria-selected="false">2 · Arqueiro</button>
   <button type="button" class="lobby-step" data-lobby-step="partida" role="tab" aria-selected="false">3 · Jogar</button>
  </div>
+ <section id="cm-identity-screen" class="cm-identity-screen" aria-label="Primeira etapa — escolha do aluno">
+   <div class="cm-identity-panel">
+     <img class="cm-identity-logo" src="assets/ui/titles/logo-classmana-torneio.png" alt="ClassMana — Torneio das Três Casas">
+     <h2>QUEM VAI JOGAR?</h2>
+     <p>Escolha seu nome para entrar no Torneio das Três Casas.</p>
+     <label for="cm-identity-player">SEU NOME NA LISTA DE ALUNOS</label>
+     <select id="cm-identity-player"><option value="">Selecione seu nome</option></select>
+     <p id="cm-identity-info" aria-live="polite">Escolha um nome para continuar.</p>
+     <button type="button" id="cm-confirm-identity" class="cm-gold-action">CONFIRMAR JOGADOR <span aria-hidden="true">➜</span></button>
+   </div>
+ </section>
  <div class="houses" id="houses" aria-label="Escolha sua Casa">
   <button class="house house-a selected" data-house="A" aria-pressed="true" style="--house-bg:url('assets/scenes/aguia.webp')">
    <span class="house-shine" aria-hidden="true"></span><span class="cm-house-sigil"><img src="assets/ui/hud/brasao-aguia-dourada.png" alt="" draggable="false"></span><span class="cm-house-pair" aria-hidden="true"><img src="assets/ui/characters/arqueiro-aguia-dourada.png" alt=""><img src="assets/ui/characters/arqueira-aguia-dourada.png" alt=""></span><span class="house-name">ÁGUIA DOURADA</span>
@@ -71,14 +82,7 @@
 </section>
  <section class="cm-duel-screen" id="duel-options" aria-label="Página 2 — Escolha do desafio">
    <img class="cm-duel-title" src="assets/ui/titles/titulo-escolha-desafio-novo.png" alt="Escolha o Desafio">
-   <p class="cm-duel-guidance">Sua Casa está pronta. Escolha o adversário ou pratique com o seu arco.</p>
-   <div class="cm-player-choice" id="cm-player-choice">
-     <label for="cm-quick-player">🏹 PRIMEIRO, ESCOLHA SEU NOME</label>
-     <select id="cm-quick-player" aria-describedby="cm-quick-help" required>
-       <option value="">Selecione seu nome para disputar</option>
-     </select>
-     <small id="cm-quick-help" role="status" aria-live="polite">Escolha o aluno da Casa selecionada antes de iniciar um duelo.</small>
-   </div>
+   <p class="cm-duel-guidance">Escolha como deseja jogar: treinar, enfrentar o robô ou desafiar um colega.</p>
    <div class="cm-duel-modes">
      <button type="button" class="cm-duel-mode" data-play-mode="bot" aria-label="Contra robô, com três dificuldades"><img src="assets/ui/buttons/botao-contra-robo.png" alt=""><span>Contra Robô</span></button>
      <button type="button" class="cm-duel-mode" data-play-mode="practice" aria-label="Treino livre, sem pontos oficiais"><img src="assets/ui/buttons/botao-treino-livre.png" alt=""><span>Treino Livre</span></button>
@@ -196,6 +200,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=api11"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=perfil12"></script>
 </body>
 </html>
