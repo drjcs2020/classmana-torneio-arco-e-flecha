@@ -612,6 +612,7 @@ function renderInbox(){
   'Selecione seu nome na lista para consultar os desafios recebidos.';
  if(!onlineInbox.length){list.innerHTML='<div class="empty">Nenhum desafio para esta conta.</div>';return;}
  for(const ch of onlineInbox){
+  if(ch.creator?.id===ch.recipient?.id)continue; // Never display a self-challenge.
   const opponent=ch.creator.id===online.user?.id?ch.recipient:ch.creator;
   const mine=ch.creator.id===online.user?.id,score=mine?ch.creatorScore:ch.creatorScore;
   const item=document.createElement('article');item.className='cm-challenge';
@@ -621,6 +622,7 @@ function renderInbox(){
   const desc=document.createElement('p');desc.textContent=score===null?
     'Pontuação inicial ainda não enviada.':
     'Pontuação do primeiro arqueiro: '+score+' pontos (5 flechas).';
+  if(cmAlertable(ch,online.user?.id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch))item.classList.add('cm-challenge-new');
   item.append(title,sub,desc);
   const buttons=document.createElement('div');buttons.className='cm-challenge-actions';
   function action(label,kind,reject=false){
@@ -639,20 +641,56 @@ function renderInbox(){
   if(buttons.children.length)item.appendChild(buttons);list.appendChild(item);
  }
 }
+const CM_NOTICES_PREFIX='cm-duel-notices-v2-';
+let cmNoticePlayer='',cmNoticeSnapshot={};
+function cmNoticeKey(id){return CM_NOTICES_PREFIX+id}
+function cmAlertable(ch,id){
+ const incoming=ch.recipient?.id===id,own=ch.creator?.id===id;
+ return (incoming&&['PENDENTE','ACEITO','CONCLUIDO'].includes(ch.status))||
+        (own&&['ACEITO','RECUSADO','CONCLUIDO'].includes(ch.status));
+}
+function cmNotificationState(ch){
+ return [ch.status,ch.creatorScore??'-',ch.recipientScore??'-'].join(':');
+}
+function cmLoadNoticeSnapshot(id){
+ try{return JSON.parse(localStorage.getItem(cmNoticeKey(id))||'{}')||{}}catch{return {}}
+}
+function cmSaveNoticeSnapshot(id){
+ try{localStorage.setItem(cmNoticeKey(id),JSON.stringify(cmNoticeSnapshot))}catch{}
+}
+function cmUpdateBell(){
+ const id=online.user?.id,btn=$('open-inbox'),num=$('unread-count');
+ if(!btn||!num)return;
+ if(!id){num.textContent='0';btn.classList.remove('cm-bell-alert');btn.title='Escolha seu perfil';return}
+ const updates=onlineInbox.filter(ch=>cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch));
+ const incoming=updates.filter(ch=>ch.recipient.id===id).length;
+ const sent=updates.length-incoming;
+ num.textContent=String(updates.length);
+ btn.classList.toggle('cm-bell-alert',updates.length>0);
+ btn.title=updates.length?incoming+' aviso(s) de desafios recebidos; '+sent+' atualização(ões) de desafios enviados':'Nenhuma atualização nova. Clique para ver todos os desafios.';
+ btn.setAttribute('aria-label',btn.title);
+}
+function cmMarkNoticesRead(){
+ const id=online.user?.id;if(!id)return;
+ for(const ch of onlineInbox){if(cmAlertable(ch,id))cmNoticeSnapshot[ch.id]=cmNotificationState(ch)}
+ cmSaveNoticeSnapshot(id);cmUpdateBell();
+}
 async function refreshInbox(){
- if(!online.enabled||!online.user){onlineInbox=[];$('unread-count').textContent='0';return [];}
- onlineInbox=await online.inbox();
- const pending=onlineInbox.filter(c=>c.recipient.id===online.user.id&&c.status==='PENDENTE').length;
- $('unread-count').textContent=String(pending);
- $('open-inbox').title=pending?'Você recebeu '+pending+' desafio(s)!':'Nenhum desafio pendente';
- renderInbox();return onlineInbox;
+ if(!online.enabled||!online.user){onlineInbox=[];cmNoticePlayer='';cmUpdateBell();return [];}
+ const requestedId=online.user.id;
+ const rows=await online.inbox();
+ // Ignore delayed results if the student changed profiles while the request ran.
+ if(online.user?.id!==requestedId)return [];
+ onlineInbox=rows;
+ if(cmNoticePlayer!==requestedId){cmNoticePlayer=requestedId;cmNoticeSnapshot=cmLoadNoticeSnapshot(requestedId)}
+ cmUpdateBell();renderInbox();return onlineInbox;
 }
 async function openInbox(){
  /* API direta: caixa de desafios usa o servidor HTTP. */
  if(!online.user){const selected=await loginStudent();if(!selected){toast('Escolha seu nome para abrir seus desafios.');return;}}
  $('online-inbox').classList.remove('hidden');
  $('inbox-status').textContent='⏳ Consultando convites recebidos...';
- try{await refreshInbox()}catch(e){$('inbox-status').textContent='⚠️ Falha ao carregar desafios: '+e.message}
+ try{await refreshInbox();cmMarkNoticesRead()}catch(e){$('inbox-status').textContent='⚠️ Falha ao carregar desafios: '+e.message}
 }
 async function onInboxAction(e){
  const button=e.target.closest('button[data-action]');if(!button||onlineLoading)return;
@@ -792,7 +830,7 @@ $('open-inbox').addEventListener('click',openInbox);
 $('close-inbox').addEventListener('click',()=>$('online-inbox').classList.add('hidden'));
 $('online-inbox').addEventListener('click',e=>{if(e.target===$('online-inbox'))$('online-inbox').classList.add('hidden')});
 $('inbox-list').addEventListener('click',onInboxAction);
-$('logout').addEventListener('click',()=>{if(match?.running){toast('Termine ou abandone esta rodada antes de sair da conta.');return;}online.logout();onlineInbox=[];$('player').value='guest';fillRivals();showOnlineStatus();$('unread-count').textContent='0';toast('Selecione outro arqueiro na lista.')});
+$('logout').addEventListener('click',()=>{if(match?.running){toast('Termine ou abandone esta rodada antes de sair da conta.');return;}online.logout();onlineInbox=[];$('player').value='guest';fillRivals();showOnlineStatus();cmNoticePlayer='';onlineInbox=[];cmUpdateBell();toast('Selecione outro arqueiro na lista.')});
 document.querySelectorAll('[data-rank]').forEach(btn=>btn.addEventListener('click',()=>{
  scoreTab=btn.dataset.rank;document.querySelectorAll('[data-rank]').forEach(x=>x.classList.toggle('active',x===btn));renderRanking();
 }));
@@ -862,4 +900,12 @@ if(document.body.dataset.page==='arena')restoreArena();
 else processLink();
 renderRanking();
 startOnlineClient();
-setInterval(async()=>{if(!online.user)return;try{const prev=Number($('unread-count').textContent)||0;const rows=await refreshInbox();const unread=rows.filter(c=>c.recipient.id===online.user.id&&c.status==='PENDENTE').length;if(unread>prev){toast('🔔 Novo desafio recebido!');await openInbox()}}catch(error){console.warn('Convites online:',error)}},120000);
+setInterval(async()=>{
+ if(!online.user||online.state!=='ready'||document.visibilityState==='hidden')return;
+ try{
+  const previous=Number($('unread-count').textContent)||0;
+  await refreshInbox();
+  const next=Number($('unread-count').textContent)||0;
+  if(next>previous)toast('🔔 Novidade no torneio! Abra Meus desafios para ver.');
+ }catch(error){console.warn('Atualização dos convites:',error)}
+},20000);
