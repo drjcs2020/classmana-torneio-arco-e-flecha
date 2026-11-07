@@ -424,7 +424,20 @@ async function fire(power){
 
 function showHit(score,x,y,blocked=false){const el=$('hit');el.textContent=blocked?'🛡️ ESCUDO!':score?'+'+score+' PONTOS':'FORA DO ALVO';el.style.left=(x*100)+'%';el.style.top=clamp(y*100-12,18,64)+'%';el.classList.remove('show');void el.offsetWidth;el.classList.add('show')}
 function chooseRobotScore(difficulty,playerAverage){const base={easy:5.1,medium:6.7,hard:8.15}[difficulty],adjust=clamp((playerAverage-5.5)*.17,-.7,.7);let result=clamp(base+adjust+rand(-3.3,3.3),0,10);return result>=9.25?10:result>=7?8:result>=5?6:result>=3?4:result>=1.5?2:0;}
-async function finishMatch(){
+async function renderFinishScore(own,opponent,opponentLabel='ADVERSÁRIO'){
+ const area=$('finish-results');if(!area)return;
+ area.replaceChildren();
+ const make=(label,value,modifier)=>{
+  const cell=document.createElement('div');cell.className='cm-score-cell '+modifier;
+  const top=document.createElement('span');top.className='cm-score-label';top.textContent=label;
+  const big=document.createElement('strong');big.className='cm-score-value';big.textContent=String(value);
+  const unit=document.createElement('span');unit.className='cm-score-unit';unit.textContent=value==='—'||value==='AGUARDANDO'?'':'PONTOS';
+  cell.append(top,big,unit);return cell;
+ };
+ area.classList.add('cm-score-grid');
+ area.append(make('VOCÊ',own,'cm-score-own'),make(opponentLabel,opponent,'cm-score-other'));
+}
+function finishMatch(){
  if(!match||match.scores.length<5)return;
  const current=match;match.locked=true;const finish=$('finish');finish.classList.remove('hidden');
  // Arte dos resultados é composta por personagens separados, sem painel cobrindo o cenário.
@@ -441,7 +454,7 @@ async function finishMatch(){
  if(match.online){
   $('finish-title').textContent='⏳ GRAVANDO RESULTADO NA PLANILHA...';
   $('finish-desc').textContent='Seus disparos estão sendo validados e registrados no placar online.';
-  $('finish-results').textContent='🏹 5 / 5 FLECHAS';
+  $('finish-results').classList.remove('cm-score-grid');$('finish-results').textContent='🏹 5 / 5 FLECHAS';
   try{
    let response;
    try{response=await online.submit(match.online.id,match.onlineShots);}
@@ -469,15 +482,15 @@ async function finishMatch(){
    }
    $('finish-title').textContent=title;$('finish-desc').textContent=desc;
    if(title.includes('VITÓRIA'))arenaAudio.play('victory');
-   $('finish-results').textContent='🎯 VOCÊ '+total+' PTS   ⚔️ ADVERSÁRIO '+(rival===null?'AGUARDANDO':rival+' PTS');
-   $('share-help').textContent='✅ Resultado persistido na planilha online. Nenhum link manual é necessário.';
+   renderFinishScore(total,rival===null?'AGUARDANDO':rival);
+   $('share-help').textContent='✅ Resultado registrado no servidor do torneio.';
    $('hud-score').textContent=total;$('hud-rival').textContent=rival===null?'—':rival;
    refreshInbox().catch(console.warn);renderRanking().catch(console.warn);
   }catch(error){
    if(match!==current)return;current.onlineSaveFailed=true;current.running=true;
    $('finish-title').textContent='⚠️ RESULTADO AINDA NÃO CONFIRMADO';
    $('finish-desc').textContent='O servidor não confirmou a gravação: '+error.message;
-   $('finish-results').textContent='Suas cinco flechas permanecem nesta partida.';
+   $('finish-results').classList.remove('cm-score-grid');$('finish-results').textContent='Suas cinco flechas permanecem nesta partida.';
    $('share-help').textContent='Tente salvar novamente antes de sair da arena.';
    $('share-result').classList.remove('hidden');$('share-result').classList.add('cm-retry');$('share-result').textContent='🔄 TENTAR SALVAR NO PLACAR';
   }
@@ -491,7 +504,7 @@ async function finishMatch(){
   total>rivalScore?'🏆 VITÓRIA SOBRE O ROBÔ!':total===rivalScore?'🤝 EMPATE!':'🏹 CONTINUE TREINANDO!';
  $('finish-title').textContent=title;
  $('finish-desc').textContent='Sua pontuação: '+total+' de 50 pontos nesta rodada.';
- $('finish-results').textContent='🏹 '+total+' PTS   '+(rivalScore===undefined?'TREINO LIVRE':'🤖 ROBÔ '+rivalScore+' PTS');
+ renderFinishScore(total,rivalScore===undefined?'—':rivalScore,rivalScore===undefined?'TREINO LIVRE':'ROBÔ');
  $('share-help').textContent='Treino e partidas com robô ficam neste navegador; somente desafios validados entram no ranking oficial.';
  if(match.playerId!=='guest')persist({house:match.house,id:match.playerId,score:total,mode:match.mode,win:rivalScore===undefined?null:total>rivalScore});
  uiHud();
