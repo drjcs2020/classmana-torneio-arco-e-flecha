@@ -126,6 +126,18 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
  assert(rankOverflow.every(x=>x==='visible'),'Ranking should not hide players inside nested scrolling lists');
  assert(rankingLegibility.title==='rgb(255, 238, 189)','Ranking header contrast incorrect');
  if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(38, 25, 14)','Ranking text must be dark on parchment');
+ const rankLayout=await desktop.locator('#view-ranking').evaluate(root=>{
+  const groups=root.querySelector('#rank-houses');
+  const archers=root.querySelector('#rank-players');
+  const exit=root.querySelector('#rank-play').getBoundingClientRect();
+  return {groupColumns:getComputedStyle(groups).gridTemplateColumns.split(' ').length,
+    archerColumns:getComputedStyle(archers).gridTemplateColumns.split(' ').length,
+    exitBottom:exit.bottom,viewport:innerHeight,
+    exitWidth:exit.width};
+ });
+ assert.equal(rankLayout.groupColumns,3,'Houses must be presented in three balanced columns');
+ assert.equal(rankLayout.archerColumns,2,'Archer rankings should use two columns');
+ assert(rankLayout.exitBottom<=rankLayout.viewport+4,'Fechar Placar is offscreen: '+JSON.stringify(rankLayout));
  await shot(desktop,'03b-ranking-desktop');
  await desktop.locator('#rank-play').click();
  assert(await desktop.locator('#view-inicio.active').isVisible(),'Closing ranking must return to game');
