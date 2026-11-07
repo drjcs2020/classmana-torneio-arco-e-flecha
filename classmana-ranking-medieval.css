@@ -350,3 +350,22 @@ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ran
 body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice span.cm-ranking-emblem{
  display:inline-block!important;visibility:visible!important;opacity:1!important;
 }
+
+/* The student-select Back button uses the same ornamental control as the arena. */
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+ width:clamp(135px,13vw,174px)!important;min-width:135px!important;
+ height:clamp(48px,7.8vh,65px)!important;min-height:48px!important;
+ padding:0!important;
+ font-size:0!important;text-shadow:none!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:url("assets/ui/buttons/classmana-voltar.png") center/contain no-repeat!important;
+ cursor:pointer!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back:hover{
+ filter:brightness(1.15) drop-shadow(0 5px 8px #0008)!important;
+}
+@media(max-width:700px){
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+  min-width:124px!important;width:124px!important;height:52px!important;min-height:52px!important;
+ }
+}

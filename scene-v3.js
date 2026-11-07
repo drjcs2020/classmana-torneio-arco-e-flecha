@@ -477,6 +477,15 @@ export function initScene(canvas, getSettings) {
     const {w,h}=canvasSize(),m=getTargetMetrics(),ppu=m.r/1.34;
     const lx=((x*w-m.x)/ppu),ly=-((y*h-m.y)/ppu);
     const e=new pc.Entity('Embedded arrow at impact');targetRoot.addChild(e);e.setLocalPosition(lx,ly,.15);
+    const approved=modelAssets['models3d/flecha_'+houseModelNames[currentHouse]+'.glb'];
+    if(approved){
+      const arrow3d=approved.instantiateRenderEntity();
+      arrow3d.name='Approved embedded House arrow GLB';
+      arrow3d.setLocalScale(.42,.42,.42);
+      arrow3d.setLocalPosition(.10,-.08,.75);
+      arrow3d.setLocalEulerAngles(0,180,0);
+      e.addChild(arrow3d);impactMarks.push(e);return;
+    }
     const dark=material('#1b2228',{metal:.45,rough:.35}),red=material('#e33d31'),white=material('#eee7cf');
     tube('embedded carbon shaft',[[0,0,0],[.11,-.11,.37],[.23,-.18,.76]],[.015,.014,.011],dark,e,8);
     tube('embedded red vane',[[.19,-.15,.65],[.27,-.16,.74],[.23,-.18,.77]],[.024,.026,.012],red,e,6);
