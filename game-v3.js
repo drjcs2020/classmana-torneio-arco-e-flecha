@@ -1,7 +1,7 @@
 import {initScene} from './scene-v3.js?v=ground43';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=autoplay47';
-import {cinematics} from './classmana-cinematics.js?v=embers46';
+import {cinematics} from './classmana-cinematics.js?v=gold48';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
 import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
@@ -940,8 +940,8 @@ document.querySelector('.studio-carousel')?.addEventListener('keydown',event=>{
   $(event.key==='ArrowLeft'?'archer-prev':'archer-next').focus();
  }
 });
-cinematics.mountAmbient($('view-inicio'),house,26);
-cinematics.mountAmbient($('stage'),house,20);
+cinematics.mountAmbient($('view-inicio'),house,72);
+cinematics.mountAmbient($('stage'),house,52);
 cinematics.bindMenuSound(effect=>arenaAudio.play(effect));
 const soundButton=$('arena-sound');
 function updateSoundButton(){
