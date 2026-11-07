@@ -1,6 +1,6 @@
 /**
  * Decorative canvas layer for the ClassMana arena.
- * Birds, house pennants, spectator terraces, embers and shield obstacles.
+ * Birds, house pennants, embers and shield obstacles.
  * This layer is transparent, cannot intercept shots and never changes scoring.
  */
 import {obstacleAt,targetMotion} from './arena-difficulty.js?v=3';
@@ -51,32 +51,6 @@ export function initAtmosphere(stage,read){
   ctx.fillStyle=palette.gold;ctx.beginPath();ctx.arc(x,y-height*.13,4.5,0,Math.PI*2);ctx.fill();
   ctx.restore();
  }
- function crowd(w,h,palette,t){
-  const stageY=h*.67;ctx.save();
-  for(const side of [-1,1]){
-   const x=side<0?w*.08:w*.92;
-   const width=w*.13;
-   // Curved layered spectator terraces sit at the edges, not across the aim line.
-   const grad=ctx.createLinearGradient(0,stageY,0,stageY+h*.17);
-   grad.addColorStop(0,'rgba(27,42,31,.79)');grad.addColorStop(1,'rgba(13,34,36,.65)');
-   ctx.fillStyle=grad;ctx.strokeStyle=palette.gold;ctx.lineWidth=2;
-   ctx.beginPath();ctx.moveTo(x-width*.64,stageY+h*.13);ctx.lineTo(x-width*.76,stageY+h*.03);
-   ctx.quadraticCurveTo(x,stageY-h*.02,x+width*.76,stageY+h*.03);
-   ctx.lineTo(x+width*.64,stageY+h*.13);ctx.closePath();ctx.fill();ctx.stroke();
-   for(let k=0;k<15;k++){
-    const row=k%2,px=x+((k%7)-3)*width*.18,py=stageY+h*.019+row*h*.042;
-    ctx.fillStyle=(k%4===0)?palette.flag:(k%3===0)?palette.gold:palette.dark;
-    ctx.beginPath();ctx.arc(px,py,3.6+row*.7,0,Math.PI*2);ctx.fill();
-    ctx.fillRect(px-4,py+3,8,9);
-    if(k%5===0){
-     const lift=4*Math.sin(t*4.5+k);ctx.strokeStyle=palette.gold;ctx.lineWidth=1.4;
-     ctx.beginPath();ctx.moveTo(px+4,py+7);ctx.lineTo(px+10,py-3-lift);ctx.stroke();
-    }
-   }
-   pennant(x+side*width*.74,stageY-h*.04,h*.13,palette,t,side);
-  }
-  ctx.restore();
- }
  function floaties(w,h,palette,t){
   ctx.save();for(let i=0;i<particles.length;i++){
    const p=particles[i],rise=(p.y-t*p.speed)%1,y=(1+rise)%1*h;
@@ -125,7 +99,7 @@ export function initAtmosphere(stage,read){
    const b=birds[j],x=((t*b.speed*24+b.phase*100)%(w+140))-70,y=h*b.y+Math.sin(t*.9+j)*h*.022;
    drawBird(x,y,b.size,Math.sin(t*7+j*2.3)*3,palette);
   }
-  crowd(w,h,palette,t);floaties(w,h,palette,t);
+  floaties(w,h,palette,t);
   const data=read?.();
   if(data?.level!=='iniciante'&&data?.metrics){
    const m=data.metrics;
