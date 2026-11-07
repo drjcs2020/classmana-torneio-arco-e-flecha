@@ -1,0 +1,54 @@
+name: Instalar trilha medieval aprovada
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/install-medieval-music.yml']
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download public Pixabay track
+        run: |
+          python - <<'PY'
+          import re,html,os,urllib.request,urllib.error
+          from pathlib import Path
+          url='https://pixabay.com/music/adventure-epic-medieval-614879/'
+          headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128.0 Safari/537.36','Referer':'https://pixabay.com/'}
+          try:
+            req=urllib.request.Request(url,headers=headers)
+            with urllib.request.urlopen(req,timeout=40) as response: page=response.read().decode('utf-8','replace')
+            print('Page bytes',len(page))
+          except Exception as e:
+            print('Page request failed',type(e).__name__,str(e));page=''
+          page=html.unescape(page).replace('\\/','/')
+          candidates=[]
+          for pattern in [r'https?://[^\s"<>\\]+?\.mp3(?:\?[^\s"<>\\]*)?',r'https?://[^\s"<>\\]+?/download/audio/[^\s"<>\\]+']:
+            candidates.extend(re.findall(pattern,page))
+          candidates += ['https://pixabay.com/music/download/614879/','https://pixabay.com/music/adventure-epic-medieval-614879/download/']
+          candidates=list(dict.fromkeys(x.rstrip('\\') for x in candidates))
+          print('Found candidates',len(candidates))
+          for link in candidates[:15]:
+            print('Trying',link[:200])
+            try:
+              req=urllib.request.Request(link,headers=headers)
+              with urllib.request.urlopen(req,timeout=45) as response: raw=response.read()
+              if len(raw)>100_000 and (raw[:3]==b'ID3' or raw[0]==255):
+                dest=Path('assets/sounds/epic-medieval-kulakovka.mp3')
+                dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(raw)
+                print('MUSIC_OK',dest,len(raw));break
+              print('Not mp3',len(raw),raw[:30])
+            except Exception as e: print('Failed',type(e).__name__,str(e)[:160])
+          else: raise RuntimeError('Pixabay did not provide a downloadable MP3. No asset was installed.')
+          PY
+      - name: Commit music asset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sounds/epic-medieval-kulakovka.mp3
+          git diff --cached --quiet || { git commit -m "assets(audio): add approved Kulakovka Epic Medieval soundtrack"; git push; }
