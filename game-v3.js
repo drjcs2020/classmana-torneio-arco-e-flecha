@@ -679,16 +679,24 @@ function cmSaveNoticeSnapshot(id){
  try{localStorage.setItem(cmNoticeKey(id),JSON.stringify(cmNoticeSnapshot))}catch{}
 }
 function cmUpdateBell(){
- const id=online.user?.id,btn=$('open-inbox'),num=$('unread-count');
+ const id=online.user?.id,btn=$('open-inbox'),num=$('unread-count'),quick=$('cm-open-challenges'),quickCount=$('cm-quick-challenges-count');
  if(!btn||!num)return;
- if(!id){num.textContent='0';btn.classList.remove('cm-bell-alert');btn.title='Escolha seu perfil';return}
- const updates=onlineInbox.filter(ch=>cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch));
- const incoming=updates.filter(ch=>ch.recipient.id===id).length;
- const sent=updates.length-incoming;
- num.textContent=String(updates.length);
+ if(!id){
+  num.textContent='—';if(quickCount)quickCount.textContent='—';
+  btn.classList.remove('cm-bell-alert');if(quick)quick.classList.remove('cm-bell-alert');
+  btn.title='Selecione seu perfil para consultar os desafios';return;
+ }
+ // The main number is the number of actual challenges, not unread notifications.
+ const rows=onlineInbox.filter(c=>c?.id&&((c.creator?.id===id&&c.recipient?.id!==id)||(c.recipient?.id===id&&c.creator?.id!==id)));
+ const received=rows.filter(c=>c.recipient?.id===id).length;
+ const sent=rows.length-received;
+ const updates=rows.filter(ch=>cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch));
+ num.textContent=String(rows.length);
+ if(quickCount)quickCount.textContent=String(rows.length);
+ const description=rows.length+' desafios: '+received+' recebidos, '+sent+' enviados; '+updates.length+' novidade(s) não vistas.';
+ btn.title=description;btn.setAttribute('aria-label','Meus desafios. '+description);
  btn.classList.toggle('cm-bell-alert',updates.length>0);
- btn.title=updates.length?incoming+' aviso(s) de desafios recebidos; '+sent+' atualização(ões) de desafios enviados':'Nenhuma atualização nova. Clique para ver todos os desafios.';
- btn.setAttribute('aria-label',btn.title);
+ if(quick){quick.title=description;quick.classList.toggle('cm-bell-alert',updates.length>0)}
 }
 function cmMarkNoticesRead(){
  const id=online.user?.id;if(!id)return;
@@ -698,7 +706,13 @@ function cmMarkNoticesRead(){
 async function refreshInbox(){
  if(!online.enabled||!online.user){onlineInbox=[];cmNoticePlayer='';cmUpdateBell();return [];}
  const requestedId=online.user.id;
- const rows=await online.inbox();
+ const counter=$('unread-count');
+ if(counter&&cmNoticePlayer!==requestedId)counter.textContent='…';
+ let rows;
+ try{rows=await online.inbox()}catch(error){
+  if(online.user?.id===requestedId){const count=$('unread-count');if(count)count.textContent='!';const q=$('cm-quick-challenges-count');if(q)q.textContent='!'}
+  throw error;
+ }
  // Ignore delayed results if the student changed profiles while the request ran.
  if(online.user?.id!==requestedId)return [];
  onlineInbox=rows;
@@ -952,9 +966,10 @@ startOnlineClient();
 setInterval(async()=>{
  if(!online.user||online.state!=='ready'||document.visibilityState==='hidden')return;
  try{
-  const previous=Number($('unread-count').textContent)||0;
+  const id=online.user.id;
+  const before=onlineInbox.filter(ch=>cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch)).length;
   await refreshInbox();
-  const next=Number($('unread-count').textContent)||0;
-  if(next>previous)toast('🔔 Novidade no torneio! Abra Meus desafios para ver.');
+  const after=onlineInbox.filter(ch=>cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch)).length;
+  if(after>before)toast('🔔 Novidade no torneio! Abra Meus desafios para ver.');
  }catch(error){console.warn('Atualização dos convites:',error)}
 },20000);
