@@ -270,3 +270,72 @@ body[data-page="lobby"] #view-ranking #rank-play{
   min-width:0!important;padding:7px 10px!important;font-size:13px!important;
  }
 }
+
+/* QA correction: podium spreads across the width, archers form two columns.
+   Avoid nested scrolling and keep FECHAR PLACAR in the visible viewport. */
+@media(min-width:781px){
+ body[data-page="lobby"] #view-ranking.active{
+   padding:clamp(7px,1.6vh,15px) clamp(12px,4vw,65px)!important;
+   gap:clamp(5px,.9vh,8px)!important;
+ }
+ body[data-page="lobby"] #view-ranking .page-heading{
+   padding:7px 14px!important;
+ }
+ body[data-page="lobby"] #view-ranking .page-heading h1{
+   font-size:clamp(23px,2.8vw,34px)!important;
+ }
+ body[data-page="lobby"] #view-ranking .page-heading small{
+   font-size:11px!important;
+ }
+ body[data-page="lobby"] #view-ranking #ranking-status{
+   min-height:29px!important;padding:5px!important;
+ }
+ body[data-page="lobby"] #view-ranking #ranking-tabs button{
+   min-height:38px!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-layout{
+   display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+   gap:8px!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel{
+   padding:8px 13px!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel h2{
+   padding:6px!important;margin:0 0 5px!important;
+   font-size:clamp(15px,1.35vw,19px)!important;
+ }
+ body[data-page="lobby"] #view-ranking #rank-houses{
+   display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+   gap:9px!important;
+ }
+ body[data-page="lobby"] #view-ranking #rank-players{
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   gap:2px 10px!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+   box-sizing:border-box!important;min-height:0!important;
+   padding:4px 8px!important;gap:2px 7px!important;
+   border:1px solid #cfaa69!important;border-radius:8px!important;
+   background:#fff7e3ba!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel .rankline b{
+   font-size:clamp(13px,1.1vw,16px)!important;line-height:1.15!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel .rankline small{
+   font-size:clamp(10px,.88vw,12px)!important;line-height:1.17!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+   font-size:clamp(10px,.95vw,12px)!important;
+   padding:4px 6px!important;
+ }
+ body[data-page="lobby"] #view-ranking #rank-play{
+   margin:4px auto 0!important;min-height:43px!important;padding:8px 21px!important;
+ }
+}
+@media(max-width:780px){
+ body[data-page="lobby"] #view-ranking #rank-houses,
+ body[data-page="lobby"] #view-ranking #rank-players{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:5px!important;
+ }
+}
