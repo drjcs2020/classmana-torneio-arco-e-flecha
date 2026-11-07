@@ -19,14 +19,14 @@ function emberLayer(host,house,count=16){
  layer.dataset.house=getHouse(house);
  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
   const rng=i=>Math.abs(Math.sin(i*19.19+7.713));
-  for(let i=0;i<Math.min(35,count);i++){
+  for(let i=0;i<Math.min(100,count);i++){
    const dot=node('span','cm-ember'),v=rng(i+1);
    dot.style.setProperty('--ember-x',(4+92*rng(i+10)).toFixed(1)+'%');
-   dot.style.setProperty('--ember-size',(3+7*v).toFixed(1)+'px');
-   dot.style.setProperty('--ember-duration',(3.2+5*rng(i+31)).toFixed(2)+'s');
-   dot.style.setProperty('--ember-delay',(-7*rng(i+46)).toFixed(2)+'s');
+   dot.style.setProperty('--ember-size',(2.8+6.5*v).toFixed(1)+'px');
+   dot.style.setProperty('--ember-duration',(3.4+5.4*rng(i+31)).toFixed(2)+'s');
+   dot.style.setProperty('--ember-delay',(-9*rng(i+46)).toFixed(2)+'s');
    dot.style.setProperty('--ember-drift',(-72+144*rng(i+64)).toFixed(0)+'px');
-   dot.style.setProperty('--ember-opacity',(.55+.42*v).toFixed(2));
+   dot.style.setProperty('--ember-opacity',(.65+.35*v).toFixed(2));
    layer.append(dot);
   }
  }
@@ -36,7 +36,7 @@ function emberLayer(host,house,count=16){
 /** Lightweight continuous atmosphere, using the same emberRise effect as VS.
  * House A: arcane blue sparks; B: glowing fire embers; C: emerald magic.
  * Decorative only: never intercepts clicks, gestures or gameplay physics. */
-function mountAmbient(host,house='A',count=22){
+function mountAmbient(host,house='A',count=56){
  if(!host)return null;
  const existing=host.querySelector(':scope > .cm-ambient-embers');
  if(existing){
@@ -77,7 +77,7 @@ function versus(config){
  outer.setAttribute('aria-modal','true');
  outer.setAttribute('aria-labelledby','cm-vs-title');
  outer.dataset.house=getHouse(own.house);
- const embers=emberLayer(outer,config.house,22);
+ const embers=emberLayer(outer,config.house,52);
  const shell=node('div','cm-vs-shell');
  const title=node('h2','cm-vs-title',config.mode==='bot'?'DESAFIO DE TREINO':'DUELO ENTRE ARQUEIROS');
  title.id='cm-vs-title';
