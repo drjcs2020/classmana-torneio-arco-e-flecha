@@ -22,6 +22,11 @@ try{
  desktop.on('pageerror',e=>errors.push('desktop: '+e.message));
  await desktop.goto(base,{waitUntil:'domcontentloaded'});await desktop.waitForTimeout(750);
  assert.equal(await desktop.locator('body').getAttribute('data-page'),'lobby');
+ const defaultSound=await desktop.evaluate(async()=>{
+  const {arenaAudio}=await import('./arena-audio.js?v=autoplay47');
+  return {enabled:arenaAudio.enabled,playing:arenaAudio.playing};
+ });
+ assert.equal(defaultSound.enabled,true,'Soundtrack must be enabled by default for new visitors');
  await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').first().waitFor();
  assert.equal(await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').count(),26,
   'Lobby must display genuine animated embers, not a static screenshot');
@@ -32,15 +37,15 @@ try{
  assert.equal(logoResponse.status(),200,'Official ClassMana logo must load');
  await desktop.locator('#cm-lobby-sound').click();
  await desktop.waitForFunction(async()=>{
-  const mod=await import('./arena-audio.js?v=cinema44');
+  const mod=await import('./arena-audio.js?v=autoplay47');
   return mod.arenaAudio.musicState.playing;
  },null,{timeout:8000});
  await desktop.waitForFunction(async()=>{
-  const mod=await import('./arena-audio.js?v=cinema44');
+  const mod=await import('./arena-audio.js?v=autoplay47');
   return mod.arenaAudio.musicState.volume>=.20;
  },null,{timeout:10000});
  const soundtrack=await desktop.evaluate(async()=>{
-  const mod=await import('./arena-audio.js?v=cinema44');
+  const mod=await import('./arena-audio.js?v=autoplay47');
   return mod.arenaAudio.musicState;
  });
  assert(soundtrack.volume>=.20,'Lobby soundtrack must have audible volume');
