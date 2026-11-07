@@ -564,34 +564,41 @@ async function share(){const link=createLink();try{await navigator.clipboard.wri
 function processLink(){try{const h=location.hash;if(!h.startsWith('#duel='))return;const d=decode(h.slice(6));if(d.v!==2)return;if(d.complete){toast('Resultado compartilhado: '+d.a.score+' × '+d.b.score+' pontos.');location.hash='';return}if(typeof d.playerId!=='string'||typeof d.rivalId!=='string'||!H[d.house]||!H[d.rivalId[0]]||d.playerId===d.rivalId||!Number.isInteger(d.score)||d.score<0||d.score>50||!choices(d.house).some(x=>x.id===d.playerId)||!choices(d.rivalId[0]).some(x=>x.id===d.rivalId))return;incoming=d;selectHouse(d.rivalId[0]);$('player').value=d.rivalId;$('mode').value=d.house===d.rivalId[0]?'challenge_same':'challenge';updateMode();$('rival-label').classList.add('hidden');$('difficulty-label').classList.add('hidden');toast('⚔️ Desafio recebido de '+byId(d.playerId)+' — '+d.score+' pontos!');setLobbyStep('partida');}catch(e){console.warn('Desafio inválido',e)}}
 const htmlSafe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function renderRanking(){
- const status=$('ranking-status');
+ const status=$('ranking-status'),classesHost=$('rank-houses'),playersHost=$('rank-players');
  if(!online.enabled){
-  status.textContent='⚠️ A planilha já foi criada, mas a API de classificação ainda não foi publicada. Nenhum resultado local é apresentado como ranking online.';
-  $('rank-houses').innerHTML='<div class="empty">Aguardando ativação do serviço online pelo professor.</div>';
-  $('rank-players').innerHTML='<div class="empty">Sem classificação online até a publicação da API.</div>';
-  return;
+  status.textContent='⚠️ A API de ranking não está configurada.';
+  classesHost.innerHTML='<div class="empty">Placar indisponível.</div>';
+  playersHost.innerHTML='<div class="empty">Placar indisponível.</div>';return;
  }
- status.textContent='⏳ Consultando os resultados oficiais no Google Sheets...';
+ status.textContent='⏳ Consultando o ranking oficial do torneio...';
  try{
   const data=await online.ranking();
-  status.textContent='✅ Placar online — '+data.games+' desafios concluídos. Atualizado: '+new Date().toLocaleTimeString('pt-BR');
-  const classes=data.classes||[],teams=data.teams||[],players=data.players||[];
-  const groups=scoreTab==='teams'?teams:classes;
-  $('rank-houses').innerHTML=groups.map((row,i)=>`<div class="rankline">
-   <div><b>${['🥇','🥈','🥉'][i]||'🏹'} ${htmlSafe(H[row.name]?.name||row.name)}</b>
-   <small>${row.members||0} integrantes · ${row.plays||0} participações</small></div>
-   <span>${row.wins||0} vitórias</span></div>`).join('')||'<div class="empty">Nenhum duelo encerrado.</div>';
-  $('rank-players').innerHTML=players.slice(0,25).map((p,i)=>`<div class="rankline">
-   <div><b>${i+1}º · ${htmlSafe(p.name)}</b>
-   <small>${htmlSafe(H[p.house]?.grade||p.house)} · ${htmlSafe(p.team)} · ${p.plays||0} partidas</small></div>
-   <span>${p.wins||0} V · ${p.total||0} pts</span></div>`).join('')||'<div class="empty">Nenhum desafio concluído ainda.</div>';
+  const matches=Number(data.games)||0;
+  const allClasses=Array.isArray(data.classes)?data.classes:[];
+  const allTeams=Array.isArray(data.teams)?data.teams:[];
+  const allPlayers=Array.isArray(data.players)?data.players:[];
+  status.textContent='🏆 '+matches+' duelos concluídos · Atualizado às '+new Date().toLocaleTimeString('pt-BR');
+  const groupType=scoreTab==='teams'?'teams':'classes';
+  const groups=groupType==='teams'?allTeams:allClasses;
+  const houseLabel=groupType==='teams'?'🛡️ Classificação das Equipes':'🏰 Classificação das Turmas';
+  const groupHeading=classesHost.closest('.ranking-panel')?.querySelector('h2');
+  if(groupHeading)groupHeading.textContent=houseLabel;
+  const playerHeading=playersHost.closest('.ranking-panel')?.querySelector('h2');
+  if(playerHeading)playerHeading.textContent=scoreTab==='players'?'🏹 Ranking dos Arqueiros':'🏹 Arqueiros em Destaque';
+  classesHost.innerHTML=groups.map((row,i)=>`<div class="rankline">
+    <div><b>${['🥇','🥈','🥉'][i]||'🏹'} ${htmlSafe(groupType==='classes'?(H[row.name]?.name||row.name):row.name)}</b>
+    <small>${row.members||0} integrantes · ${row.plays||0} participações · ${row.total||0} pontos</small></div>
+    <span>${row.wins||0} vitórias</span></div>`).join('')||'<div class="empty">Nenhum registro para este grupo.</div>';
+  playersHost.innerHTML=allPlayers.slice(0,25).map((p,i)=>`<div class="rankline">
+    <div><b>${i+1}º · ${htmlSafe(p.name)}</b>
+    <small>${htmlSafe(H[p.house]?.grade||p.house)} · ${htmlSafe(p.team||'Sem equipe')} · ${p.plays||0} partidas</small></div>
+    <span>${p.wins||0} V · ${p.losses||0} D · ${p.total||0} pts</span></div>`).join('')||'<div class="empty">Ainda não há duelos concluídos.</div>';
  }catch(err){
-  status.textContent='⚠️ Não foi possível consultar o placar: '+err.message;
-  $('rank-houses').innerHTML='<div class="empty">Placar temporariamente indisponível.</div>';
-  $('rank-players').innerHTML='<div class="empty">Os resultados permanecem no servidor; tente novamente.</div>';
+  status.textContent='⚠️ Falha ao consultar o ranking no servidor: '+err.message;
+  classesHost.innerHTML='<div class="empty">Não foi possível atualizar a classificação.</div>';
+  playersHost.innerHTML='<div class="empty">Os resultados registrados não foram apagados. Tente novamente.</div>';
  }
 }
-
 function showOnlineStatus(){
  const active=online.enabled&&online.state==='ready',user=online.user;
  $('online-status').classList.toggle('ok',active);
