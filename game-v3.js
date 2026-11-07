@@ -85,7 +85,18 @@ function drawCourse(){
 }
 
 function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(2,'0'),name}));}
-function fillPlayer(wanted){const sel=$('player');sel.innerHTML='<option value="guest">Arqueiro convidado</option>'+choices(house).map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');if(wanted&&choices(house).some(x=>x.id===wanted))sel.value=wanted;fillRivals()}
+function fillPlayer(wanted){
+ const sel=$('player'),quick=$('cm-quick-player');
+ const valid=choices(house),previous=sel.value;
+ const selected=[wanted,previous,online.user?.id].find(id=>valid.some(p=>p.id===id))||'guest';
+ sel.innerHTML='<option value="guest">Selecione seu nome</option>'+valid.map(p=>`<option value="${p.id}">${p.name} · ${p.id}</option>`).join('');
+ sel.value=selected;
+ if(quick){
+  quick.innerHTML='<option value="">Selecione seu nome para disputar</option>'+valid.map(p=>`<option value="${p.id}">${p.name} · ${p.id}</option>`).join('');
+  quick.value=selected==='guest'?'':selected;
+ }
+ fillRivals();
+}
 function fillRivals(){
  const mode=$('mode').value,same=mode==='challenge_same',teams=mode==='challenge_team',myId=$('player').value;
  const myTeam=TEAMS[myId]||'',all=Object.keys(H),scope=$('team-scope').value;
@@ -259,6 +270,12 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
+  if(!/^[ABC]\\d{2}$/.test(userId||'')){
+    setLobbyStep('desafio');
+    $('cm-quick-player')?.focus();
+    toast('Selecione seu nome na tela de desafios.');
+    return;
+  }
   /* API direta: o duelo acontece no GitHub Pages, sem portal Apps Script. */
   if(!online.enabled||online.state!=='ready'){toast('⚠️ '+(online.lastError||'A Arena Online não conseguiu conectar ao Apps Script.'));return}
   if(!online.user||online.user.id!==userId){
@@ -675,7 +692,22 @@ updateSoundButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
 applyEquipment();
 $('mode').addEventListener('change',updateMode);
-$('player').addEventListener('change',()=>{fillRivals();if(online.state==='ready'&&$('player').value!=='guest')loginStudent().catch(console.warn)});
+$('player').addEventListener('change',()=>{
+ const quick=$('cm-quick-player');if(quick)quick.value=$('player').value==='guest'?'':$('player').value;
+ fillRivals();if(online.state==='ready'&&$('player').value!=='guest')loginStudent().catch(console.warn);
+});
+$('cm-quick-player')?.addEventListener('change',async event=>{
+ const id=event.currentTarget.value;
+ $('player').value=id||'guest';fillRivals();
+ const help=$('cm-quick-help');
+ if(!id){if(help)help.textContent='Escolha seu nome para iniciar um duelo.';return}
+ if(help)help.textContent='⏳ Conectando perfil ao servidor...';
+ if(online.state!=='ready'){
+  try{await startOnlineClient()}catch(error){if(help)help.textContent='⚠️ '+error.message;return}
+ }
+ const user=await loginStudent();
+ if(help)help.textContent=user?'✅ '+user.name+' selecionado. Agora escolha o desafio.':'⚠️ Não foi possível conectar o perfil.';
+});
 $('team-scope').addEventListener('change',updateMode);
 $('opponent-house').addEventListener('change',fillRivals);
 $('opponent-team').addEventListener('change',fillRivals);
@@ -741,8 +773,13 @@ document.querySelectorAll('[data-play-mode]').forEach(button=>{
  button.addEventListener('click',()=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
+  if(isDuel(chosen)&&!(/^[ABC]\\d{2}$/.test($('player').value))){
+    setLobbyStep('desafio');
+    const quick=$('cm-quick-player');if(quick){quick.focus();quick.classList.add('cm-needs-player');}
+    toast('🏹 Escolha seu nome antes de iniciar o duelo.');
+    return;
+  }
   $('mode').value=chosen;updateMode();
-  
   setLobbyStep('partida');
  });
 });
