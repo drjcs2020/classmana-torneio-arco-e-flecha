@@ -625,16 +625,19 @@ function renderInbox(){
  if(!id){list.innerHTML='<div class="empty">Selecione seu jogador.</div>';return}
  const rows=onlineInbox.filter(ch=>ch?.id&&ch.creator?.id!==ch.recipient?.id&&
    (ch.creator?.id===id||ch.recipient?.id===id));
- const finished=rows.filter(ch=>ch.status==='CONCLUIDO');
- const archived=rows.filter(ch=>ch.status==='RECUSADO');
- const open=rows.filter(ch=>!['CONCLUIDO','RECUSADO'].includes(ch.status));
+ // Use an explicit allow-list: terminal and unknown statuses must never inflate open challenges.
+ const statusOf=ch=>String(ch.status||'').trim().toUpperCase();
+ const finished=rows.filter(ch=>statusOf(ch)==='CONCLUIDO');
+ const archived=rows.filter(ch=>['RECUSADO','RECUSADA','REJEITADO','DECLINED'].includes(statusOf(ch)));
+ const open=rows.filter(ch=>['PENDENTE','ACEITO','CRIADOR_JOGANDO'].includes(statusOf(ch)));
+ const other=rows.filter(ch=>!['CONCLUIDO','RECUSADO','RECUSADA','REJEITADO','DECLINED','PENDENTE','ACEITO','CRIADOR_JOGANDO'].includes(statusOf(ch)));
  const score=(ch,mine)=>Number(mine?ch.creatorScore:ch.recipientScore);
  const otherScore=(ch,mine)=>Number(mine?ch.recipientScore:ch.creatorScore);
  const wins=finished.filter(ch=>{const mine=ch.creator.id===id;return score(ch,mine)>otherScore(ch,mine)}).length;
  const losses=finished.filter(ch=>{const mine=ch.creator.id===id;return score(ch,mine)<otherScore(ch,mine)}).length;
  const draws=finished.length-wins-losses;
  const summary=document.createElement('div');summary.className='cm-duel-summary';
- for(const [name,count,cls] of [['Em aberto',open.length,'open'],['Vitórias',wins,'win'],['Derrotas',losses,'loss'],['Empates',draws,'draw']]){
+ for(const [name,count,cls] of [['Em aberto',open.length,'open'],['Recusados',archived.length,'declined'],['Vitórias',wins,'win'],['Derrotas',losses,'loss'],['Empates',draws,'draw']]){
   const cell=document.createElement('div');cell.className='cm-duel-stat cm-stat-'+cls;
   const n=document.createElement('strong');n.textContent=String(count);
   const label=document.createElement('span');label.textContent=name;cell.append(n,label);summary.appendChild(cell);
@@ -647,29 +650,32 @@ function renderInbox(){
  function card(ch){
   const mine=ch.creator.id===id,opponent=mine?ch.recipient:ch.creator;
   const item=document.createElement('article');item.className='cm-challenge';
-  if(ch.status==='CONCLUIDO'){
+  if(statusOf(ch)==='CONCLUIDO'){
    const own=score(ch,mine),other=otherScore(ch,mine);
    item.classList.add(own>other?'cm-duel-win':own<other?'cm-duel-loss':'cm-duel-draw');
-  }else if(ch.status==='RECUSADO'){item.classList.add('cm-duel-declined')}
+  }else if(archived.includes(ch)){item.classList.add('cm-duel-declined')}
   else{item.classList.add('cm-duel-open')}
   if(cmAlertable(ch,id)&&cmNoticeSnapshot[ch.id]!==cmNotificationState(ch))item.classList.add('cm-challenge-new');
   const title=document.createElement('strong');title.textContent=(mine?'📤 Você desafiou ':'🔔 Você foi desafiado por ')+(opponent?.name||'Colega');
   const type={mesma_turma:'Mesma turma',entre_equipes:'Entre equipes',interclasses:'Interclasses'}[ch.kind]||ch.kind;
-  const statusLabel={CRIADOR_JOGANDO:'Termine suas 5 flechas',PENDENTE:'Aguardando aceite',ACEITO:'Desafio aceito',RECUSADO:'Recusado',CONCLUIDO:'Concluído'}[ch.status]||ch.status;
+  const statusLabel={CRIADOR_JOGANDO:mine?'Termine suas 5 flechas':'O desafiante ainda está jogando',PENDENTE:'Aguardando aceite',ACEITO:'Desafio aceito',RECUSADO:'Recusado',RECUSADA:'Recusado',REJEITADO:'Recusado',DECLINED:'Recusado',CONCLUIDO:'Concluído'}[statusOf(ch)]||'Estado indisponível';
   const sub=document.createElement('small');sub.textContent=type+' · '+statusLabel+' · '+new Date(ch.created).toLocaleDateString('pt-BR');
   item.append(title,sub);
-  if(ch.status==='CONCLUIDO'){
+  if(statusOf(ch)==='CONCLUIDO'){
    const own=score(ch,mine),other=otherScore(ch,mine);
    const result=document.createElement('p');result.className='cm-duel-result';
    result.textContent=(own>other?'🏆 VITÓRIA':own<other?'⚔️ DERROTA':'🤝 EMPATE')+' · '+own+' × '+other+' pontos';
    item.appendChild(result);
   }else{
    const desc=document.createElement('p');
-   desc.textContent=ch.status==='CRIADOR_JOGANDO'&&mine?'Faça suas cinco flechas para enviar o convite.':
-     ch.status==='PENDENTE'&&mine?'Seu colega já pode aceitar o desafio.':
-     ch.status==='PENDENTE'?'Você recebeu um convite. Aceite ou recuse.':
-     ch.status==='ACEITO'&&mine?'Aguardando a rodada do colega.':
-     ch.status==='ACEITO'?'Sua rodada está disponível.':'Convite recusado.';
+   const status=statusOf(ch);
+   desc.textContent=archived.includes(ch)?'Convite recusado e encerrado.':
+     status==='CRIADOR_JOGANDO'&&mine?'Faça suas cinco flechas para enviar o convite.':
+     status==='CRIADOR_JOGANDO'?'O desafiante ainda precisa terminar as cinco flechas. Você não precisa agir agora.':
+     status==='PENDENTE'&&mine?'Seu colega já pode aceitar o desafio.':
+     status==='PENDENTE'?'Você recebeu um convite. Aceite ou recuse.':
+     status==='ACEITO'&&mine?'Aguardando a rodada do colega.':
+     status==='ACEITO'?'Sua rodada está disponível.':'Status não reconhecido. Consulte novamente mais tarde.';
    item.appendChild(desc);
   }
   const actions=document.createElement('div');actions.className='cm-challenge-actions';
@@ -677,9 +683,9 @@ function renderInbox(){
    const button=document.createElement('button');button.type='button';button.className='cm-challenge-btn'+(reject?' reject':'');
    button.textContent=label;button.dataset.id=ch.id;button.dataset.action=kind;actions.appendChild(button);
   }
-  if(!mine&&ch.status==='PENDENTE'){action('✅ ACEITAR','accept');action('❌ RECUSAR','decline',true)}
-  else if(!mine&&ch.status==='ACEITO')action('🏹 JOGAR MINHAS 5 FLECHAS','play');
-  else if(mine&&ch.status==='CRIADOR_JOGANDO')action('🏹 RETOMAR MINHA RODADA','play');
+  if(!mine&&statusOf(ch)==='PENDENTE'){action('✅ ACEITAR','accept');action('❌ RECUSAR','decline',true)}
+  else if(!mine&&statusOf(ch)==='ACEITO')action('🏹 JOGAR MINHAS 5 FLECHAS','play');
+  else if(mine&&statusOf(ch)==='CRIADOR_JOGANDO')action('🏹 RETOMAR MINHA RODADA','play');
   if(actions.childElementCount)item.appendChild(actions);
   return item;
  }
@@ -700,7 +706,7 @@ function renderInbox(){
  const history=document.createElement('details');history.className='cm-duel-history';
  const historyTitle=document.createElement('summary');historyTitle.textContent='📜 HISTÓRICO — '+finished.length+' concluídos · '+archived.length+' recusados';
  history.appendChild(historyTitle);
- for(const [label,items] of [['✅ Duelos concluídos',finished],['🚫 Convites recusados',archived]]){
+ for(const [label,items] of [['✅ Duelos concluídos',finished],['🚫 Desafios recusados — encerrados',archived],['⚠️ Outros estados — não contabilizados como abertos',other]]){
   history.appendChild(heading(label,items.length));
   for(const ch of items)history.appendChild(card(ch));
  }
