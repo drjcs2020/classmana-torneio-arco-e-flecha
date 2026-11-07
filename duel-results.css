@@ -1,0 +1,127 @@
+
+/* ClassMana — Resultado de duelo legível. Não altera cenário, personagens ou física. */
+#view-arena #finish.finish:not(.hidden){
+ position:absolute!important;inset:0!important;z-index:45!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:clamp(10px,2vw,24px)!important;overflow:auto!important;
+ background:rgba(3,13,31,.67)!important;
+ backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important;
+}
+#view-arena #finish .finish-card{
+ box-sizing:border-box!important;position:relative!important;
+ width:min(730px,96vw)!important;max-width:730px!important;
+ min-height:0!important;max-height:min(88%,690px)!important;
+ overflow-y:auto!important;overflow-x:hidden!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;
+ gap:clamp(8px,1.45vh,16px)!important;
+ padding:clamp(17px,3vw,34px)!important;
+ background:linear-gradient(150deg,rgba(7,28,59,.98),rgba(8,48,83,.98) 58%,rgba(5,25,52,.98))!important;
+ border:4px ridge #efc56c!important;border-radius:22px!important;
+ box-shadow:0 22px 65px #000d,0 0 0 3px #07152bd9,inset 0 0 30px #d99e3d24!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ text-align:center!important;
+}
+#view-arena #finish .cm-finish-heroes{
+ display:none!important;
+}
+#view-arena #finish .finish-card>small{
+ display:block!important;font:800 clamp(11px,1.15vw,14px)/1.25 'Nunito',sans-serif!important;
+ letter-spacing:.14em!important;color:#f2cf8a!important;
+ text-shadow:none!important;margin:0!important;
+}
+#view-arena #finish #finish-title{
+ display:block!important;max-width:100%!important;
+ margin:0!important;padding:0!important;
+ color:#ffe09b!important;
+ font:800 clamp(24px,3.5vw,43px)/1.13 'Cinzel',Georgia,serif!important;
+ text-shadow:0 2px 1px #5c310c,0 4px 10px #000b!important;
+ overflow-wrap:anywhere!important;word-break:normal!important;
+}
+#view-arena #finish #finish-desc{
+ display:block!important;max-width:590px!important;
+ margin:0!important;padding:0!important;
+ color:#fff8e9!important;
+ font:700 clamp(14px,1.5vw,18px)/1.45 'Nunito',sans-serif!important;
+ text-shadow:none!important;overflow-wrap:anywhere!important;
+}
+#view-arena #finish .finish-results{
+ width:100%!important;max-width:620px!important;
+ box-sizing:border-box!important;
+ margin:4px auto!important;padding:clamp(10px,1.5vw,18px)!important;
+ border:2px solid #d9ac5e!important;border-radius:17px!important;
+ background:linear-gradient(170deg,rgba(255,250,232,.98),rgba(239,218,170,.96))!important;
+ color:#183650!important;box-shadow:inset 0 2px 8px #8b68223b,0 7px 16px #0005!important;
+ font:900 clamp(15px,1.6vw,20px)/1.25 'Nunito',sans-serif!important;
+ text-shadow:none!important;
+}
+#view-arena #finish .finish-results.cm-score-grid{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:clamp(9px,2vw,22px)!important;align-items:stretch!important;
+}
+#view-arena #finish .cm-score-cell{
+ min-width:0!important;display:flex!important;flex-direction:column!important;
+ gap:3px!important;align-items:center!important;justify-content:center!important;
+ padding:clamp(8px,1.5vw,17px)!important;border-radius:12px!important;
+ border:2px solid #c89f5c!important;background:#fff9ee!important;
+}
+#view-arena #finish .cm-score-own{border-color:#c79b37!important;background:#fff1c7!important}
+#view-arena #finish .cm-score-other{border-color:#a5bad1!important;background:#f2f6fc!important}
+#view-arena #finish .cm-score-label{
+ color:#334259!important;font:900 clamp(12px,1.25vw,16px)/1.3 'Nunito',sans-serif!important;
+ letter-spacing:.07em!important;
+}
+#view-arena #finish .cm-score-value{
+ display:block!important;color:#183b61!important;
+ font:900 clamp(30px,4.2vw,53px)/1.12 'Baloo 2','Nunito',sans-serif!important;
+ text-shadow:none!important;overflow-wrap:anywhere!important;
+}
+#view-arena #finish .cm-score-unit{
+ color:#5e4c2b!important;font:900 12px/1.2 'Nunito',sans-serif!important;letter-spacing:.1em!important;
+}
+#view-arena #finish .finish-actions{
+ display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:center!important;
+ gap:clamp(9px,1.8vw,18px)!important;width:100%!important;margin:2px 0!important;
+}
+#view-arena #finish #play-again,
+#view-arena #finish #share-result{
+ width:min(100%,290px)!important;height:clamp(58px,8vh,83px)!important;min-height:58px!important;
+ max-width:290px!important;flex:1 1 200px!important;
+ padding:0!important;cursor:pointer!important;
+ background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;
+ filter:drop-shadow(0 5px 6px #0009)!important;
+}
+#view-arena #finish #play-again:focus-visible,
+#view-arena #finish #share-result:focus-visible{
+ outline:3px solid #fff3ab!important;outline-offset:3px!important;
+}
+#view-arena #finish #share-result.cm-retry{
+ background:linear-gradient(#0b5085,#05365b)!important;
+ border:2px solid #ffde92!important;color:#fff5dc!important;
+ font:900 15px 'Nunito',sans-serif!important;border-radius:12px!important;
+}
+#view-arena #finish .share-help{
+ margin:2px 0 0!important;padding:0!important;
+ max-width:590px!important;
+ color:#e9f7e9!important;font:700 clamp(12px,1.15vw,14px)/1.4 'Nunito',sans-serif!important;
+ text-align:center!important;text-shadow:none!important;
+}
+@media(max-width:560px){
+ #view-arena #finish.finish:not(.hidden){padding:8px!important}
+ #view-arena #finish .finish-card{width:100%!important;max-height:94%!important;padding:15px 12px!important;gap:8px!important}
+ #view-arena #finish #finish-title{font-size:clamp(22px,6vw,30px)!important}
+ #view-arena #finish #finish-desc{font-size:14px!important}
+ #view-arena #finish .finish-results.cm-score-grid{gap:7px!important;padding:8px!important}
+ #view-arena #finish .cm-score-value{font-size:34px!important}
+ #view-arena #finish .finish-actions{gap:5px!important}
+ #view-arena #finish #play-again,#view-arena #finish #share-result{
+  height:58px!important;min-height:58px!important;flex-basis:140px!important
+ }
+}
+@media(max-height:580px){
+ #view-arena #finish .finish-card{max-height:96%!important;padding:12px 18px!important;gap:5px!important}
+ #view-arena #finish #finish-title{font-size:clamp(20px,3vw,30px)!important}
+ #view-arena #finish #finish-desc{font-size:13px!important}
+ #view-arena #finish .cm-score-value{font-size:31px!important}
+ #view-arena #finish .finish-actions button{height:55px!important;min-height:55px!important}
+}
