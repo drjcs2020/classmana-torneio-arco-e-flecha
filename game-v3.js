@@ -2,7 +2,7 @@ import {initScene} from './scene-v3.js?v=23';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=5';
 import {initAtmosphere} from './arena-atmosphere.js?v=1';
-import {online} from './online-client.js?v=portal9b';
+import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
 const $=id=>document.getElementById(id);
 const H={A:{grade:'4º A',name:'Águia Dourada',color:'#78bdff'},B:{grade:'4º B',name:'Leão de Fogo',color:'#ff9778'},C:{grade:'4º C',name:'Dragão de Esmeralda',color:'#8defac'}};
@@ -694,7 +694,7 @@ document.addEventListener('keydown',e=>{if(view!=='arena'||!match?.running||matc
 setInterval(()=>{if(holding&&!match?.paused){scene?.setPower(chargePower());uiHud()}},60);
 
 $('retry-online')?.addEventListener('click',async()=>{
- if(window.parent===window){goOnlinePortal();return}
+ 
  const button=$('retry-online');button.disabled=true;
  try{await startOnlineClient()}
  finally{button.disabled=false}
@@ -741,7 +741,7 @@ document.querySelectorAll('[data-play-mode]').forEach(button=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
   $('mode').value=chosen;updateMode();
-  if(isDuel(chosen)&&window.parent===window){goOnlinePortal(chosen);return}
+  
   setLobbyStep('partida');
  });
 });
