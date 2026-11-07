@@ -43,6 +43,7 @@ function chooseEquipment(key,value){
  applyEquipment();
 }
 let incoming=null,scoreTab='players',onlineInbox=[],onlineLoading=false,startMatchPending=false;
+let identifiedPlayerId='';
 const TEAMS=window.CLASSMANA_TEAMS||{};
 
 const rand=(a,b)=>a+Math.random()*(b-a);
@@ -67,7 +68,7 @@ function openView(name){
  if(name==='ranking')renderRanking();
 }
 function setLobbyStep(step){
- if(!['reino','heroi','desafio','partida'].includes(step))return;
+ if(!['perfil','reino','heroi','desafio','partida'].includes(step))return;
  const el=$('view-inicio');if(!el)return;
  el.dataset.step=step;
  document.querySelectorAll('[data-lobby-step]').forEach(button=>{
@@ -88,7 +89,7 @@ function choices(h){return (R[h]||[]).map((name,i)=>({id:h+String(i+1).padStart(
 function fillPlayer(wanted){
  const sel=$('player'),quick=$('cm-quick-player');
  const valid=choices(house),previous=sel.value;
- const selected=[wanted,previous,online.user?.id].find(id=>valid.some(p=>p.id===id))||'guest';
+ const selected=[identifiedPlayerId,wanted,previous,online.user?.id].find(id=>valid.some(p=>p.id===id))||'guest';
  sel.innerHTML='<option value="guest">Selecione seu nome</option>'+valid.map(p=>`<option value="${p.id}">${p.name} · ${p.id}</option>`).join('');
  sel.value=selected;
  if(quick){
@@ -154,6 +155,9 @@ function chooseArcher(g){
 }
 function selectHouse(k){
  if(!H[k])return;
+ if(document.body.dataset.page==='lobby'&&identifiedPlayerId&&identifiedPlayerId[0]!==k){
+  toast('Seu perfil pertence ao 4º '+identifiedPlayerId[0]+'. Para trocar de Casa, escolha outro aluno.');return;
+ }
  house=k;arenaAudio.setHouse(k);atmosphere?.setHouse(k);
  const lobby=$('view-inicio');if(lobby)lobby.dataset.house=k;
  document.querySelectorAll('.house').forEach(el=>{
@@ -171,7 +175,7 @@ function selectHouse(k){
   if(match)uiHud();
  });
  fillPlayer(incoming?.rivalId?.[0]===k?incoming.rivalId:null);
- if(view==='inicio')setLobbyStep('heroi');
+ if(view==='inicio'&&document.body.dataset.page==='lobby'&&$('view-inicio')?.dataset.step!=='perfil')setLobbyStep('heroi');
 }
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
 function goOnlinePortal(mode=$('mode').value,inbox=false){
@@ -271,9 +275,9 @@ async function startMatch(accepted=null){
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
   if(!/^[ABC][0-9]{2}$/.test(userId||'')){
-    setLobbyStep('desafio');
-    $('cm-quick-player')?.focus();
-    toast('Selecione seu nome na tela de desafios.');
+    setLobbyStep('perfil');
+    $('cm-identity-player')?.focus();
+    toast('Primeiro escolha seu nome na entrada do torneio.');
     return;
   }
   /* API direta: o duelo acontece no GitHub Pages, sem portal Apps Script. */
@@ -663,7 +667,29 @@ async function startOnlineClient(){
 
 // Interações do jogo.
 document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.view==='inicio'&&view==='inicio')setLobbyStep('reino');else openView(el.dataset.view)}));
-document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>setLobbyStep(button.dataset.lobbyStep)));
+document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>{if(document.body.dataset.page==='lobby'&&!identifiedPlayerId){setLobbyStep('perfil');return}setLobbyStep(button.dataset.lobbyStep)}));
+function populateIdentityOptions(){
+ const el=$('cm-identity-player');if(!el)return;
+ el.innerHTML='<option value="">Selecione seu nome</option>'+['A','B','C'].map(h=>
+  '<optgroup label="'+H[h].grade+' — '+H[h].name+'">'+choices(h).map(p=>
+    '<option value="'+p.id+'">'+p.name+' · '+p.id+'</option>').join('')+'</optgroup>').join('');
+ if(identifiedPlayerId)el.value=identifiedPlayerId;
+}
+populateIdentityOptions();
+$('cm-identity-player')?.addEventListener('change',event=>{
+ const id=event.currentTarget.value,found=choices(id?.[0]||'').find(p=>p.id===id);
+ const info=$('cm-identity-info');
+ if(info)info.textContent=found?'✓ '+found.name+' · 4º '+id[0]+' — '+H[id[0]].name:'Escolha um nome para continuar.';
+});
+$('cm-confirm-identity')?.addEventListener('click',async()=>{
+ const id=$('cm-identity-player')?.value||'';
+ if(!/^[ABC][0-9]{2}$/.test(id)){toast('Escolha seu nome na lista.');$('cm-identity-player')?.focus();return;}
+ identifiedPlayerId=id;
+ selectHouse(id[0]);
+ $('player').value=id;fillRivals();
+ setLobbyStep('reino');
+ if(online.state==='ready')void loginStudent().catch(console.warn);
+});
 $('confirm-archer').addEventListener('click',()=>setLobbyStep('desafio'));
 $('challenge-level').addEventListener('change',drawCourse);
 document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>{
@@ -696,18 +722,7 @@ $('player').addEventListener('change',()=>{
  const quick=$('cm-quick-player');if(quick)quick.value=$('player').value==='guest'?'':$('player').value;
  fillRivals();if(online.state==='ready'&&$('player').value!=='guest')loginStudent().catch(console.warn);
 });
-$('cm-quick-player')?.addEventListener('change',async event=>{
- const id=event.currentTarget.value;
- $('player').value=id||'guest';fillRivals();
- const help=$('cm-quick-help');
- if(!id){if(help)help.textContent='Escolha seu nome para iniciar um duelo.';return}
- if(help)help.textContent='⏳ Conectando perfil ao servidor...';
- if(online.state!=='ready'){
-  try{await startOnlineClient()}catch(error){if(help)help.textContent='⚠️ '+error.message;return}
- }
- const user=await loginStudent();
- if(help)help.textContent=user?'✅ '+user.name+' selecionado. Agora escolha o desafio.':'⚠️ Não foi possível conectar o perfil.';
-});
+
 $('team-scope').addEventListener('change',updateMode);
 $('opponent-house').addEventListener('change',fillRivals);
 $('opponent-team').addEventListener('change',fillRivals);
@@ -755,7 +770,8 @@ spriteHud=mountSpriteHUD({
   $('stage').classList.remove('aiming');scene?.setPower(p);fire(p);uiHud();},
  onPause:toggleArenaPause
 });
-selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');
+selectHouse('A');updateMode();drawCourse();
+if(document.body.dataset.page==='lobby')setLobbyStep('perfil');else setLobbyStep('reino');
 const hostedParams=new URLSearchParams(location.search);
 if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
  const hostHouse=hostedParams.get('house'),hostMode=hostedParams.get('mode'),hostPlayer=hostedParams.get('player');
@@ -767,17 +783,15 @@ if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
 // A abertura duplicada foi removida. O fluxo começa na escolha da Casa.
 $('cm-lobby-back')?.addEventListener('click',()=>{
  const step=$('view-inicio')?.dataset.step;
- setLobbyStep(step==='partida'?'desafio':step==='desafio'?'heroi':'reino');
+ setLobbyStep(step==='partida'?'desafio':step==='desafio'?'heroi':step==='heroi'?'reino':'perfil');
 });
 document.querySelectorAll('[data-play-mode]').forEach(button=>{
  button.addEventListener('click',()=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
   if(isDuel(chosen)&&!(/^[ABC][0-9]{2}$/.test($('player').value))){
-    setLobbyStep('desafio');
-    const quick=$('cm-quick-player');if(quick){quick.focus();quick.classList.add('cm-needs-player');}
-    toast('🏹 Escolha seu nome antes de iniciar o duelo.');
-    return;
+    setLobbyStep('perfil');$('cm-identity-player')?.focus();
+    toast('🏹 Escolha seu nome antes de iniciar o duelo.');return;
   }
   $('mode').value=chosen;updateMode();
   setLobbyStep('partida');
