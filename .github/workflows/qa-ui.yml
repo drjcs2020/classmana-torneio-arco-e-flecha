@@ -50,7 +50,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Check desktop and mobile layout + game navigation
         run: |
-          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/classmana-http.log 2>&1 &
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/classmana-http.log 2>&1 &
           node scripts/qa-browser.mjs
       # JSONP e iframe cross-site de Apps Script foram substituídos pelo portal v9.
       # Teste de rede /exec separado: scripts/qa-online.mjs (não cria desafios).
