@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="wind-panel-restored.css?v=wind20">
 </head>
 <body data-page="arena">
+<!-- A arena é a view inicial. A seleção antiga nunca é exibida durante o carregamento. -->
 <div class="sky-sparkles" aria-hidden="true"></div>
 <div class="page">
 <header class="nav-bar">
@@ -26,7 +27,7 @@
 </header>
 
 <main>
-<section id="view-inicio" class="view active" data-step="reino" aria-label="Página 1 — Preparar o torneio">
+<section id="view-inicio" class="view" data-step="reino" aria-label="Página 1 — Preparar o torneio">
  <div class="section-title kingdom-title"><div><small>⚔️ TORNEIO DAS TRÊS CASAS</small><h1>Escolha seu Reino</h1></div><p>3 Casas · 6 arqueiros · 1 grande aventura</p></div>
  <div class="lobby-steps" id="lobby-steps" role="tablist" aria-label="Preparação do torneio">
   <button type="button" class="lobby-step chosen" data-lobby-step="reino" role="tab" aria-selected="true">1 · Reino</button>
@@ -114,7 +115,7 @@
  </div>
 </section>
 
-<section id="view-arena" class="view" aria-label="Página 2 — Arena">
+<section id="view-arena" class="view active" aria-label="Página 2 — Arena">
  <div class="arena-top"><button class="back" id="leave-arena">← REINOS</button><div class="arena-header"><b id="match-title">ARENA DO ARCO E FLECHA</b></div><button type="button" id="arena-sound" class="arena-sound-toggle" aria-pressed="true" aria-label="Desativar som da arena">🔊 SOM</button></div>
  <div class="stage" id="stage">
  <div class="battle-hud">
