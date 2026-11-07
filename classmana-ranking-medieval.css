@@ -428,3 +428,13 @@ body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
   margin-top:auto!important;height:56px!important;
  }
 }
+
+/* Mobile sound control must not cover the main START PARTIDA button. */
+@media(max-width:780px){
+ body[data-page="lobby"] #view-inicio[data-step="partida"]~#cm-lobby-sound,
+ body[data-page="lobby"]:has(#view-inicio[data-step="partida"]) #cm-lobby-sound{
+  position:fixed!important;top:auto!important;bottom:80px!important;
+  right:8px!important;left:auto!important;max-width:116px!important;
+  z-index:30!important;
+ }
+}
