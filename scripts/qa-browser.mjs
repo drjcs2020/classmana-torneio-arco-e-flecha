@@ -57,6 +57,16 @@ try{
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'perfil');
  await desktop.locator('#cm-identity-player').selectOption('B01');
  await verifyPicture(desktop,'.cm-identity-logo');
+ const identityBox=await desktop.locator('.cm-identity-panel').evaluate(el=>{
+   const r=el.getBoundingClientRect(),cs=getComputedStyle(el),last=el.querySelector('#cm-confirm-identity')?.getBoundingClientRect();
+   const brand=document.querySelector('#view-inicio .cm-house-title')?.getBoundingClientRect();
+   return {top:r.top,bottom:r.bottom,width:r.width,overflowY:cs.overflowY,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,
+    confirmBottom:last?.bottom,brandBottom:brand?.bottom};
+ });
+ assert(identityBox.width>=790,'Student identity panel too narrow');
+ assert(identityBox.scrollHeight<=identityBox.clientHeight+3,'Student identity panel has unnecessary internal scroll');
+ assert(identityBox.confirmBottom<=identityBox.bottom-6,'Confirm player button clipped');
+ await shot(desktop,'01b-identidade-desktop');
  const logoDimensions=await desktop.locator('.cm-identity-logo').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight}));
  assert(logoDimensions.width>=1300&&logoDimensions.height>=480,'ClassMana logo is low-resolution');
  await desktop.locator('#cm-confirm-identity').click();
@@ -77,6 +87,8 @@ await shot(desktop,'02-arqueiro-desktop');
  assert.match(await desktop.locator('#archer-carousel-indicator').textContent(),/Valéria/);
  await desktop.locator('[data-equip-bow="real"]').click();
  assert.equal(await desktop.locator('[data-equip-bow="real"]').getAttribute('aria-pressed'),'true');
+ const confirmButton=await desktop.locator('#confirm-archer').boundingBox();
+ assert(confirmButton&&confirmButton.width<=320&&confirmButton.height<=82,'Confirm button disproportionate: '+JSON.stringify(confirmButton));
  await desktop.locator('#confirm-archer').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'desafio');
  await verifyPicture(desktop,'.cm-duel-title');
