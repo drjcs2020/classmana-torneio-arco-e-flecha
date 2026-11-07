@@ -1,4 +1,4 @@
-import {initScene} from './scene-v3.js?v=glb37';
+import {initScene} from './scene-v3.js?v=ground42';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
 import {arenaAudio} from './arena-audio.js?v=media38';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
