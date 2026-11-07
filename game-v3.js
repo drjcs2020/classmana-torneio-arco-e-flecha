@@ -359,6 +359,18 @@ function aim(e){
  updateReticle();
 }
 function levelScore(x,y,r){const norm=Math.hypot(x,y)/r;return norm>1?0:Math.max(1,10-Math.floor(norm*10))}
+function showDuelTurn(text,style='opponent'){
+ const stage=$('stage');
+ let panel=$('cm-duel-turn');
+ if(!panel){panel=document.createElement('div');panel.id='cm-duel-turn';panel.className='cm-duel-turn hidden';panel.setAttribute('role','status');panel.setAttribute('aria-live','polite');stage.appendChild(panel)}
+ panel.textContent=text;panel.dataset.turn=style;panel.classList.remove('hidden');
+ return panel;
+}
+function hideDuelTurn(){const panel=$('cm-duel-turn');if(panel)panel.classList.add('hidden')}
+async function duelTurnPause(ms,currentMatch){
+ await new Promise(resolve=>setTimeout(resolve,ms));
+ return match===currentMatch&&currentMatch.running;
+}
 async function fire(power){
  if(!match?.running||match.locked||match.scores.length>=5)return;
  const currentMatch=match,shotIndex=match.scores.length;
@@ -405,18 +417,30 @@ async function fire(power){
  else if(score>=8){arenaAudio.play('applause');toast(score===10?'🎯 ACERTO PERFEITO! +10 pontos':'👏 A TORCIDA VIBROU!');}
  else if(score===0){arenaAudio.play('boo');toast('📣 A TORCIDA REAGIU! Tente novamente.');}
  else arenaAudio.play('hit',score);
- // Opponent does not need to be present: replay their 5 recorded arrows now.
+ // The challenger already completed these five shots. Reproduce them one at a time,
+ // with a clear turn announcement after the current student's result.
  const ghost=match.onlineReplay?.[shotIndex];
  if(ghost&&match.online){
-  $('instruction').textContent='🏹 DISPARO DO ADVERSÁRIO • RECONSTITUIÇÃO DA RODADA SALVA';
+  // Let the student's own impact/score remain visible before changing turns.
+  if(!await duelTurnPause(1150,currentMatch))return;
+  const opponentName=match.online.creator?.name||'ADVERSÁRIO';
+  const turnPanel=showDuelTurn('⚔️ VEZ DO ADVERSÁRIO','opponent');
+  $('instruction').textContent='⚔️ VEZ DO ADVERSÁRIO • AGUARDE A FLECHA';
+  if(!await duelTurnPause(1500,currentMatch)){hideDuelTurn();return;}
+  turnPanel.classList.add('hidden');
+  if(match!==currentMatch||!currentMatch.running)return;
   const px=(t.x+ghost.impactDx*t.r)/w,py=(t.y+ghost.impactDy*t.r)/h;
-  try{await Promise.race([scene?.fire?.({x:px,y:py,power:ghost.power||1}),new Promise(resolve=>setTimeout(resolve,1700))]);}catch(e){console.warn('Replay:',e)}
+  try{await Promise.race([scene?.fire?.({x:px,y:py,power:ghost.power||1}),new Promise(resolve=>setTimeout(resolve,1700))]);}
+  catch(e){console.warn('Replay:',e)}
   if(match!==currentMatch||!currentMatch.running)return;
   scene?.impact?.({x:px,y:py,score:ghost.score});
   match.onlineReplayPoints+=Number(ghost.score)||0;
   $('hud-rival').textContent=match.onlineReplayPoints;
-  toast('⚔️ '+(match.online.creator.name||'Adversário')+' acertou '+ghost.score+' pontos (replay)');
-  $('instruction').textContent='SUA VEZ • MIRE COM O ARCO E SOLTE PARA DISPARAR';
+  $('instruction').textContent='⚔️ '+opponentName+' • '+ghost.score+' PONTOS';
+  showDuelTurn('🎯 ADVERSÁRIO: '+ghost.score+' PONTOS','result');
+  if(!await duelTurnPause(1050,currentMatch)){hideDuelTurn();return;}
+  hideDuelTurn();
+  $('instruction').textContent='🏹 SUA VEZ • MIRE COM O ARCO E SOLTE PARA DISPARAR';
  }
  if(match.scores.length>=5){setTimeout(()=>{if(match===currentMatch&&currentMatch.running)finishMatch()},580);}
  else{setTimeout(()=>{if(match===currentMatch&&currentMatch.running){changeTarget();match.locked=false;}},520);}
