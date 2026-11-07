@@ -74,7 +74,9 @@ function ambience(){
 // Real recording supplied by the teacher. The synthetic placeholder is removed.
 function musicLevel(){
  const target=enabled&&unlocked&&!document.hidden?(active?.045:.28):0;
- if(musicFade)cancelAnimationFrame(musicFade);
+ if(musicFade){cancelAnimationFrame(musicFade);musicFade=0;}
+ // Menus: audible immediately after the first user gesture. Only fade on arena transitions.
+ if(!active&&target>0){bgm.volume=target;return;}
  const initial=bgm.volume,started=performance.now(),duration=700;
  function step(now){
   const t=Math.min(1,(now-started)/duration);
