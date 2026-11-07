@@ -28,7 +28,7 @@ try{
  });
  assert.equal(defaultSound.enabled,true,'Soundtrack must be enabled by default for new visitors');
  await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').first().waitFor();
- assert.equal(await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').count(),26,
+ assert.equal(await desktop.locator('#view-inicio > .cm-ambient-embers .cm-ember').count(),72,
   'Lobby must display genuine animated embers, not a static screenshot');
  await desktop.locator('button.house[data-house="B"]').first().waitFor();
  const musicResponse=await desktop.request.get(base+'assets/sounds/kulakovka-epic-medieval-614879.mp3');
@@ -188,10 +188,16 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#start-game').click();
  await desktop.locator('#cm-vs-overlay').waitFor({timeout:15000});
  assert.equal(await desktop.locator('.cm-vs-fighter').count(),2,'VS screen requires two comic archer portraits');
- assert.equal(await desktop.locator('#cm-vs-overlay .cm-ember').count(),22,
+ assert.equal(await desktop.locator('#cm-vs-overlay .cm-ember').count(),52,
   'VS embers must rise with real animated elements');
  await desktop.waitForTimeout(950);
- await shot(desktop,'04c-versus-gibi-desktop');
+ const cards=await desktop.locator('#cm-vs-overlay .cm-vs-fighter').evaluateAll(els=>els.map(el=>{
+ const r=el.getBoundingClientRect(),img=el.querySelector('img');
+ return {width:r.width,height:r.height,imageLoaded:img.complete&&img.naturalWidth>0,visibleHeight:img.getBoundingClientRect().height};
+}));
+assert(cards.every(c=>c.width<=325&&c.height<=350&&c.imageLoaded&&c.visibleHeight>=110),
+ 'VS cards must be compact with loaded comic archer portraits: '+JSON.stringify(cards));
+await shot(desktop,'04c-versus-gibi-desktop');
  await desktop.locator('#cm-vs-cancel').click();
  assert.equal(await desktop.locator('#cm-vs-overlay').count(),0,'Cancel must return to setup');
  await desktop.locator('#start-game').click();
@@ -200,7 +206,7 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
  await desktop.waitForTimeout(600);
  assert(await desktop.locator('#world').isVisible());
- assert.equal(await desktop.locator('#stage > .cm-ambient-embers .cm-ember').count(),20,
+ assert.equal(await desktop.locator('#stage > .cm-ambient-embers .cm-ember').count(),52,
   'Arena must have visible, non-interactive rising embers');
  await desktop.waitForFunction(()=>document.body.classList.contains('cm-art-on'),null,{timeout:11000});
  const backBox=await desktop.locator('#leave-arena').boundingBox();
