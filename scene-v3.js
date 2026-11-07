@@ -390,10 +390,12 @@ export function initScene(canvas, getSettings) {
       // The GLB has no stand. Keep the physical wooden tripod as a sibling of
       // the target mesh, so fixed targets never float after model loading.
       if(targetStand&&targetStand.parent===targetVisual){
+        targetVisual.removeChild(targetStand);
         holder.addChild(targetStand);
       }
       if(targetStand){
-        const moving=setting.level==='avancado'||setting.level==='lendario';
+        const currentSettings=getSettings();
+        const moving=currentSettings.level==='avancado'||currentSettings.level==='lendario';
         targetStand.enabled=!moving;
       }
       targetVisual.enabled=false;
