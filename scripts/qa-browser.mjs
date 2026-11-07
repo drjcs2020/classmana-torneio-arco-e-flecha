@@ -185,6 +185,9 @@ await shot(desktop,'04-preparar-desktop');
  const backBox=await desktop.locator('#leave-arena').boundingBox();
  assert(backBox&&backBox.x<100&&backBox.y<100&&backBox.width>=110&&backBox.height>=50,
   'Back button must be readable at top-left of the arena: '+JSON.stringify(backBox));
+ const desktopWind=await desktop.locator('#wind').boundingBox();
+ assert(desktopWind&&desktopWind.x<55&&desktopWind.y>=200&&desktopWind.width<=190,
+  'Wind gauge must be compact below arrows at the left edge: '+JSON.stringify(desktopWind));
  assert.equal(await desktop.locator('#stage').getAttribute('data-level'),'lendario');
  await shot(desktop,'05-arena-desktop');
 await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});
@@ -251,6 +254,12 @@ if(engine==='playcanvas'){
  await mobile.locator('#start-game').click();
  await mobile.waitForURL('**/arena.html',{timeout:18000});
  await mobile.locator('#view-arena.active').waitFor({timeout:12000});
+ await mobile.waitForFunction(()=>document.querySelector('#stage')?.dataset.glbTarget==='ready',null,{timeout:20000});
+ assert.equal(await mobile.locator('#stage').getAttribute('data-target-stand'),'standing',
+  'Fixed target must stay on wooden ground legs even when GLB loads');
+ const mobileWind=await mobile.locator('#wind').boundingBox();
+ assert(mobileWind&&mobileWind.x<=16&&mobileWind.width<=135&&mobileWind.y>=500,
+  'Mobile wind gauge must be compact at bottom-left and outside target: '+JSON.stringify(mobileWind));
  await shot(mobile,'10-arena-mobile');
  await mobile.close();
  assert.deepEqual(errors,[],'Uncaught browser exceptions');
