@@ -52,3 +52,10 @@
 #finish.cm-cinematic-result .finish-actions button{border:3px ridge #e4b85a;border-radius:10px}
 @media(max-width:680px){.cm-vs-fighters{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)}.cm-vs-fighter{height:clamp(190px,38vh,310px)}.cm-vs-title{font-size:22px}.cm-vs-mark{font-size:40px}.cm-vs-actions button{min-height:46px;padding:8px 12px;font-size:14px}#finish.cm-cinematic-result .cm-final-duel{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:5px}#finish.cm-cinematic-result .cm-final-player{padding:4px}#finish.cm-cinematic-result .cm-final-player img{max-height:115px}}
 @media(prefers-reduced-motion:reduce){.cm-ember,.cm-vs-shell,.cm-vs-fighter,.cm-vs-mark,.cm-vs-start,.cm-impact-sparks span{animation:none!important}.cm-ember{opacity:.2}}
+
+/* Result score strip is data-dependent: never show an empty pale placeholder. */
+#finish.cm-cinematic-result #finish-results:empty{display:none!important}
+#finish.cm-cinematic-result #finish-results.cm-score-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;width:min(100%,740px)!important;margin:8px auto!important;background:transparent!important;padding:0!important;border:0!important}
+#finish.cm-cinematic-result .cm-score-cell{background:linear-gradient(155deg,#0b315e,#061530)!important;color:#fff3ce!important;border:3px ridge #d7a64e!important;border-radius:11px!important;box-shadow:0 4px 10px #0006!important;padding:9px!important}
+#finish.cm-cinematic-result .cm-score-label,#finish.cm-cinematic-result .cm-score-unit{color:#f7d897!important}
+#finish.cm-cinematic-result .cm-score-value{color:#ffe5ac!important;font:900 clamp(26px,3.2vw,44px)/1 Georgia,serif!important}
