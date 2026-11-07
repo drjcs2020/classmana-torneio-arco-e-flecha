@@ -18,17 +18,19 @@
 <link rel="stylesheet" href="classmana-audio-ui.css?v=music28">
 <link rel="stylesheet" href="identity-navigation-fix.css?v=identity30">
 <link rel="stylesheet" href="duel-buttons-proportions.css?v=buttons34">
+<link rel="stylesheet" href="classmana-ranking-medieval.css?v=medieval32b">
 </head>
 <body data-page="lobby">
 <div class="sky-sparkles" aria-hidden="true"></div>
 <div class="page">
+<button type="button" id="cm-lobby-sound" class="cm-lobby-sound" aria-pressed="true" aria-label="Desativar música e efeitos">🔊 Música e sons</button>
 <header class="nav-bar">
  <a class="brand" href="./" title="Início do Torneio">
-  <img src="assets/images/arte-002.webp" alt="Logo ClassMana">
+  <img src="assets/images/logo-classmana-oficial.webp" alt="Logo ClassMana">
   <span class="brand-caption">ARENA DO ARCO E FLECHA</span>
  </a>
  <nav class="nav-links" aria-label="Navegação principal"><button type="button" class="nav-link active" data-view="inicio">🏰 Reinos</button><button type="button" class="nav-link" data-view="ranking">🏆 Ranking</button><button type="button" class="nav-link" data-view="regras">📜 Regras</button></nav>
- <button type="button" id="cm-lobby-sound" class="cm-lobby-sound" aria-pressed="true" aria-label="Desativar música e efeitos">🔊 Música e sons</button>
+ 
  <span class="ready" id="online-banner"><span class="ready-dot"></span> TREINO DISPONÍVEL</span>
 </header>
 
@@ -46,7 +48,7 @@
  <section id="cm-identity-screen" class="cm-identity-screen" aria-label="Escolha do aluno da Casa selecionada">
    <div class="cm-identity-panel">
      <button id="cm-identity-back" type="button" class="cm-identity-back" aria-label="Voltar para escolher outra Casa">← VOLTAR ÀS CASAS</button>
-     <img class="cm-identity-logo" src="assets/images/arte-002.webp" alt="Logotipo oficial ClassMana">
+     <img class="cm-identity-logo" src="assets/images/logo-classmana-oficial.webp" alt="Logotipo oficial ClassMana">
      <h2>QUEM VAI JOGAR?</h2>
      <div id="cm-previous-session" class="cm-previous-session" hidden>
        <span id="cm-previous-session-name"></span>
@@ -194,7 +196,7 @@
 
 <section id="view-ranking" class="view information-view" role="dialog" aria-modal="true" aria-labelledby="ranking-title">
   <div class="page-heading"><small>🏆 SALÃO DOS CAMPEÕES</small><h1 id="ranking-title">Ranking do Torneio</h1><p>As três Casas disputam o trono dos arqueiros.</p></div>
-  <div class="notice" id="ranking-status">🏆 Resultados oficiais de desafios concluídos, armazenados no Google Sheets. A consulta exige que o serviço online esteja publicado.</div>
+  <div class="notice" id="ranking-status">🏆 Consultando os resultados dos duelos concluídos no servidor ClassMana.</div>
   <div class="cm-score-mode-tabs" id="ranking-tabs">
    <button type="button" class="active" data-rank="players">🎯 Arqueiros</button>
    <button type="button" data-rank="teams">🛡️ Equipes</button>
@@ -217,10 +219,10 @@
  </div>
 </section>
 </main>
-<footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
+<footer><img src="assets/images/logo-classmana-oficial.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=sessionranking34"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=revision32media1"></script>
 <script type="module" src="wind-panel-restored.js?v=wind20"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-const base='http://127.0.0.1:8765/';
+const base='http://127.0.0.1:8000/';
 fs.mkdirSync('qa-screenshots',{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-gpu']});
 const errors=[];
@@ -22,6 +22,22 @@ try{
  desktop.on('pageerror',e=>errors.push('desktop: '+e.message));
  await desktop.goto(base,{waitUntil:'domcontentloaded'});await desktop.waitForTimeout(750);
  assert.equal(await desktop.locator('body').getAttribute('data-page'),'lobby');
+ const musicResponse=await desktop.request.get(base+'assets/sounds/kulakovka-epic-medieval-614879.mp3');
+ assert.equal(musicResponse.status(),200,'Official MP3 must be accessible');
+ const logoResponse=await desktop.request.get(base+'assets/images/logo-classmana-oficial.webp');
+ assert.equal(logoResponse.status(),200,'Official ClassMana logo must load');
+ await desktop.locator('#cm-lobby-sound').click();
+ await desktop.waitForFunction(async()=>{
+  const mod=await import('./arena-audio.js?v=revision32media1');
+  return mod.arenaAudio.musicState.playing;
+ },null,{timeout:8000});
+ await desktop.waitForTimeout(750);
+ const soundtrack=await desktop.evaluate(async()=>{
+  const mod=await import('./arena-audio.js?v=revision32media1');
+  return mod.arenaAudio.musicState;
+ });
+ assert(soundtrack.volume>=.20,'Lobby soundtrack must have audible volume');
+ assert(soundtrack.source.includes('kulakovka-epic-medieval-614879.mp3'),'Wrong soundtrack loaded');
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'reino','Must open on house selection');
  assert.equal(await desktop.locator('#cm-main-menu').count(),0,'Deprecated intro screen must not be rendered');
  await verifyPicture(desktop,'.cm-house-title');
@@ -40,6 +56,19 @@ try{
  await desktop.locator('button.house[data-house="B"]').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'perfil');
  await desktop.locator('#cm-identity-player').selectOption('B01');
+ await verifyPicture(desktop,'.cm-identity-logo');
+ const identityBox=await desktop.locator('.cm-identity-panel').evaluate(el=>{
+   const r=el.getBoundingClientRect(),cs=getComputedStyle(el),last=el.querySelector('#cm-confirm-identity')?.getBoundingClientRect();
+   const brand=document.querySelector('#view-inicio .cm-house-title')?.getBoundingClientRect();
+   return {top:r.top,bottom:r.bottom,width:r.width,overflowY:cs.overflowY,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,
+    confirmBottom:last?.bottom,brandBottom:brand?.bottom};
+ });
+ assert(identityBox.width>=790,'Student identity panel too narrow');
+ assert(identityBox.scrollHeight<=identityBox.clientHeight+3,'Student identity panel has unnecessary internal scroll');
+ assert(identityBox.confirmBottom<=identityBox.bottom-6,'Confirm player button clipped');
+ await shot(desktop,'01b-identidade-desktop');
+ const logoDimensions=await desktop.locator('.cm-identity-logo').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight}));
+ assert(logoDimensions.width>=1300&&logoDimensions.height>=480,'ClassMana logo is low-resolution');
  await desktop.locator('#cm-confirm-identity').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
  await desktop.reload({waitUntil:'domcontentloaded'});
@@ -58,6 +87,8 @@ await shot(desktop,'02-arqueiro-desktop');
  assert.match(await desktop.locator('#archer-carousel-indicator').textContent(),/Valéria/);
  await desktop.locator('[data-equip-bow="real"]').click();
  assert.equal(await desktop.locator('[data-equip-bow="real"]').getAttribute('aria-pressed'),'true');
+ const confirmButton=await desktop.locator('#confirm-archer').boundingBox();
+ assert(confirmButton&&confirmButton.width<=320&&confirmButton.height<=82,'Confirm button disproportionate: '+JSON.stringify(confirmButton));
  await desktop.locator('#confirm-archer').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'desafio');
  await verifyPicture(desktop,'.cm-duel-title');
@@ -70,8 +101,27 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
  assert.equal(tileSizes.length,6,'Expected five play modes and ranking');
  assert(Math.max(...tileSizes.map(x=>x.h))-Math.min(...tileSizes.map(x=>x.h))<2,'Tiles must have the same height');
  assert(Math.max(...tileSizes.map(x=>x.w))-Math.min(...tileSizes.map(x=>x.w))<2,'Tiles must have the same width');
+ const rankingTile=await desktop.locator('#cm-ranking-choice').evaluate(el=>getComputedStyle(el).backgroundImage);
+ assert(rankingTile.includes('botao-ranking-classmana.svg'),'Ranking needs the approved blue-and-gold artwork');
  await desktop.locator('#cm-ranking-choice').click();
  assert(await desktop.locator('#view-ranking.active').isVisible(),'Ranking button must open the standings');
+ await desktop.waitForFunction(()=>{
+  const status=document.querySelector('#ranking-status')?.textContent||'';
+  return status.includes('duelos concluídos')||status.includes('⚠️');
+ },null,{timeout:16000});
+ assert.match(await desktop.locator('#ranking-status').textContent(),/duelos concluídos/,'Ranking must load live server data, not show an error');
+ assert((await desktop.locator('#rank-houses .rankline').count())>=3,'House ranking must contain three classes');
+ assert((await desktop.locator('#rank-players .rankline').count())>=1,'Player ranking must contain duel results');
+ const rankingLegibility=await desktop.locator('#view-ranking').evaluate(root=>{
+  const panel=root.querySelector('.ranking-panel');
+  const title=root.querySelector('.ranking-panel h2');
+  const line=root.querySelector('.rankline b');
+  return {panel:getComputedStyle(panel).backgroundImage,title:getComputedStyle(title).color,line:line?getComputedStyle(line).color:null};
+ });
+ assert(rankingLegibility.panel.includes('gradient'),'Ranking cards must have a parchment texture');
+ assert(rankingLegibility.title==='rgb(255, 237, 189)','Ranking header contrast incorrect');
+ if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(37, 24, 14)','Ranking text must be dark on parchment');
+ await shot(desktop,'03b-ranking-desktop');
  await desktop.locator('#rank-play').click();
  assert(await desktop.locator('#view-inicio.active').isVisible(),'Closing ranking must return to game');
 await shot(desktop,'03-desafio-desktop');
@@ -90,6 +140,10 @@ await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#view-arena.active').waitFor({timeout:12000});
  await desktop.waitForTimeout(600);
  assert(await desktop.locator('#world').isVisible());
+ await desktop.waitForFunction(()=>document.body.classList.contains('cm-art-on'),null,{timeout:11000});
+ const backBox=await desktop.locator('#leave-arena').boundingBox();
+ assert(backBox&&backBox.x<100&&backBox.y<100&&backBox.width>=110&&backBox.height>=50,
+  'Back button must be readable at top-left of the arena: '+JSON.stringify(backBox));
  assert.equal(await desktop.locator('#stage').getAttribute('data-level'),'lendario');
  await shot(desktop,'05-arena-desktop');
 await desktop.goto(base+'arena.html?qa=1',{waitUntil:'domcontentloaded'});

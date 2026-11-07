@@ -1,0 +1,352 @@
+/* ClassMana 32 | Patch visual aprovado — menus e Salão dos Campeões.
+   Somente branch de revisão. Não altera dados, lógica ou resultados. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes {
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  grid-template-rows:repeat(2,clamp(78px,14.5vh,112px))!important;
+  width:min(93vw,1090px)!important;max-width:1090px!important;
+  height:auto!important;flex:0 0 auto!important;min-height:0!important;
+  gap:clamp(13px,3vh,28px) clamp(9px,1.6vw,20px)!important;
+  margin:clamp(12px,2.5vh,26px) auto 0!important;overflow:visible!important;
+  align-items:center!important;justify-items:stretch!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes>.cm-duel-mode{
+  width:100%!important;max-width:none!important;
+  height:clamp(78px,14.5vh,112px)!important;min-height:0!important;
+  max-height:112px!important;padding:0!important;margin:0!important;
+  grid-column:auto!important;grid-row:auto!important;overflow:visible!important;
+  transform:none!important;transition:filter .18s,transform .18s!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode img{
+  display:block!important;width:100%!important;height:100%!important;max-height:100%!important;
+  object-fit:fill!important;pointer-events:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:nth-child(5) img{
+  transform:scale(1.12)!important;transform-origin:center center!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:hover,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:focus-visible{
+  transform:translateY(-3px)!important;filter:brightness(1.14) drop-shadow(0 7px 8px #0008)!important;
+}
+/* Ranking is a graphic button with the same outline and proportions as five sprite buttons. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-ranking-choice {
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex-direction:row!important;gap:clamp(8px,1.2vw,14px)!important;
+  background:url("assets/ui/buttons/botao-ranking-classmana.svg") center/100% 100% no-repeat!important;
+  background-color:transparent!important;background-image:url("assets/ui/buttons/botao-ranking-classmana.svg")!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  padding:10px clamp(18px,3.2vw,39px)!important;
+  text-shadow:0 3px 3px #130d0b,0 0 5px #000!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-ranking-choice .cm-ranking-emblem {
+  display:inline-block!important;font-size:clamp(27px,3vw,43px)!important;
+  line-height:1!important;filter:drop-shadow(0 2px 2px #000)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-ranking-choice .cm-ranking-label {
+  display:inline-block!important;white-space:nowrap!important;
+  font:900 clamp(17px,2vw,28px)/1 'Cinzel',Georgia,serif!important;
+  color:#fff1ce!important;-webkit-text-stroke:.35px #9e6628!important;
+  letter-spacing:.015em!important;
+}
+@media(max-width:780px) {
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes{
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-template-rows:repeat(3,clamp(65px,11vh,90px))!important;
+   width:min(96vw,620px)!important;gap:8px!important;margin:5px auto!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes>.cm-duel-mode{
+   height:clamp(65px,11vh,90px)!important;width:100%!important;max-height:90px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-ranking-choice .cm-ranking-label{
+   font-size:clamp(13px,3vw,19px)!important;
+ }
+}
+/* Salão dos Campeões: 3D fantasy theme consistent with the lobby.
+   Keep all ranking text as live DOM rather than baking a screenshot. */
+body[data-page="lobby"] #view-ranking.active{
+  box-sizing:border-box!important;inset:0!important;padding:clamp(10px,2.2vh,25px) clamp(12px,5vw,80px) clamp(12px,2vh,24px)!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;gap:clamp(7px,1.3vh,13px)!important;
+  overflow-y:auto!important;overflow-x:hidden!important;z-index:100!important;
+  background:
+   linear-gradient(125deg,rgba(5,18,49,.90),rgba(7,27,67,.88)),
+   url("assets/scenes/leao.webp") center/cover no-repeat!important;
+  color:#fff1c7!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading {
+  width:min(100%,1220px)!important;max-width:1220px!important;
+  flex:none!important;box-sizing:border-box!important;
+  padding:clamp(12px,1.8vh,19px) 22px!important;margin:0!important;
+  border:5px ridge #eebc5c!important;border-radius:22px 9px 22px 9px!important;
+  background:linear-gradient(180deg,#16488b,#071e57 52%,#07113b)!important;
+  box-shadow:inset 0 0 0 3px #653909,inset 0 1px 12px #8fc3ff33,0 7px 20px #0008!important;
+  text-align:center!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading small {
+  color:#ffe19c!important;font:900 clamp(11px,1.1vw,15px)/1.2 'Cinzel',Georgia,serif!important;
+  letter-spacing:.17em!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading h1 {
+  color:#ffe8af!important;font:900 clamp(25px,3.4vw,43px)/1.08 'Cinzel',Georgia,serif!important;
+  text-shadow:0 3px 2px #2b1405,0 0 7px #000!important;margin:3px 0!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading p{
+  color:#fff3db!important;font:800 clamp(13px,1.25vw,16px)/1.25 'Nunito',sans-serif!important;margin:3px 0!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-status{
+  width:min(100%,950px)!important;max-width:950px!important;flex:none!important;
+  padding:9px 20px!important;margin:0!important;box-sizing:border-box!important;
+  border:3px solid #e7ac43!important;border-radius:13px!important;
+  background:linear-gradient(180deg,#fff8df,#efd5a5)!important;color:#3e2a14!important;
+  font:800 clamp(13px,1.3vw,17px)/1.3 'Nunito',sans-serif!important;
+  text-align:center!important;box-shadow:0 3px 8px #0006!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  gap:clamp(6px,2vw,20px)!important;margin:0!important;flex:none!important;flex-wrap:wrap!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs button{
+  min-height:clamp(44px,6.5vh,58px)!important;min-width:clamp(125px,13vw,185px)!important;
+  padding:9px 19px!important;border-radius:11px!important;
+  background:linear-gradient(#0c4b98,#072653)!important;border:3px ridge #f0c36a!important;
+  color:#fff2d3!important;font:900 clamp(14px,1.6vw,20px)/1 'Cinzel',Georgia,serif!important;
+  text-shadow:0 2px 3px #000!important;box-shadow:0 4px 0 #3c2009!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs button.active{
+  background:linear-gradient(#279632,#086427)!important;color:#fff0b1!important;
+  border-color:#ffdd75!important;box-shadow:0 4px 0 #3e280c,0 0 11px #ffe07970!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-layout{
+  box-sizing:border-box!important;display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:min(100%,1250px)!important;max-width:1250px!important;
+  gap:clamp(10px,1.6vw,20px)!important;
+  flex:1 1 auto!important;min-height:230px!important;max-height:none!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel{
+  min-width:0!important;min-height:0!important;
+  padding:clamp(12px,1.5vw,19px)!important;box-sizing:border-box!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  background:linear-gradient(165deg,#fff4d4,#e8c99a)!important;
+  color:#271d12!important;border:5px ridge #dba547!important;border-radius:16px!important;
+  box-shadow:inset 0 0 0 2px #fff5cf,0 9px 23px #0008!important;
+  scrollbar-color:#a66a2d #fae9c4!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel h2{
+  margin:0 0 10px!important;padding:12px 10px!important;text-align:center!important;
+  color:#ffedbd!important;background:linear-gradient(#0e8345,#06502e)!important;
+  border:3px ridge #ebb457!important;border-radius:10px!important;
+  font:900 clamp(16px,1.75vw,24px)/1.2 'Cinzel',Georgia,serif!important;
+  text-shadow:0 2px 3px #0b2617!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;
+  gap:clamp(8px,1vw,17px)!important;
+  padding:clamp(9px,1.2vh,14px) 8px!important;margin:0!important;
+  min-height:58px!important;border:0!important;border-bottom:2px solid #b78d5060!important;
+  background:transparent!important;color:#201b17!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline:nth-child(2n){
+  background:#fff9e36b!important;border-radius:6px!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline>div{
+  min-width:0!important;flex:1!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline b{
+  display:block!important;font:900 clamp(15px,1.6vw,21px)/1.25 'Nunito',sans-serif!important;
+  color:#25180e!important;text-shadow:none!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline small{
+  display:block!important;margin-top:3px!important;font:750 clamp(12px,1.05vw,14px)/1.35 'Nunito',sans-serif!important;
+  color:#59412a!important;text-shadow:none!important;opacity:1!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+  display:inline-block!important;white-space:normal!important;flex:0 0 auto!important;
+  padding:6px 9px!important;border-radius:9px!important;
+  background:linear-gradient(#22883e,#08602d)!important;color:#fff2d0!important;
+  border:2px solid #d2a24c!important;text-align:center!important;
+  font:900 clamp(12px,1.2vw,15px)/1.3 'Nunito',sans-serif!important;
+  text-shadow:0 1px #0b301a!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .empty{
+  color:#47301a!important;font:800 16px/1.4 'Nunito',sans-serif!important;
+}
+body[data-page="lobby"] #view-ranking #rank-play{
+  flex:0 0 auto!important;align-self:center!important;min-height:50px!important;
+  padding:10px 32px!important;margin:2px auto!important;
+  border:4px ridge #e6bd69!important;border-radius:13px!important;
+  background:linear-gradient(#167a37,#07552e)!important;color:#fff1c4!important;
+  box-shadow:0 5px 0 #55310b,0 8px 14px #0008!important;
+  font:900 clamp(16px,1.8vw,22px)/1 'Cinzel',Georgia,serif!important;
+  text-shadow:0 2px 3px #000!important;
+}
+body[data-page="lobby"] #view-ranking button:focus-visible,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode:focus-visible{
+  outline:3px solid #fff7a8!important;outline-offset:3px!important;
+}
+@media(max-width:740px){
+ body[data-page="lobby"] #view-ranking.active{padding:8px!important;gap:8px!important}
+ body[data-page="lobby"] #view-ranking .ranking-layout{
+   grid-template-columns:1fr!important;flex:0 0 auto!important;min-height:0!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel{
+   max-height:none!important;overflow:visible!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel h2{font-size:16px!important}
+ body[data-page="lobby"] #view-ranking #ranking-tabs button{min-width:0!important;padding:8px!important;font-size:12px!important;min-height:43px!important}
+ body[data-page="lobby"] #view-ranking #ranking-status{font-size:12px!important}
+ body[data-page="lobby"] #view-ranking .page-heading h1{font-size:25px!important}
+}
+/* Arena navigation: the approved ornamented BACK image at a readable position. */
+body.cm-art-on #view-arena #leave-arena{
+  position:fixed!important;top:clamp(12px,2vh,22px)!important;left:clamp(10px,2vw,30px)!important;
+  right:auto!important;bottom:auto!important;
+  width:clamp(112px,11vw,154px)!important;height:clamp(51px,7vh,65px)!important;
+  min-width:112px!important;min-height:51px!important;max-width:none!important;
+  font-size:0!important;padding:0!important;
+  background:url("assets/ui/buttons/classmana-voltar.png") center/contain no-repeat!important;
+  border:0!important;z-index:100!important;pointer-events:auto!important;cursor:pointer!important;
+}
+body.cm-art-on #view-arena #leave-arena:hover{filter:brightness(1.14)!important}
+body.cm-art-on #view-arena #leave-arena:focus-visible{
+ outline:3px solid #fff7a8!important;outline-offset:2px!important;
+}
+@media(max-width:760px){
+ body.cm-art-on #view-arena #leave-arena{
+   top:5px!important;left:5px!important;right:auto!important;bottom:auto!important;
+   width:105px!important;height:47px!important;min-width:105px!important;min-height:47px!important;
+ }
+}
+
+/* Keep the tournament crest clear of the enlarged BACK button. */
+@media(min-width:761px){
+ body.cm-art-on #view-arena .stage.cm-art-ready .cm-visual-logo{
+   left:clamp(175px,15vw,214px)!important;top:6px!important;
+   right:auto!important;
+ }
+}
+@media(max-width:760px){
+ body.cm-art-on #view-arena .stage.cm-art-ready .cm-visual-logo{
+   top:auto!important;left:6px!important;right:auto!important;bottom:53px!important;
+   width:112px!important;max-height:64px!important;
+ }
+}
+
+/* Revision: compact hero confirmation; 3D artwork stays untouched. */
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{
+ width:clamp(220px,26vw,310px)!important;
+ height:clamp(58px,9vh,78px)!important;
+ max-width:310px!important;max-height:78px!important;
+ aspect-ratio:auto!important;flex:none!important;
+ align-self:center!important;justify-self:center!important;
+ padding:0!important;margin:6px auto!important;
+ background:none!important;border:0!important;
+ box-shadow:none!important;filter:drop-shadow(0 5px 8px #0008)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer img{
+ width:100%!important;height:100%!important;object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer:hover{
+ filter:brightness(1.12) drop-shadow(0 7px 10px #000b)!important;
+}
+/* Player identification — landscape parchment panel, no inner scrollbar on desktop.
+   The tournament crest remains above the card, never underneath it. */
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{
+ position:absolute!important;
+ inset:clamp(116px,19vh,170px) 3% 3%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ padding:0!important;overflow:visible!important;
+ z-index:12!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel{
+ position:relative!important;
+ box-sizing:border-box!important;width:min(90vw,880px)!important;
+ max-width:880px!important;max-height:100%!important;
+ height:auto!important;overflow:visible!important;
+ display:flex!important;flex-direction:column!important;
+ align-items:center!important;justify-content:center!important;
+ gap:clamp(5px,.75vh,9px)!important;
+ padding:clamp(13px,1.8vh,20px) clamp(24px,4vw,54px)!important;
+ border:4px ridge #f3c45d!important;border-radius:20px!important;
+ background:linear-gradient(160deg,rgba(9,41,49,.95),rgba(9,67,46,.94))!important;
+ box-shadow:0 14px 29px #0009,inset 0 0 0 2px #87551e,inset 0 0 35px #e3ad4b21!important;
+ color:#fff3d8!important;text-align:center!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-logo{
+ display:block!important;width:clamp(170px,19vw,240px)!important;
+ height:clamp(48px,8vh,70px)!important;max-height:70px!important;
+ margin:0 auto 0!important;object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel h2{
+ margin:0!important;
+ font:900 clamp(24px,3.2vw,39px)/1.12 'Cinzel',Georgia,serif!important;
+ color:#ffdfa0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel p{
+ margin:0!important;font-size:clamp(12px,1.3vw,16px)!important;line-height:1.22!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel label{
+ font-size:clamp(13px,1.35vw,17px)!important;line-height:1.22!important;margin:0!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-player{
+ width:min(100%,720px)!important;min-height:clamp(45px,6.5vh,55px)!important;
+ height:clamp(45px,6.5vh,55px)!important;
+ padding:8px 18px!important;background:#fff6de!important;color:#2b261d!important;
+ border:3px solid #e7b75a!important;border-radius:11px!important;
+ font-size:clamp(15px,1.5vw,19px)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-confirm-identity{
+ width:min(100%,420px)!important;
+ min-height:clamp(48px,7vh,59px)!important;height:clamp(48px,7vh,59px)!important;
+ padding:6px 15px!important;
+ background:linear-gradient(180deg,#ffe38f,#d99a2f)!important;
+ font-size:clamp(16px,1.6vw,22px)!important;
+ border:3px solid #ffe3a1!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+ position:absolute!important;left:clamp(12px,1.5vw,22px)!important;
+ top:clamp(12px,1.6vh,20px)!important;
+ min-width:140px!important;min-height:39px!important;
+ padding:6px 12px!important;
+ background:linear-gradient(180deg,#0c5f44,#073c31)!important;
+ border:2px solid #f3c86b!important;color:#fff0c9!important;
+ z-index:15!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-previous-session:not([hidden]){
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex-wrap:wrap!important;gap:8px!important;
+ width:min(100%,720px)!important;min-height:0!important;
+ margin:1px auto!important;padding:5px 10px!important;
+ border:2px ridge #d6ac54!important;border-radius:9px!important;
+ background:#103f33!important;color:#fff1d5!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-previous-session-exit{
+ min-height:33px!important;padding:5px 11px!important;
+ background:linear-gradient(#137047,#07512f)!important;color:#fff2d9!important;
+}
+@media(max-width:700px){
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{
+  inset:clamp(80px,14vh,125px) 2% 2%!important;
+  overflow-y:auto!important;align-items:flex-start!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen .cm-identity-panel{
+  flex:0 0 auto!important;width:96vw!important;max-height:none!important;
+  margin:auto!important;padding:64px 14px 18px!important;gap:8px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-screen #cm-identity-back{
+  left:12px!important;top:10px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="heroi"] #confirm-archer{
+  width:clamp(185px,58vw,265px)!important;height:60px!important;
+ }
+}
+/* Ranking tile uses the exact ornamented SVG; override inherited hidden sprite labels. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice{
+ background-image:url("assets/ui/buttons/botao-ranking-classmana.svg")!important;
+ background-size:100% 100%!important;background-position:center!important;
+ background-repeat:no-repeat!important;background-color:transparent!important;
+ min-width:0!important;border:0!important;box-shadow:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice span.cm-ranking-label,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-modes #cm-ranking-choice span.cm-ranking-emblem{
+ display:inline-block!important;visibility:visible!important;opacity:1!important;
+}
