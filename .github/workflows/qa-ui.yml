@@ -40,13 +40,9 @@ jobs:
           node --check game-v3.js
           node --check scene-v3.js
           node --check online-client.js
-          cp backend/Code.gs /tmp/classmana-backend-qa.js
-          node --check /tmp/classmana-backend-qa.js
           node scripts/qa-static.mjs
-      - name: Testar backend em memória (sem alterar planilha real)
-        run: node scripts/qa-backend.mjs
-      - name: Verificar protocolo da Arena Online v9 sem alterar alunos
-        run: node scripts/qa-portal.mjs
+      - name: Validate deployed independent duel API and live ranking (read-only)
+        run: node scripts/qa-duel-api.mjs
       - name: Install browser test runner
         run: |
           npm install --no-save --ignore-scripts playwright@1.56.1
