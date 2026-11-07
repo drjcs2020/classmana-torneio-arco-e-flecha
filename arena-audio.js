@@ -4,6 +4,8 @@
  */
 const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
 let ctx=null,bus=null,active=false,timer=null,house='A';
+let musicGain=null,musicTimer=null,musicStep=0,unlocked=false;
+const scoreNotes=[220,329.63,392,493.88,440,329.63,293.66,392,261.63,329.63,440,523.25,392,293.66,329.63,246.94];
 let enabled=localStorage.getItem('cm_arena_sound')!=='off';
 const clips={};
 function soundClip(name){
@@ -21,6 +23,7 @@ function init(){
   if(!ctx){
    ctx=new AudioContextCtor();
    bus=ctx.createGain();bus.gain.value=.20;bus.connect(ctx.destination);
+   musicGain=ctx.createGain();musicGain.gain.value=0;musicGain.connect(bus);
   }
   if(ctx.state==='suspended')ctx.resume().catch(()=>{});
   return ctx;
@@ -59,14 +62,47 @@ function ambience(){
  init();chirp();
  timer=setInterval(()=>{if(active&&enabled&&!document.hidden)chirp()},5800);
 }
+
+// Original repeating fantasy melody: lightly plucked notes, no copyrighted audio.
+function musicTick(){
+ if(!enabled||!unlocked||document.hidden||!musicGain||!ctx)return;
+ const hz=scoreNotes[musicStep++%scoreNotes.length],now=ctx.currentTime;
+ const osc=ctx.createOscillator(),amp=ctx.createGain();
+ osc.type='triangle';osc.frequency.setValueAtTime(hz,now);
+ amp.gain.setValueAtTime(.0001,now);
+ amp.gain.exponentialRampToValueAtTime(.11,now+.018);
+ amp.gain.exponentialRampToValueAtTime(.0001,now+.70);
+ osc.connect(amp);amp.connect(musicGain);osc.start(now);osc.stop(now+.72);
+ if(musicStep%4===1){
+  const bass=ctx.createOscillator(),g=ctx.createGain();
+  bass.type='sine';bass.frequency.value=hz/2;
+  g.gain.setValueAtTime(.0001,now);g.gain.exponentialRampToValueAtTime(.07,now+.05);
+  g.gain.exponentialRampToValueAtTime(.0001,now+1.1);
+  bass.connect(g);g.connect(musicGain);bass.start(now);bass.stop(now+1.12);
+ }
+}
+function musicLevel(){
+ if(!musicGain||!ctx)return;
+ const volume=enabled&&unlocked&&!document.hidden?(active?.09:.62):0;
+ musicGain.gain.setTargetAtTime(volume,ctx.currentTime,.40);
+}
+function unlockMusic(){
+ if(!enabled)return;
+ const audio=init();if(!audio)return;
+ unlocked=true;musicLevel();
+ if(!musicTimer){musicTick();musicTimer=setInterval(musicTick,440)}
+}
+document.addEventListener('pointerdown',unlockMusic,{passive:true});
+document.addEventListener('keydown',unlockMusic);
+
 export const arenaAudio={
  get enabled(){return enabled&&!!AudioContextCtor},
  setHouse(k){house=['A','B','C'].includes(k)?k:'A'},
- setActive(value){active=!!value;ambience()},
+ setActive(value){active=!!value;ambience();musicLevel()},
  toggle(){
   enabled=!enabled;localStorage.setItem('cm_arena_sound',enabled?'on':'off');
-  if(!enabled){clearInterval(timer);timer=null;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);}
-  else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.20,ctx.currentTime,.05);ambience()}
+  if(!enabled){clearInterval(timer);timer=null;for(const clip of Object.values(clips)){clip.pause();clip.currentTime=0;}if(bus&&ctx)bus.gain.setTargetAtTime(0,ctx.currentTime,.03);musicLevel();}
+  else{init();if(bus&&ctx)bus.gain.setTargetAtTime(.20,ctx.currentTime,.05);ambience();unlockMusic();musicLevel()}
   return enabled;
  },
  play(effect,score=0){
@@ -112,7 +148,8 @@ export const arenaAudio={
     }
    }
    if(effect==='victory'){soundClip('vitoria');[523,659,784,1047].forEach((n,i)=>tone(n,n*1.03,.31,.065,'triangle',i*.12));}
+   if(effect==='defeat'){[293.66,261.63,220,164.81].forEach((n,i)=>tone(n,n*.94,.36,.045,'triangle',i*.18));}
   }catch(error){console.warn('[ClassMana] Falha ao emitir efeito sonoro:',error)}
  }
 };
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(timer);timer=null}else ambience()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(timer);timer=null}else ambience();musicLevel()});
