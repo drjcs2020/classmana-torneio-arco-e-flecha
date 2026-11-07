@@ -688,7 +688,7 @@ $('cm-confirm-identity')?.addEventListener('click',async()=>{
  selectHouse(id[0]);
  $('player').value=id;fillRivals();
  setLobbyStep('reino');
- if(online.state==='ready')void loginStudent().catch(console.warn);
+ // O login online ocorre ao entrar no duelo, sem pular a escolha visual da Casa.
 });
 $('confirm-archer').addEventListener('click',()=>setLobbyStep('desafio'));
 $('challenge-level').addEventListener('change',drawCourse);
