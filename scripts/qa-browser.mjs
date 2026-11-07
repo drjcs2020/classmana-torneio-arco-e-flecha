@@ -38,6 +38,9 @@ try{
  }
  await shot(desktop,'01-escolha-casa-desktop');
  await desktop.locator('button.house[data-house="B"]').click();
+ assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'perfil');
+ await desktop.locator('#cm-identity-player').selectOption('B01');
+ await desktop.locator('#cm-confirm-identity').click();
  assert.equal(await desktop.locator('#view-inicio').getAttribute('data-step'),'heroi');
  assert.equal(await desktop.locator('button.house[data-house="B"]').getAttribute('aria-pressed'),'true');
  const panelsHero=await desktop.evaluate(()=>['.studio-character','.studio-equipment','.studio-carousel'].map(selector=>{
@@ -101,6 +104,9 @@ if(engine==='playcanvas'){
  }
  await shot(mobile,'06-casa-mobile');
  await mobile.locator('button.house[data-house="C"]').click();
+ assert.equal(await mobile.locator('#view-inicio').getAttribute('data-step'),'perfil');
+ await mobile.locator('#cm-identity-player').selectOption('C01');
+ await mobile.locator('#cm-confirm-identity').click();
  assert.equal(await mobile.locator('#view-inicio').getAttribute('data-step'),'heroi');
  await shot(mobile,'07-arqueiro-mobile');
  await mobile.locator('#confirm-archer').click();
