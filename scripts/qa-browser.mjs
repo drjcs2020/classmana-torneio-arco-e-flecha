@@ -165,7 +165,7 @@ await shot(desktop,'03-desafio-desktop');
 await shot(desktop,'04-preparar-desktop');
  await desktop.locator('#mode').selectOption('challenge_team');
  await desktop.locator('#team-scope').selectOption('same');
- assert(await desktop.locator('#team-label').isVisible(),'Team challenge must display player's team');
+ assert(await desktop.locator('#team-label').isVisible(),"Team challenge must display the player's team");
  assert(await desktop.locator('#opponent-team-label').isVisible(),'Team challenge must display opposing team');
  assert(await desktop.locator('#rival-label').isVisible(),'Team challenge must display opposing archer');
  const teamFields=await desktop.locator('#view-inicio[data-step="partida"] .setup-fields>label:not(.hidden)').evaluateAll(els=>els.map(el=>{
