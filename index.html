@@ -72,6 +72,13 @@
  <section class="cm-duel-screen" id="duel-options" aria-label="Página 2 — Escolha do desafio">
    <img class="cm-duel-title" src="assets/ui/titles/titulo-escolha-desafio-novo.png" alt="Escolha o Desafio">
    <p class="cm-duel-guidance">Sua Casa está pronta. Escolha o adversário ou pratique com o seu arco.</p>
+   <div class="cm-player-choice" id="cm-player-choice">
+     <label for="cm-quick-player">🏹 PRIMEIRO, ESCOLHA SEU NOME</label>
+     <select id="cm-quick-player" aria-describedby="cm-quick-help" required>
+       <option value="">Selecione seu nome para disputar</option>
+     </select>
+     <small id="cm-quick-help" role="status" aria-live="polite">Escolha o aluno da Casa selecionada antes de iniciar um duelo.</small>
+   </div>
    <div class="cm-duel-modes">
      <button type="button" class="cm-duel-mode" data-play-mode="bot" aria-label="Contra robô, com três dificuldades"><img src="assets/ui/buttons/botao-contra-robo.png" alt=""><span>Contra Robô</span></button>
      <button type="button" class="cm-duel-mode" data-play-mode="practice" aria-label="Treino livre, sem pontos oficiais"><img src="assets/ui/buttons/botao-treino-livre.png" alt=""><span>Treino Livre</span></button>
@@ -189,6 +196,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=api10"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=api11"></script>
 </body>
 </html>
