@@ -1,0 +1,117 @@
+/* ClassMana | Design system unificado — telas e janelas.
+   Fantasia medieval: pergaminho, madeira escura, bronze e ouro.
+   Não modifica interações nem estados da aplicação. */
+:root{
+ --cm-frame:#f4c873;--cm-frame-dark:#8a5529;
+ --cm-panel-top:#352b28;--cm-panel-bottom:#142b2a;
+ --cm-parchment:#fff4d9;--cm-parchment-text:#42301f;
+ --cm-gold-light:#ffe092;--cm-gold:#e4a93c;
+ --cm-green:#12664c;--cm-red:#a53b34;
+}
+body[data-page="lobby"] #view-inicio .cm-identity-panel,
+body .cm-inbox-panel{
+ box-sizing:border-box!important;
+ border:3px solid var(--cm-frame)!important;
+ border-radius:22px!important;
+ background:linear-gradient(155deg,rgba(58,43,39,.975),rgba(19,41,39,.985))!important;
+ color:var(--cm-parchment)!important;
+ box-shadow:0 18px 52px #070805bb,inset 0 0 0 2px #a86b3070,inset 0 16px 28px #f6c87a0c!important;
+}
+body[data-page="lobby"] #view-inicio .cm-identity-panel{
+ width:min(94vw,660px)!important;
+ padding:clamp(20px,2.5vw,28px)!important;
+ gap:clamp(9px,1.35vh,15px)!important;
+}
+body[data-page="lobby"] .cm-identity-panel h2,
+body .cm-inbox-panel h2{
+ color:#ffdf94!important;
+ font:900 clamp(23px,2.7vw,34px)/1.14 'Cinzel',Georgia,serif!important;
+ text-shadow:0 3px 4px #130d09!important;
+ letter-spacing:.005em!important;
+}
+body .cm-inbox-panel{width:min(750px,96vw)!important;max-height:88dvh!important;overflow-y:auto!important;padding:clamp(14px,2.3vw,25px)!important}
+body .cm-inbox-panel #inbox-status{color:#f5e7c9!important;line-height:1.45!important}
+body .cm-inbox-panel .cm-inbox-head{padding-bottom:12px!important;margin-bottom:8px!important;border-bottom:1px solid #deaf624d!important}
+body .cm-inbox-panel .cm-inbox-head #close-inbox,
+body[data-page="lobby"] #cm-identity-back{
+ appearance:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:42px!important;padding:9px 14px!important;
+ border:2px solid #f2c978!important;border-radius:10px!important;
+ color:#fff2d3!important;background:linear-gradient(180deg,#874b27,#49271e)!important;
+ font:900 13px/1.2 'Nunito',sans-serif!important;
+ box-shadow:inset 0 1px #fff2c344,0 4px 0 #24120e!important;
+ text-shadow:0 1px 2px #28140c!important;cursor:pointer!important;
+}
+body .cm-inbox-panel .cm-inbox-head #close-inbox:hover,
+body[data-page="lobby"] #cm-identity-back:hover{filter:brightness(1.13)!important}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-panel{position:relative!important;padding-top:clamp(66px,7vw,78px)!important}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-back{
+ display:inline-flex!important;position:absolute!important;
+ top:14px!important;left:16px!important;z-index:80!important;pointer-events:auto!important;
+}
+body[data-page="lobby"] .cm-identity-panel select,
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields select{
+ color:var(--cm-parchment-text)!important;
+ background:linear-gradient(#fff9e9,#f9e9c9)!important;
+ border:2px solid #c89447!important;
+ border-radius:11px!important;
+ box-shadow:inset 0 2px 5px #6b4a1b17,0 3px 0 #694425!important;
+ font:800 clamp(14px,1.2vw,17px)/1.2 'Nunito',sans-serif!important;
+}
+body[data-page="lobby"] .cm-identity-panel label{color:#ffdda0!important;text-shadow:0 2px 4px #150d0b!important}
+body[data-page="lobby"] .cm-identity-panel p{color:#fdf0d0!important}
+body[data-page="lobby"] .cm-identity-panel .cm-gold-action,
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ color:#442714!important;background:linear-gradient(180deg,#ffe393,#e3a436)!important;
+ border:2px solid #fff0b0!important;border-radius:13px!important;
+ box-shadow:inset 0 2px 2px #fff7d39e,0 5px 0 #895021!important;
+ font:900 clamp(16px,1.65vw,21px)/1.2 'Cinzel',Georgia,serif!important;
+ text-shadow:0 1px #fff3ce!important;
+}
+body .cm-inbox-panel .cm-inbox-group,
+body .cm-inbox-panel .cm-duel-history>summary{
+ background:linear-gradient(110deg,#61412b,#244139)!important;
+ color:#ffe0a0!important;border:2px solid #cf9a4b!important;
+ border-radius:12px!important;
+ box-shadow:inset 0 1px #ffe4a621!important;
+}
+body .cm-inbox-panel .cm-challenge{
+ background:linear-gradient(160deg,#fff7e4,#f4e7cc)!important;
+ border:2px solid #d4ac6c!important;border-radius:13px!important;
+ color:#4b3323!important;
+ box-shadow:0 3px 0 #79552733!important;
+}
+body .cm-inbox-panel .cm-challenge strong{color:#3a2b22!important}
+body .cm-inbox-panel .cm-challenge small{color:#765c48!important}
+body .cm-inbox-panel .cm-challenge p{color:#513b2d!important}
+body .cm-inbox-panel .cm-challenge.cm-duel-win{background:#e8f5e6!important;border-color:#379565!important}
+body .cm-inbox-panel .cm-challenge.cm-duel-loss{background:#f9e6e1!important;border-color:#c4514d!important}
+body .cm-inbox-panel .cm-challenge.cm-duel-declined{background:#ede9e2!important;border-color:#a59a8f!important}
+body .cm-inbox-panel .cm-challenge-btn,
+body .cm-inbox-panel .cm-session-button{
+ min-height:42px!important;border:2px solid #d6a964!important;border-radius:10px!important;
+ background:linear-gradient(180deg,#267d5d,#12513e)!important;color:#fff8e7!important;
+ box-shadow:0 4px 0 #0a372a!important;font:900 13px/1.2 'Nunito',sans-serif!important;
+}
+body .cm-inbox-panel .cm-challenge-btn.reject{
+ background:linear-gradient(180deg,#bb564b,#85352e)!important;box-shadow:0 4px 0 #56241f!important;
+}
+body .cm-inbox-panel .cm-duel-stat{
+ border-radius:12px!important;box-shadow:inset 0 1px #fff8df!important;
+}
+body .cm-inbox-panel .cm-duel-summary{gap:7px!important}
+body .cm-inbox-panel .cm-inbox-empty{color:#f1dcc0!important}
+body[data-page="lobby"] #view-inicio[data-step="partida"] .setup-fields>label{
+ color:#ffebba!important;text-shadow:0 2px 4px #000!important;
+}
+body[data-page="lobby"] .cm-identity-panel button:focus-visible,
+body .cm-inbox-panel button:focus-visible,
+body[data-page="lobby"] #view-inicio[data-step="partida"] select:focus-visible{
+ outline:3px solid #fff7b2!important;outline-offset:3px!important;
+}
+@media(max-width:680px){
+ body .cm-inbox-panel{max-height:92dvh!important;padding:13px!important}
+ body .cm-inbox-panel h2{font-size:22px!important}
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-panel{padding-top:60px!important}
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-identity-back{top:10px!important;left:10px!important}
+}
