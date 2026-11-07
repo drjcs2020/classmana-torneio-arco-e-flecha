@@ -270,7 +270,7 @@ async function startMatch(accepted=null){
  const mode=fromInbox?duelMode(fromInbox.kind):$('mode').value;
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
-  if(!/^[ABC]\\d{2}$/.test(userId||'')){
+  if(!/^[ABC][0-9]{2}$/.test(userId||'')){
     setLobbyStep('desafio');
     $('cm-quick-player')?.focus();
     toast('Selecione seu nome na tela de desafios.');
@@ -773,7 +773,7 @@ document.querySelectorAll('[data-play-mode]').forEach(button=>{
  button.addEventListener('click',()=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
-  if(isDuel(chosen)&&!(/^[ABC]\\d{2}$/.test($('player').value))){
+  if(isDuel(chosen)&&!(/^[ABC][0-9]{2}$/.test($('player').value))){
     setLobbyStep('desafio');
     const quick=$('cm-quick-player');if(quick){quick.focus();quick.classList.add('cm-needs-player');}
     toast('🏹 Escolha seu nome antes de iniciar o duelo.');
