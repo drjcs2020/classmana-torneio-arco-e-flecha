@@ -155,9 +155,7 @@ function chooseArcher(g){
 }
 function selectHouse(k){
  if(!H[k])return;
- if(document.body.dataset.page==='lobby'&&identifiedPlayerId&&identifiedPlayerId[0]!==k){
-  toast('Seu perfil pertence ao 4º '+identifiedPlayerId[0]+'. Para trocar de Casa, escolha outro aluno.');return;
- }
+ 
  house=k;arenaAudio.setHouse(k);atmosphere?.setHouse(k);
  const lobby=$('view-inicio');if(lobby)lobby.dataset.house=k;
  document.querySelectorAll('.house').forEach(el=>{
@@ -175,7 +173,7 @@ function selectHouse(k){
   if(match)uiHud();
  });
  fillPlayer(incoming?.rivalId?.[0]===k?incoming.rivalId:null);
- if(view==='inicio'&&document.body.dataset.page==='lobby'&&$('view-inicio')?.dataset.step!=='perfil')setLobbyStep('heroi');
+ // A Casa escolhida define a turma. A escolha do nome vem antes do arqueiro.
 }
 function isDuel(mode){return mode==='challenge'||mode==='challenge_same'||mode==='challenge_team'}
 function goOnlinePortal(mode=$('mode').value,inbox=false){
@@ -275,7 +273,7 @@ async function startMatch(accepted=null){
  let userId=$('player').value,rivalId=fromInbox?(fromInbox.creator.id===online.user?.id?fromInbox.recipient.id:fromInbox.creator.id):$('rival').value,challenge=null;
  if(isDuel(mode)){
   if(!/^[ABC][0-9]{2}$/.test(userId||'')){
-    setLobbyStep('perfil');
+    setLobbyStep('perfil');populateIdentityOptions();
     $('cm-identity-player')?.focus();
     toast('Primeiro escolha seu nome na entrada do torneio.');
     return;
@@ -581,7 +579,7 @@ function showOnlineStatus(){
  $('logout').classList.toggle('hidden',!user);
  $('open-inbox').disabled=!active&&online.state!=='portal';
  const retry=$('retry-online');if(retry){retry.classList.toggle('hidden',active||!online.enabled);retry.textContent=online.state==='portal'?'⚔️ ABRIR ARENA ONLINE':'↻ RECONECTAR';}
- if(user&&($('player').value!==user.id||house!==user.house)){
+ if(user&&(document.body.dataset.page!=='lobby'||(identifiedPlayerId&&identifiedPlayerId===user.id))&&($('player').value!==user.id||house!==user.house)){
   selectHouse(user.house);$('player').value=user.id;fillRivals();
  }
 }
@@ -680,10 +678,10 @@ async function startOnlineClient(){
   if(!connected)return;
   try{await online.list()}catch(err){console.warn('Lista online indisponível; usando nomes cadastrados no jogo:',err)}
   const request=new URLSearchParams(location.search);
-  const requestedPlayer=request.get('hosted')==='1'?request.get('player'):null;
-  const remembered=/^[ABC]\d{2}$/.test(requestedPlayer||'')?requestedPlayer:localStorage.getItem('cm_arco_nome');
-  if(!online.user&&/^[ABC]\d{2}$/.test(remembered||'')){
-   selectHouse(remembered[0]);$('player').value=remembered;await loginStudent();
+  // No lobby, preserve House-first selection instead of restoring a previous pupil automatically.
+  if(document.body.dataset.page!=='lobby'&&!online.user){
+   const remembered=localStorage.getItem('cm_arco_nome');
+   if(/^[ABC][0-9]{2}$/.test(remembered||'')){selectHouse(remembered[0]);$('player').value=remembered;await loginStudent();}
   }
   try{
    const pendentes=await refreshInbox();
@@ -704,34 +702,40 @@ async function startOnlineClient(){
 
 // Interações do jogo.
 document.querySelectorAll('.nav-link').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.view==='inicio'&&view==='inicio')setLobbyStep('reino');else openView(el.dataset.view)}));
-document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>{if(document.body.dataset.page==='lobby'&&!identifiedPlayerId){setLobbyStep('perfil');return}setLobbyStep(button.dataset.lobbyStep)}));
+document.querySelectorAll('[data-lobby-step]').forEach(button=>button.addEventListener('click',()=>{if(document.body.dataset.page==='lobby'&&!identifiedPlayerId){setLobbyStep('reino');return}setLobbyStep(button.dataset.lobbyStep)}));
 function populateIdentityOptions(){
  const el=$('cm-identity-player');if(!el)return;
- el.innerHTML='<option value="">Selecione seu nome</option>'+['A','B','C'].map(h=>
-  '<optgroup label="'+H[h].grade+' — '+H[h].name+'">'+choices(h).map(p=>
-    '<option value="'+p.id+'">'+p.name+' · '+p.id+'</option>').join('')+'</optgroup>').join('');
- if(identifiedPlayerId)el.value=identifiedPlayerId;
+ const names=choices(house);
+ el.innerHTML='<option value="">Selecione seu nome — 4º '+house+'</option>'+names.map(p=>
+  '<option value="'+p.id+'">'+p.name+' · '+p.id+'</option>').join('');
+ el.value=identifiedPlayerId?.[0]===house?identifiedPlayerId:'';
+ const info=$('cm-identity-info');
+ if(info)info.textContent='Turma: 4º '+house+' — '+H[house].name+' · '+names.length+' alunos';
+ const label=document.querySelector('label[for="cm-identity-player"]');
+ if(label)label.textContent='ALUNOS DO 4º '+house+' — '+H[house].name.toUpperCase();
 }
 populateIdentityOptions();
 $('cm-identity-player')?.addEventListener('change',event=>{
- const id=event.currentTarget.value,found=choices(id?.[0]||'').find(p=>p.id===id);
+ const id=event.currentTarget.value,found=choices(house).find(p=>p.id===id);
  const info=$('cm-identity-info');
- if(info)info.textContent=found?'✓ '+found.name+' · 4º '+id[0]+' — '+H[id[0]].name:'Escolha um nome para continuar.';
+ if(info)info.textContent=found?'✓ '+found.name+' · 4º '+house+' — '+H[house].name:'Selecione seu nome no 4º '+house+'.';
 });
-$('cm-confirm-identity')?.addEventListener('click',async()=>{
+$('cm-confirm-identity')?.addEventListener('click',()=>{
  const id=$('cm-identity-player')?.value||'';
- if(!/^[ABC][0-9]{2}$/.test(id)){toast('Escolha seu nome na lista.');$('cm-identity-player')?.focus();return;}
+ if(!/^[ABC][0-9]{2}$/.test(id)||id[0]!==house){toast('Escolha seu nome no 4º '+house+'.');$('cm-identity-player')?.focus();return;}
  identifiedPlayerId=id;
- selectHouse(id[0]);
- $('player').value=id;fillRivals();
- setLobbyStep('reino');
- // O login online ocorre ao entrar no duelo, sem pular a escolha visual da Casa.
+ $('player').value=id;fillPlayer(id);fillRivals();
+ setLobbyStep('heroi');
 });
+
 $('confirm-archer').addEventListener('click',()=>setLobbyStep('desafio'));
 $('challenge-level').addEventListener('change',drawCourse);
 document.querySelectorAll('.house').forEach(el=>el.addEventListener('click',()=>{
- selectHouse(el.dataset.house);
- el.classList.remove('castle-selection-animation');void el.offsetWidth;el.classList.add('castle-selection-animation');
+ const chosen=el.dataset.house;
+ if(identifiedPlayerId&&identifiedPlayerId[0]!==chosen){identifiedPlayerId='';online.logout();}
+ selectHouse(chosen);
+ populateIdentityOptions();
+ setLobbyStep('perfil');
 }));
 function rotateArcher(){chooseArcher(archerGender()==='m'?'f':'m')}
 $('archer-prev').addEventListener('click',rotateArcher);
@@ -807,8 +811,7 @@ spriteHud=mountSpriteHUD({
   $('stage').classList.remove('aiming');scene?.setPower(p);fire(p);uiHud();},
  onPause:toggleArenaPause
 });
-selectHouse('A');updateMode();drawCourse();
-if(document.body.dataset.page==='lobby')setLobbyStep('perfil');else setLobbyStep('reino');
+selectHouse('A');updateMode();drawCourse();setLobbyStep('reino');
 const hostedParams=new URLSearchParams(location.search);
 if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
  const hostHouse=hostedParams.get('house'),hostMode=hostedParams.get('mode'),hostPlayer=hostedParams.get('player');
@@ -820,14 +823,14 @@ if(hostedParams.get('hosted')==='1'&&document.body.dataset.page!=='arena'){
 // A abertura duplicada foi removida. O fluxo começa na escolha da Casa.
 $('cm-lobby-back')?.addEventListener('click',()=>{
  const step=$('view-inicio')?.dataset.step;
- setLobbyStep(step==='partida'?'desafio':step==='desafio'?'heroi':step==='heroi'?'reino':'perfil');
+ setLobbyStep(step==='partida'?'desafio':step==='desafio'?'heroi':step==='heroi'?'perfil':'reino');
 });
 document.querySelectorAll('[data-play-mode]').forEach(button=>{
  button.addEventListener('click',()=>{
   const chosen=button.dataset.playMode;
   if(!['practice','bot','challenge_same','challenge_team','challenge'].includes(chosen))return;
   if(isDuel(chosen)&&!(/^[ABC][0-9]{2}$/.test($('player').value))){
-    setLobbyStep('perfil');$('cm-identity-player')?.focus();
+    setLobbyStep('perfil');populateIdentityOptions();$('cm-identity-player')?.focus();
     toast('🏹 Escolha seu nome antes de iniciar o duelo.');return;
   }
   $('mode').value=chosen;updateMode();
