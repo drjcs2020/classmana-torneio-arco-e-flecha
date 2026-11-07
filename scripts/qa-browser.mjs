@@ -269,6 +269,8 @@ if(engine==='playcanvas'){
  assert(fields.length>=3,'Preparation labels missing');
  assert(fields.every(x=>x.width>=300&&x.height>=40),'Mobile preparation fields must be full-width and legible: '+JSON.stringify(fields));
  await shot(mobile,'09-preparar-mobile');
+ // Free practice starts immediately; bot and student duels use the new VS introduction.
+ await mobile.locator('#mode').selectOption('bot');
  await mobile.locator('#start-game').click();
  await mobile.locator('#cm-vs-overlay').waitFor({timeout:15000});
  await shot(mobile,'09b-versus-gibi-mobile');
