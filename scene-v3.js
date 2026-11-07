@@ -387,11 +387,22 @@ export function initScene(canvas, getSettings) {
     if(targetRoot)moveTarget();
     updateBowAim();
     if(projectile&&pendingShot){const s=pendingShot;s.elapsed+=dt;const t=clamp(s.elapsed/s.duration,0,1);
-      const eased=t*t*(3-2*t);const pos=new pc.Vec3().lerp(s.start,s.end,eased);
-      const meters=getSettings()?.distance||30;
-       const trajectory=Math.pow(Math.max(10,meters)/30,.45);
-       pos.y+=.18*trajectory*Math.sin(t*Math.PI)-.10*trajectory*t*t;
+      // Ballistic arc with exact launch and impact positions. Height and velocity
+      // use the same derivative so the arrow's point rises, levels out and drops.
+      const arc=s.arcHeight;
+      const pos=new pc.Vec3().lerp(s.start,s.end,t);
+      pos.y+=4*arc*t*(1-t);
       projectile.setPosition(pos);
+      const direction=new pc.Vec3(
+        s.end.x-s.start.x,
+        s.end.y-s.start.y+4*arc*(1-2*t),
+        s.end.z-s.start.z
+      );
+      if(direction.lengthSq()>1e-7){
+        direction.normalize();
+        // The modeled arrow tip points along local -Z, as does PlayCanvas lookAt.
+        projectile.lookAt(pos.clone().add(direction));
+      }
       if(t>=1){projectile.enabled=false;pendingShot=null;if(arrowLoaded)arrowLoaded.enabled=true;s.done?.();}}
   }
   function impact({x=.5,y=.45,score=0}={}){
@@ -431,7 +442,10 @@ export function initScene(canvas, getSettings) {
     projectile.enabled=true;projectile.setPosition(start);projectile.setEulerAngles(0,0,0);
     const meters=getSettings()?.distance||30;
     const duration=.43+.42*Math.pow(Math.max(10,meters)/80,.56)+.13*(1-shotPower);
-    return new Promise(resolve=>{pendingShot={start,end,elapsed:0,duration,done:resolve};});
+    const trajectory=Math.pow(Math.max(10,meters)/30,.45);
+    // Both slopes must be visible even when the target is above the bow.
+    const arcHeight=Math.max(.37*trajectory,.28+Math.abs(end.y-start.y)*.42);
+    return new Promise(resolve=>{pendingShot={start,end,arcHeight,elapsed:0,duration,done:resolve};});
   }
 
   (async()=>{
