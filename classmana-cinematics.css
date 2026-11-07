@@ -1,0 +1,54 @@
+/* ClassMana Cinematics — imported from reference ZIP patterns, rewritten for vanilla JS.
+   Functional controls remain DOM elements; this is not a full-screen screenshot. */
+@keyframes cm-ember-rise{0%{transform:translate3d(0,8vh,0) scale(.8);opacity:0}12%{opacity:var(--ember-opacity,.85)}80%{opacity:.75}100%{transform:translate3d(var(--ember-drift,35px),-105vh,0) scale(.15);opacity:0}}
+@keyframes cm-vs-card-enter{from{transform:translateY(45px) scale(.94);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes cm-vs-slam{0%{transform:scale(2.5) rotate(-12deg);opacity:0}65%{transform:scale(.92) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes cm-banner-drop{from{transform:translateY(-40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes cm-pulse-gold{50%{filter:brightness(1.26) drop-shadow(0 0 17px #ffcc6880)}}
+@keyframes cm-landing-spark{0%{transform:translateY(0) scale(.5);opacity:0}20%{opacity:1}100%{transform:translateY(-92px) scale(.12);opacity:0}}
+.cm-embers{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;contain:layout paint}
+.cm-ember{position:absolute;bottom:-10%;left:var(--ember-x);height:var(--ember-size);width:var(--ember-size);border-radius:50%;background:radial-gradient(circle at 25% 25%,#fff8cd,#ffc047 38%,#ef6124 75%,transparent);box-shadow:0 0 10px #ff8f2fb5;opacity:0;animation:cm-ember-rise var(--ember-duration) linear var(--ember-delay) infinite}
+.cm-embers[data-house="A"] .cm-ember{background:radial-gradient(circle,#fff8da,#a5edff 42%,#347bf7 80%,transparent);box-shadow:0 0 10px #63c3ffb9}
+.cm-embers[data-house="C"] .cm-ember{background:radial-gradient(circle,#ffffc2,#9cff9c 42%,#12aa75 80%,transparent);box-shadow:0 0 10px #32eaa2b9}
+.cm-vs-overlay{position:fixed;inset:0;z-index:20000;display:flex;align-items:center;justify-content:center;padding:clamp(10px,3vh,25px);box-sizing:border-box;overflow-y:auto;background:radial-gradient(ellipse at 30% 65%,#1f48956e,transparent 55%),radial-gradient(ellipse at 75% 65%,#b543275c,transparent 52%),linear-gradient(115deg,#05132cf2,#071d45ed 50%,#130e2aef);color:#fff3d1;font-family:Georgia,serif}
+.cm-vs-overlay[hidden]{display:none}
+.cm-vs-overlay .cm-embers{position:fixed}
+.cm-vs-shell{position:relative;z-index:2;width:min(100%,1080px);min-height:0;display:flex;flex-direction:column;align-items:center;gap:clamp(9px,2vh,22px);animation:cm-banner-drop .5s ease-out}
+.cm-vs-title{box-sizing:border-box;text-align:center;width:min(92%,640px);padding:12px 24px;border:5px ridge #f3c15d;border-radius:12px;background:linear-gradient(#7d142f,#4a0a21);box-shadow:0 8px 15px #000a,inset 0 0 0 2px #ffd77d63;font:900 clamp(22px,3.2vw,41px)/1.1 Georgia,serif;letter-spacing:.025em;text-shadow:0 3px 4px #11060a}
+.cm-vs-sub{font:900 clamp(11px,1.5vw,17px)/1.15 'Nunito',sans-serif;color:#ffdc84;letter-spacing:.12em;text-transform:uppercase;text-align:center}
+.cm-vs-fighters{width:100%;display:grid;grid-template-columns:minmax(0,1fr) clamp(62px,11vw,145px) minmax(0,1fr);gap:clamp(5px,1.3vw,16px);align-items:center}
+.cm-vs-fighter{position:relative;isolation:isolate;min-width:0;max-height:min(55vh,430px);height:clamp(190px,46vh,430px);display:flex;flex-direction:column;overflow:hidden;border:5px ridge #f6cb73;border-radius:17px 17px 9px 9px;background:linear-gradient(160deg,#153f87,#051536 75%);box-shadow:0 13px 28px #000b,inset 0 0 0 2px #f8dfaa70;animation:cm-vs-card-enter .5s both}
+.cm-vs-fighter[data-house="B"]{background:linear-gradient(160deg,#8a1c2b,#290a17 75%);border-color:#e2ad45}
+.cm-vs-fighter[data-house="C"]{background:linear-gradient(160deg,#117350,#042f2b 75%);border-color:#b8cc73}
+.cm-vs-fighter:nth-of-type(3){animation-delay:.18s}
+.cm-vs-fighter img{width:100%;height:100%;min-height:0;flex:1 1 auto;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 4px 10px #0008);background:radial-gradient(ellipse at 50% 64%,#ffffff18,transparent 65%)}
+.cm-vs-fighter-info{position:relative;flex:0 0 auto;box-sizing:border-box;max-width:100%;padding:10px 5px 12px;background:linear-gradient(0deg,#031225,#0b2950ed);border-top:3px solid #f4cb6f;text-align:center}
+.cm-vs-fighter-info strong{display:block;color:#fff4d7;font:900 clamp(15px,2.1vw,25px)/1.12 Georgia,serif;overflow-wrap:anywhere;text-shadow:0 2px #000}
+.cm-vs-fighter-info small{display:block;margin-top:6px;font:900 clamp(10px,1.2vw,13px)/1.15 'Nunito',sans-serif;color:#ffdc98}
+.cm-vs-mark{font:italic 900 clamp(45px,8.2vw,100px)/1 Georgia,serif;text-align:center;color:#ffcf6f;text-shadow:0 4px #683113,0 8px #220b0a,0 0 28px #ff7a2b9c;animation:cm-vs-slam .65s .33s both}
+.cm-vs-actions{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center}
+.cm-vs-actions button{min-height:52px;padding:10px 24px;cursor:pointer;font:900 clamp(15px,1.8vw,23px)/1.1 Georgia,serif;border-radius:12px;text-shadow:0 2px #000;transition:filter .2s,transform .2s}
+.cm-vs-start{color:#fff4d6;background:linear-gradient(#2fc763,#087239);border:5px ridge #f3c36d;box-shadow:0 6px 0 #5d3f10,0 9px 18px #000a;animation:cm-pulse-gold 2.4s infinite}
+.cm-vs-cancel{color:#fff5df;background:linear-gradient(#244d88,#081c45);border:3px ridge #e7bb66}
+.cm-vs-actions button:hover{filter:brightness(1.18);transform:translateY(-2px)}
+.cm-vs-actions button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+.cm-vs-overlay .cm-vs-note{color:#ffebb6;font:800 12px/1.3 'Nunito',sans-serif;text-align:center}
+.cm-impact-sparks{position:absolute;z-index:70;width:2px;height:2px;pointer-events:none}
+.cm-impact-sparks span{position:absolute;width:var(--sz,6px);height:var(--sz,6px);border-radius:50%;background:radial-gradient(circle,#fffbd8,#ffb52d,#ff542a);animation:cm-landing-spark var(--duration,.9s) ease-out forwards;transform:translateX(var(--tx))}
+#finish.cm-cinematic-result{background:radial-gradient(ellipse at center,#091b41d9,#020916ef)}
+#finish.cm-cinematic-result .finish-card{position:relative;isolation:isolate;box-sizing:border-box;max-height:calc(100dvh - 28px);overflow:auto;width:min(94vw,900px);max-width:900px;border:5px ridge #f3c66c;border-radius:20px;background:linear-gradient(165deg,#132b59,#051535 74%);box-shadow:0 0 0 3px #271404,0 12px 36px #000b}
+#finish.cm-cinematic-result .finish-card>*:not(.cm-embers){position:relative;z-index:2}
+#finish.cm-cinematic-result #finish-title{color:#ffe3a3!important;font:900 clamp(24px,4vw,48px)/1.08 Georgia,serif!important;text-shadow:0 4px #55230d,0 0 13px #000!important;margin:6px 0!important}
+#finish.cm-cinematic-result #finish-desc{color:#fff2d1!important;font-size:clamp(13px,1.55vw,18px)!important}
+#finish.cm-cinematic-result .cm-finish-heroes{display:none!important}
+#finish.cm-cinematic-result .cm-final-duel{display:grid;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);gap:12px;align-items:center;margin:12px auto;width:min(100%,740px)}
+#finish.cm-cinematic-result .cm-final-player{display:flex;flex-direction:column;align-items:center;min-width:0;gap:4px;border:3px ridge #e6bd68;border-radius:12px;background:#091e43d9;padding:10px}
+#finish.cm-cinematic-result .cm-final-player img{max-height:clamp(80px,17vh,160px);width:100%;max-width:180px;object-fit:contain}
+#finish.cm-cinematic-result .cm-final-player b{font:900 clamp(13px,1.7vw,20px)/1.1 Georgia,serif;color:#fff4d9;overflow-wrap:anywhere;text-align:center}
+#finish.cm-cinematic-result .cm-final-player small{font:800 11px/1.2 'Nunito',sans-serif;color:#ffe1a4}
+#finish.cm-cinematic-result .cm-final-vs{text-align:center;font:italic 900 clamp(30px,4vw,56px)/1 Georgia,serif;color:#ffc66b}
+#finish.cm-cinematic-result .cm-final-shots{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin:7px 0}
+#finish.cm-cinematic-result .cm-final-shots span{min-width:22px;padding:4px 6px;border:1px solid #e4ae4f;border-radius:5px;background:#05122f;color:#ffe2a5;font:900 13px/1 Georgia,serif;text-align:center}
+#finish.cm-cinematic-result .finish-actions button{border:3px ridge #e4b85a;border-radius:10px}
+@media(max-width:680px){.cm-vs-fighters{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr)}.cm-vs-fighter{height:clamp(190px,38vh,310px)}.cm-vs-title{font-size:22px}.cm-vs-mark{font-size:40px}.cm-vs-actions button{min-height:46px;padding:8px 12px;font-size:14px}#finish.cm-cinematic-result .cm-final-duel{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:5px}#finish.cm-cinematic-result .cm-final-player{padding:4px}#finish.cm-cinematic-result .cm-final-player img{max-height:115px}}
+@media(prefers-reduced-motion:reduce){.cm-ember,.cm-vs-shell,.cm-vs-fighter,.cm-vs-mark,.cm-vs-start,.cm-impact-sparks span{animation:none!important}.cm-ember{opacity:.2}}
