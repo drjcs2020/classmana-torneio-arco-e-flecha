@@ -33,6 +33,25 @@ function emberLayer(host,house,count=16){
  host.prepend(layer);
  return layer;
 }
+/** Lightweight continuous atmosphere, using the same emberRise effect as VS.
+ * House A: arcane blue sparks; B: glowing fire embers; C: emerald magic.
+ * Decorative only: never intercepts clicks, gestures or gameplay physics. */
+function mountAmbient(host,house='A',count=22){
+ if(!host)return null;
+ const existing=host.querySelector(':scope > .cm-ambient-embers');
+ if(existing){
+  existing.dataset.house=getHouse(house);
+  return existing;
+ }
+ const layer=emberLayer(host,house,count);
+ layer.classList.add('cm-ambient-embers');
+ return layer;
+}
+function setAmbientHouse(house){
+ for(const layer of document.querySelectorAll('.cm-ambient-embers')){
+  layer.dataset.house=getHouse(house);
+ }
+}
 function fighter(person){
  const house=getHouse(person.house);
  const card=node('article','cm-vs-fighter');
@@ -149,4 +168,4 @@ function bindMenuSound(sound){
   try{sound('click')}catch{}
  });
 }
-export const cinematics={versus,resultView,impactSparkle,bindMenuSound};
+export const cinematics={versus,resultView,impactSparkle,bindMenuSound,mountAmbient,setAmbientHouse};
