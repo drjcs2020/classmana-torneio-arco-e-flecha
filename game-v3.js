@@ -1,6 +1,6 @@
 import {initScene} from './scene-v3.js?v=ballistic27';
 import {CIRCUITS,LEVELS,targetMotion,obstacleBlocks,distanceDifficulty,flightSeconds} from './arena-difficulty.js?v=3';
-import {arenaAudio} from './arena-audio.js?v=music28';
+import {arenaAudio} from './arena-audio.js?v=music32';
 import {initAtmosphere} from './arena-atmosphere.js?v=no-crowd15';
 import {online} from './online-client.js?v=api10';
 import {mountSpriteHUD} from './sprite-hud.js?v=1';
@@ -892,12 +892,18 @@ function updateSoundButton(){
 }
 function updateLobbyAudioButton(){
  const button=$('cm-lobby-sound');if(!button)return;
- button.textContent=arenaAudio.enabled?'🔊 Música e sons':'🔇 Som desligado';
- button.setAttribute('aria-pressed',String(arenaAudio.enabled));
- button.setAttribute('aria-label',arenaAudio.enabled?'Desativar música e efeitos':'Ativar música e efeitos');
+ button.textContent=!arenaAudio.enabled?'🔇 Som desligado':arenaAudio.playing?'🔊 Música e sons':'▶ Ativar trilha sonora';
+ button.setAttribute('aria-pressed',String(arenaAudio.enabled&&arenaAudio.playing));
+ button.setAttribute('aria-label',!arenaAudio.enabled?'Ativar música e efeitos':arenaAudio.playing?'Desativar música e efeitos':'Iniciar trilha sonora');
 }
-soundButton?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton();updateLobbyAudioButton()});
-$('cm-lobby-sound')?.addEventListener('click',()=>{arenaAudio.toggle();updateSoundButton();updateLobbyAudioButton()});
+function audioControl(){
+ if(arenaAudio.enabled&&!arenaAudio.playing)arenaAudio.start();
+ else arenaAudio.toggle();
+ updateSoundButton();updateLobbyAudioButton();
+}
+soundButton?.addEventListener('click',audioControl);
+$('cm-lobby-sound')?.addEventListener('click',audioControl);
+document.addEventListener('pointerdown',()=>queueMicrotask(updateLobbyAudioButton),{passive:true});
 updateSoundButton();updateLobbyAudioButton();
 document.querySelectorAll('[data-equip-bow]').forEach(el=>el.addEventListener('click',()=>chooseEquipment('bow',el.dataset.equipBow)));
 applyEquipment();
