@@ -325,3 +325,86 @@ body[data-page="lobby"] #view-inicio[data-step="desafio"] #cm-quick-help{
   min-height:47px!important;font-size:15px!important
  }
 }
+
+/* Etapa de identificação, ANTES das Casas. Preserva a arte de fundo existente. */
+body[data-page="lobby"] #view-inicio:not([data-step="perfil"]) > #cm-identity-screen{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > .houses,
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > .cm-house-title,
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > .character-studio,
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > .cm-duel-screen,
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > .setup,
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-lobby-back{display:none!important}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{
+ display:flex!important;position:absolute!important;inset:16% 3% 5%!important;
+ z-index:12!important;align-items:center!important;justify-content:center!important;
+ overflow-y:auto!important;padding:10px!important
+}
+body[data-page="lobby"] #view-inicio .cm-identity-panel{
+ box-sizing:border-box!important;width:min(94vw,660px)!important;max-height:100%!important;
+ overflow-y:auto!important;display:flex!important;flex-direction:column!important;
+ align-items:stretch!important;gap:clamp(8px,1.2vh,16px)!important;
+ border:4px ridge #eec46c!important;border-radius:23px!important;
+ padding:clamp(18px,3vw,32px)!important;
+ background:linear-gradient(160deg,rgba(5,23,47,.96),rgba(9,49,84,.96))!important;
+ box-shadow:0 22px 70px #000c,inset 0 0 32px #f5cc6240!important;
+ color:#fff4d6!important;text-align:center!important
+}
+body[data-page="lobby"] .cm-identity-panel .cm-identity-logo{
+ width:min(85%,400px)!important;max-height:90px!important;object-fit:contain!important;margin:0 auto!important
+}
+body[data-page="lobby"] .cm-identity-panel h2{
+ margin:0!important;color:#ffe4a1!important;
+ font:900 clamp(25px,3vw,37px) 'Cinzel',Georgia,serif!important;
+ text-shadow:0 3px 8px #000!important
+}
+body[data-page="lobby"] .cm-identity-panel p{
+ margin:0!important;color:#fff8e8!important;
+ font:700 clamp(14px,1.5vw,18px) 'Nunito',sans-serif!important;line-height:1.4!important
+}
+body[data-page="lobby"] .cm-identity-panel label{
+ color:#ffe0a2!important;font:900 clamp(15px,1.6vw,19px) 'Nunito',sans-serif!important;
+ text-shadow:0 2px 6px #000!important
+}
+body[data-page="lobby"] #cm-identity-player{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ width:100%!important;min-height:58px!important;padding:12px 16px!important;
+ background:#fff8e7!important;color:#172e4a!important;border:3px solid #e7b95e!important;
+ border-radius:13px!important;font:800 clamp(16px,1.5vw,20px) 'Nunito',sans-serif!important;
+ box-shadow:0 5px 0 #765628!important;cursor:pointer!important
+}
+body[data-page="lobby"] #cm-identity-player option,
+body[data-page="lobby"] #cm-identity-player optgroup{
+ color:#172e4a!important;background:#fff8e7!important
+}
+body[data-page="lobby"] #cm-identity-player:focus-visible{
+ outline:4px solid #ffe8a1!important;outline-offset:3px!important
+}
+body[data-page="lobby"] .cm-identity-panel .cm-gold-action{
+ cursor:pointer!important;display:block!important;width:100%!important;
+ min-height:62px!important;border-radius:13px!important;
+ border:3px solid #ffe6aa!important;
+ background:linear-gradient(180deg,#ffdf78,#d8982e)!important;
+ color:#332009!important;font:900 clamp(17px,1.8vw,23px) 'Cinzel',Georgia,serif!important;
+ box-shadow:0 6px 0 #6b3d0d,0 12px 30px #0008!important;
+ text-shadow:0 1px #fff6d6!important
+}
+body[data-page="lobby"] .cm-identity-panel .cm-gold-action:hover,
+body[data-page="lobby"] .cm-identity-panel .cm-gold-action:focus-visible{
+ filter:brightness(1.1)!important;transform:translateY(-2px)!important
+}
+/* Desafio: texto legível em uma faixa, sem seleção duplicada e sem poluição visual. */
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-guidance{
+ display:block!important;width:min(93%,820px)!important;
+ max-width:820px!important;margin:0 auto clamp(10px,1.5vh,18px)!important;
+ padding:10px 16px!important;border:2px solid #e4bd72!important;
+ border-radius:13px!important;background:rgba(4,23,46,.91)!important;
+ color:#fff5da!important;font:900 clamp(15px,1.55vw,20px)/1.35 'Nunito',sans-serif!important;
+ text-align:center!important;text-shadow:0 2px 6px #000!important
+}
+@media(max-width:600px){
+ body[data-page="lobby"] #view-inicio[data-step="perfil"] > #cm-identity-screen{inset:10% 1% 3%!important}
+ body[data-page="lobby"] #view-inicio .cm-identity-panel{padding:16px!important;gap:8px!important}
+ body[data-page="lobby"] .cm-identity-panel .cm-identity-logo{max-height:65px!important}
+ body[data-page="lobby"] #cm-identity-player{min-height:52px!important}
+ body[data-page="lobby"] .cm-identity-panel .cm-gold-action{min-height:52px!important}
+}
