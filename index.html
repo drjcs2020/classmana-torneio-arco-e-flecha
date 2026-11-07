@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Cinzel:wght@600;700;800&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=2">
-<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1"><link rel="stylesheet" href="lobby-fantasy.css?v=1"><link rel="stylesheet" href="classmana-rebuild.css?v=1"><link rel="stylesheet" href="classmana-clean.css?v=houses14">
+<link rel="stylesheet" href="v3.css?v=14"><link rel="stylesheet" href="online-ui.css?v=4"><link rel="stylesheet" href="archer-selection.css?v=20261104b"><link rel="stylesheet" href="experience.css?v=20261104arena2"><link rel="stylesheet" href="studio.css?v=fix1104"><link rel="stylesheet" href="tour-layout.css?v=1"><link rel="stylesheet" href="sprite-hud.css?v=1"><link rel="stylesheet" href="lobby-fantasy.css?v=1"><link rel="stylesheet" href="classmana-rebuild.css?v=1"><link rel="stylesheet" href="classmana-clean.css?v=house-first17">
 <link rel="stylesheet" href="duel-results.css?v=results13">
 <link rel="stylesheet" href="duel-turns.css?v=turns16">
 </head>
@@ -25,7 +25,7 @@
 </header>
 
 <main>
-<section id="view-inicio" class="view active" data-step="perfil" aria-label="Identificação, Casa, arqueiro e desafio">
+<section id="view-inicio" class="view active" data-step="reino" aria-label="Escolha da Casa, identificação, arqueiro e desafio">
 
  <button type="button" id="cm-lobby-back" class="cm-sprite-button cm-lobby-back" aria-label="Voltar à tela anterior"><img src="assets/ui/buttons/classmana-voltar.png" alt=""></button>
  <div class="section-title kingdom-title"><div><h1>ClassMana — Torneio das Três Casas</h1></div></div>
@@ -35,12 +35,12 @@
   <button type="button" class="lobby-step" data-lobby-step="heroi" role="tab" aria-selected="false">2 · Arqueiro</button>
   <button type="button" class="lobby-step" data-lobby-step="partida" role="tab" aria-selected="false">3 · Jogar</button>
  </div>
- <section id="cm-identity-screen" class="cm-identity-screen" aria-label="Primeira etapa — escolha do aluno">
+ <section id="cm-identity-screen" class="cm-identity-screen" aria-label="Escolha do aluno da Casa selecionada">
    <div class="cm-identity-panel">
      <img class="cm-identity-logo" src="assets/ui/titles/logo-classmana-torneio.png" alt="ClassMana — Torneio das Três Casas">
      <h2>QUEM VAI JOGAR?</h2>
-     <p>Escolha seu nome para entrar no Torneio das Três Casas.</p>
-     <label for="cm-identity-player">SEU NOME NA LISTA DE ALUNOS</label>
+     <p>Escolha seu nome na turma da Casa selecionada.</p>
+     <label for="cm-identity-player">SEU NOME NA TURMA</label>
      <select id="cm-identity-player"><option value="">Selecione seu nome</option></select>
      <p id="cm-identity-info" aria-live="polite">Escolha um nome para continuar.</p>
      <button type="button" id="cm-confirm-identity" class="cm-gold-action">CONFIRMAR JOGADOR <span aria-hidden="true">➜</span></button>
@@ -202,6 +202,6 @@
 <footer><img src="assets/images/arte-002.webp" alt="ClassMana"><span>CLASSMANA · TORNEIO DAS TRÊS CASAS · MODO ONLINE</span><span>Feito para jogar na web · Sem conexão local obrigatória</span></footer>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=turns16"></script>
+<script src="roster.js?v=2"></script><script src="teams.js?v=1"></script><script type="module" src="game-v3.js?v=house-first17"></script>
 </body>
 </html>
