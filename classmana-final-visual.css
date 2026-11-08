@@ -68,9 +68,8 @@ body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-panel{
 }
 /* Vento informativo menor, junto aos controles superiores; jamais cobre o arco. */
 #view-arena .stage #wind.cm-wind-restored{
- top:clamp(72px,11vh,106px)!important;
- right:clamp(12px,2vw,27px)!important;
- left:auto!important;bottom:auto!important;
+ top:clamp(215px,34vh,310px)!important;
+ left:12px!important;right:auto!important;bottom:auto!important;
  width:clamp(120px,11vw,154px)!important;
  min-height:62px!important;height:auto!important;
  padding:5px 8px!important;gap:1px!important;
@@ -98,11 +97,11 @@ body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-panel{
 /* Voltar legível: não mais um ícone minúsculo no canto inferior direito. */
 body.cm-art-on #view-arena #leave-arena{
  position:fixed!important;
- top:auto!important;right:auto!important;
- bottom:clamp(11px,2vh,25px)!important;
+ top:12px!important;right:auto!important;
+ bottom:auto!important;
  left:clamp(12px,2vw,28px)!important;
  width:clamp(130px,14vw,178px)!important;
- height:clamp(48px,6vh,63px)!important;
+ height:clamp(53px,7vh,64px)!important;
  background:url('assets/ui/buttons/classmana-voltar.png') center/contain no-repeat!important;
  z-index:130!important;
  font-size:0!important;
@@ -137,7 +136,8 @@ body.cm-art-on #view-arena #leave-arena:focus-visible{
 .cm-embers,.cm-ambient-embers{pointer-events:none!important}
 @media(max-width:760px){
  #view-arena .stage #wind.cm-wind-restored{
-  top:clamp(62px,13vh,94px)!important;right:6px!important;
+  top:auto!important;bottom:clamp(75px,11vh,110px)!important;
+  left:6px!important;right:auto!important;
   width:112px!important;min-height:55px!important;
   padding:4px 5px!important;gap:1px!important;
  }
@@ -147,7 +147,7 @@ body.cm-art-on #view-arena #leave-arena:focus-visible{
  #view-arena .stage #wind.cm-wind-restored .wind-direction-text{font-size:8px!important}
  body.cm-art-on #view-arena #leave-arena{
   width:122px!important;height:47px!important;
-  bottom:9px!important;left:7px!important;
+  top:12px!important;bottom:auto!important;left:7px!important;
  }
  body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
   padding:5px 7px!important;gap:4px!important;
