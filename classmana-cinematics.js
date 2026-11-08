@@ -132,15 +132,16 @@ function resultView({player,house,rival,rivalHouse,ownShots=[],rivalShots=[],opp
  card.querySelector('.cm-embers')?.remove();
  emberLayer(card,house,17);
  const wrap=node('div','cm-final-duel');
- const left=resultPerson(player,house,ownShots);
+ const playerPortrait=document.getElementById('hud-archer-image')?.getAttribute('src');
+ const left=resultPerson(player,house,ownShots,undefined,playerPortrait);
  const right=resultPerson(rival||'Adversário',rivalHouse,rivalShots,opponent);
  wrap.append(left,node('div','cm-final-vs','VS'),right);
  const anchor=card.querySelector('#finish-results');
  if(anchor)anchor.before(wrap);else card.append(wrap);
 }
-function resultPerson(name,house,shots,score){
+function resultPerson(name,house,shots,score,selectedPortrait){
  const article=node('div','cm-final-player'),img=node('img');
- img.src=portrait(house);img.alt='Ilustração estilo gibi de '+houses[getHouse(house)].name;
+ img.src=selectedPortrait||portrait(house);img.alt='Arqueiro da Casa '+houses[getHouse(house)].name;
  article.append(img,node('b','',name),node('small','',houses[getHouse(house)].name));
  if(Array.isArray(shots)&&shots.length){
   const strip=node('div','cm-final-shots');strip.setAttribute('aria-label','Pontuação das cinco flechas');
