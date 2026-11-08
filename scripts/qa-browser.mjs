@@ -201,8 +201,11 @@ await shot(desktop,'04-preparar-desktop');
  const r=el.getBoundingClientRect(),img=el.querySelector('img');
  return {width:r.width,height:r.height,imageLoaded:img.complete&&img.naturalWidth>0,visibleHeight:img.getBoundingClientRect().height};
 }));
-assert(cards.every(c=>c.width<=325&&c.height<=350&&c.imageLoaded&&c.visibleHeight>=110),
- 'VS cards must be compact with loaded comic archer portraits: '+JSON.stringify(cards));
+// As cartas maiores agora seguem a referência de duelo com arqueiros chibi.
+ // O teste continua exigindo retratos carregados, não recortados e dimensões moderadas.
+assert(cards.every(c=>c.width>=270&&c.width<=440&&c.height>=240&&c.height<=490&&
+  c.imageLoaded&&c.visibleHeight>=160),
+ 'VS cards must display complete comic portraits at the approved scale: '+JSON.stringify(cards));
 await shot(desktop,'04c-versus-gibi-desktop');
  await desktop.locator('#cm-vs-cancel').click();
  assert.equal(await desktop.locator('#cm-vs-overlay').count(),0,'Cancel must return to setup');
