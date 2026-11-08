@@ -1,0 +1,139 @@
+/* ClassMana — fidelidade visual: Salão dos Campeões e resultado.
+   Ajuste estritamente visual. Sem alterar JS, canvas, física, rankings,
+   modos, desafios assíncronos ou APIs. Carregado por último no index.html. */
+:root{--cm-ref-navy:#071937;--cm-ref-blue:#0c2a58;--cm-ref-gold:#e8b64f;--cm-ref-ivory:#fff0cf}
+body[data-page="lobby"] #view-ranking.active{
+  background:
+    linear-gradient(180deg,rgba(3,13,35,.52) 0%,rgba(3,15,41,.69) 100%),
+    url("assets/scenes/aguia.webp") center/cover no-repeat!important;
+  color:var(--cm-ref-ivory)!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading{
+  border:4px ridge #ecc575!important;
+  border-radius:20px!important;
+  background:linear-gradient(165deg,#164076,#081e48 56%,#071733)!important;
+  box-shadow:inset 0 0 0 2px #d59a4e8a,0 12px 25px #0009!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading h1,
+body[data-page="lobby"] #view-ranking .page-heading small{
+  color:#ffdda0!important;
+  text-shadow:0 2px 3px #160c08,0 0 14px #d9a33d50!important;
+}
+body[data-page="lobby"] #view-ranking .page-heading p{
+  color:#f7e9c7!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-status{
+  color:#ffe9bb!important;
+  background:linear-gradient(140deg,#0b315f,#081a38)!important;
+  border:2px solid #e4b35e!important;
+  box-shadow:0 4px 15px #0007!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel{
+  color:#f9eac7!important;
+  background:
+    radial-gradient(ellipse at 50% 0%,#24538b77,transparent 72%),
+    linear-gradient(155deg,#0e3566 0%,#071d44 54%,#04122b 100%)!important;
+  border:5px ridge #e5b95b!important;
+  border-radius:17px!important;
+  box-shadow:inset 0 0 0 2px #9b712d,
+             inset 0 0 24px #5297dd1b,
+             0 12px 26px #000a!important;
+  scrollbar-color:#a57c3d #0a254e!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel h2{
+  color:#ffe8a9!important;
+  background:linear-gradient(180deg,#28568c,#0d2e5a 55%,#061b3f)!important;
+  border:3px ridge #e6ba61!important;
+  box-shadow:inset 0 0 9px #afdbff1e,0 5px 12px #0008!important;
+  text-shadow:0 2px 4px #000!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+  border-bottom:1px solid #dfb46b5c!important;
+  color:#fff0cf!important;
+  background:transparent!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline:nth-child(2n){
+  background:linear-gradient(90deg,#1950874d,#22497528)!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline b{
+  color:#fff3d7!important;
+  text-shadow:0 1px 2px #0008!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline small{
+  color:#c8e1ff!important;
+  text-shadow:none!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+  color:#ffedbc!important;
+  background:linear-gradient(180deg,#174679,#081e45)!important;
+  border:2px solid #cda253!important;
+  box-shadow:inset 0 1px 3px #b5d8ff26!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .empty{
+  color:#f5e2b8!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs button{
+  background:linear-gradient(180deg,#22598c,#0b2954)!important;
+  border:3px ridge #dfb65f!important;
+  color:#fff0cf!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs button.active{
+  background:linear-gradient(180deg,#158554,#075d3c)!important;
+  border-color:#ffe194!important;
+  color:#fff6d2!important;
+}
+body[data-page="lobby"] #view-ranking #rank-play{
+  background:linear-gradient(180deg,#1e9b63,#075737)!important;
+  color:#fff7dc!important;
+  border:4px ridge #f0c878!important;
+}
+/* Resultado real da partida: muda moldura e legibilidade, não altera placares. */
+body[data-page="lobby"] #view-arena .finish .finish-card{
+  color:#fff0c9!important;
+  background:
+    radial-gradient(ellipse at top,#28508595,transparent 75%),
+    linear-gradient(155deg,#102f5a,#071a3e 68%,#04102a)!important;
+  border:5px ridge #e7b65a!important;
+  border-radius:22px!important;
+  box-shadow:inset 0 0 0 2px #8d6329,inset 0 0 35px #77b8ff20,0 18px 50px #000c!important;
+}
+body[data-page="lobby"] #view-arena .finish .finish-card h2{
+  color:#ffe3a0!important;
+  font-family:'Cinzel',Georgia,serif!important;
+  text-shadow:0 3px 4px #110a09,0 0 18px #e8ad4555!important;
+}
+body[data-page="lobby"] #view-arena .finish .finish-card p,
+body[data-page="lobby"] #view-arena .finish .finish-card small{
+  color:#fff0ce!important;
+}
+body[data-page="lobby"] #view-arena .finish .finish-results{
+  color:#ffe8b0!important;
+  border:2px ridge #daa64c!important;
+  border-radius:12px!important;
+  background:linear-gradient(180deg,#174474,#092149)!important;
+  text-shadow:0 2px 3px #000!important;
+}
+body[data-page="lobby"] #view-arena .finish button:focus-visible,
+body[data-page="lobby"] #view-ranking button:focus-visible{
+  outline:3px solid #fff4b0!important;outline-offset:3px!important;
+}
+@media(max-width:740px){
+  body[data-page="lobby"] #view-ranking .ranking-panel{
+    border-width:3px!important;padding:12px!important;
+  }
+  body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+    min-width:0!important;gap:8px!important;
+  }
+  body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+    overflow-wrap:anywhere!important;max-width:40%!important;
+  }
+  body[data-page="lobby"] #view-arena .finish .finish-card{
+    border-width:3px!important;border-radius:15px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-page="lobby"] #view-ranking .ranking-panel,
+  body[data-page="lobby"] #view-arena .finish .finish-card{
+    transition:none!important;
+  }
+}
