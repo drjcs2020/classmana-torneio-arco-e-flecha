@@ -133,8 +133,14 @@ assert(await desktop.locator('#cm-ranking-choice').isVisible(),'Ranking shortcut
  assert(rankingLegibility.panel.includes('gradient'),'Ranking cards must have a parchment texture');
  const rankOverflow=await desktop.locator('#view-ranking .ranking-panel').evaluateAll(els=>els.map(el=>getComputedStyle(el).overflowY));
  assert(rankOverflow.every(x=>x==='visible'),'Ranking should not hide players inside nested scrolling lists');
- assert(rankingLegibility.title==='rgb(255, 238, 189)','Ranking header contrast incorrect');
- if(rankingLegibility.line)assert.equal(rankingLegibility.line,'rgb(38, 25, 14)','Ranking text must be dark on parchment');
+ // Referência aprovada: painel azul-marinho, com títulos e linhas em creme/dourado.
+ // A antiga exigência de texto escuro em pergaminho corresponde a um layout descartado.
+ const rankingTextIsLegible=color=>{
+   const rgb=(color.match(/\d+(?:\.\d+)?/g)||[]).slice(0,3).map(Number);
+   return rgb.length===3&&rgb[0]>=220&&rgb[1]>=195&&rgb[2]>=145;
+ };
+ assert(rankingTextIsLegible(rankingLegibility.title),'Ranking heading must be light and readable on dark blue');
+ if(rankingLegibility.line)assert(rankingTextIsLegible(rankingLegibility.line),'Ranking row text must be light on dark blue');
  const rankLayout=await desktop.locator('#view-ranking').evaluate(root=>{
   const groups=root.querySelector('#rank-houses');
   const archers=root.querySelector('#rank-players');
