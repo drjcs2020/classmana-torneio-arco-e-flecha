@@ -1,0 +1,162 @@
+/* ClassMana — revisão estritamente visual, 08/11/2026.
+   Preserva motor PlayCanvas, pontuações, turmas, modos, duelos assíncronos,
+   identificação de estudantes, APIs, sons e ranking. Carregado por último. */
+:root{--cm-finish-gold:#f0c66d;--cm-finish-ink:#061a3c;--cm-finish-cream:#fff4dc}
+body[data-page="lobby"] #view-ranking .ranking-panel,
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+ color:var(--cm-finish-cream)!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+ background:linear-gradient(95deg,rgba(10,43,87,.96),rgba(9,27,62,.93))!important;
+ border:1px solid rgba(241,197,106,.65)!important;
+ border-radius:10px!important;
+ min-width:0!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline:nth-child(2n){
+ background:linear-gradient(95deg,rgba(23,72,117,.97),rgba(11,34,73,.94))!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline b,
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+ color:#fff0d0!important;
+ font-weight:900!important;
+ text-shadow:0 2px 4px #000b!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline small{
+ color:#dbeeff!important;
+}
+body[data-page="lobby"] #view-ranking .ranking-panel .rankline>span{
+ background:#061c45!important;
+ border:1px solid var(--cm-finish-gold)!important;
+ min-width:0!important;overflow-wrap:anywhere!important;
+}
+body[data-page="lobby"] #view-ranking #ranking-tabs button,
+body[data-page="lobby"] #view-ranking #rank-play{
+ min-height:44px!important;
+ color:#fff4d8!important;
+ font-weight:900!important;
+ text-shadow:0 2px 3px #0008!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode,
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-ranking-choice{
+ box-sizing:border-box!important;
+ min-width:0!important;
+ border-radius:15px!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode img{
+ object-fit:contain!important;
+ transform:none!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-ranking-choice img{
+ width:100%!important;height:100%!important;object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] #cm-confirm-identity,
+body[data-page="lobby"] #view-inicio[data-step="partida"] #start-game{
+ width:min(100%,380px)!important;
+ max-width:380px!important;
+ min-height:48px!important;
+ max-height:72px!important;
+ font-size:clamp(15px,1.7vw,21px)!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-logo{
+ width:min(40vw,290px)!important;
+ max-height:clamp(56px,11vh,105px)!important;
+ object-fit:contain!important;
+}
+body[data-page="lobby"] #view-inicio[data-step="perfil"] .cm-identity-panel{
+ box-sizing:border-box!important;
+ max-width:min(94vw,780px)!important;
+}
+/* Vento informativo menor, junto aos controles superiores; jamais cobre o arco. */
+#view-arena .stage #wind.cm-wind-restored{
+ top:clamp(72px,11vh,106px)!important;
+ right:clamp(12px,2vw,27px)!important;
+ left:auto!important;bottom:auto!important;
+ width:clamp(120px,11vw,154px)!important;
+ min-height:62px!important;height:auto!important;
+ padding:5px 8px!important;gap:1px!important;
+ border-width:2px!important;
+ border-radius:12px!important;
+ pointer-events:none!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-caption{gap:0!important}
+#view-arena .stage #wind.cm-wind-restored .wind-caption span{
+ font-size:10px!important;line-height:1.05!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-speed{
+ font-size:clamp(16px,1.5vw,20px)!important;
+ line-height:1.05!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-main{
+ gap:3px!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-arrow{
+ width:26px!important;height:17px!important;
+}
+#view-arena .stage #wind.cm-wind-restored .wind-direction-text{
+ font-size:10px!important;
+}
+/* Voltar legível: não mais um ícone minúsculo no canto inferior direito. */
+body.cm-art-on #view-arena #leave-arena{
+ position:fixed!important;
+ top:auto!important;right:auto!important;
+ bottom:clamp(11px,2vh,25px)!important;
+ left:clamp(12px,2vw,28px)!important;
+ width:clamp(130px,14vw,178px)!important;
+ height:clamp(48px,6vh,63px)!important;
+ background:url('assets/ui/buttons/classmana-voltar.png') center/contain no-repeat!important;
+ z-index:130!important;
+ font-size:0!important;
+ border:0!important;box-shadow:none!important;
+ pointer-events:auto!important;
+}
+body.cm-art-on #view-arena #leave-arena:focus-visible{
+ outline:3px solid #fff1b8!important;outline-offset:3px!important;
+}
+/* Combate e resultado: preservar arqueiros inteiros e controles acessíveis. */
+.cm-vs-overlay .cm-vs-shell{
+ max-height:calc(100dvh - 16px)!important;
+ box-sizing:border-box!important;
+}
+.cm-vs-overlay .cm-vs-fighter img,
+#finish.cm-cinematic-result .cm-final-player img{
+ object-fit:contain!important;object-position:center bottom!important;
+}
+.cm-vs-overlay .cm-vs-actions{flex-wrap:wrap!important}
+.cm-vs-overlay .cm-vs-actions button{
+ min-width:clamp(135px,16vw,210px)!important;
+ min-height:46px!important;
+}
+.cm-vs-overlay .cm-vs-mark{
+ color:#ffe2a2!important;text-shadow:0 2px #a14d1b,0 5px #3b1609,0 0 18px #ffbc42d4!important;
+}
+#finish.cm-cinematic-result .cm-final-player b{
+ overflow-wrap:anywhere!important;text-align:center!important;
+}
+/* Mais fagulhas douradas, mantendo a camada decorativa sem bloquear ações. */
+.cm-ember{background:radial-gradient(circle at 25% 20%,#fffef3 0%,#ffe998 28%,#ffbc39 60%,#ec701e 84%,transparent)!important;box-shadow:0 0 12px #ffc351d0,0 0 23px #d9782060!important}
+.cm-embers,.cm-ambient-embers{pointer-events:none!important}
+@media(max-width:760px){
+ #view-arena .stage #wind.cm-wind-restored{
+  top:clamp(62px,13vh,94px)!important;right:6px!important;
+  width:112px!important;min-height:55px!important;
+  padding:4px 5px!important;gap:1px!important;
+ }
+ #view-arena .stage #wind.cm-wind-restored .wind-caption span{font-size:8px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-speed{font-size:15px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-arrow{width:21px!important;height:12px!important}
+ #view-arena .stage #wind.cm-wind-restored .wind-direction-text{font-size:8px!important}
+ body.cm-art-on #view-arena #leave-arena{
+  width:122px!important;height:47px!important;
+  bottom:9px!important;left:7px!important;
+ }
+ body[data-page="lobby"] #view-ranking .ranking-panel .rankline{
+  padding:5px 7px!important;gap:4px!important;
+ }
+ body[data-page="lobby"] #view-inicio[data-step="desafio"] .cm-duel-mode img{
+  max-width:100%!important;
+ }
+ .cm-vs-overlay .cm-vs-actions button{
+  min-width:118px!important;min-height:43px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){.cm-ember{animation:none!important;opacity:.15!important}}
