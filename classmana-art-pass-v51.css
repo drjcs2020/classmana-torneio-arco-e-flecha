@@ -1,0 +1,281 @@
+/* ClassMana — acabamento artístico das cenas de duelo e resultado.
+   Somente CSS. Não modifica motor, backend, criação de convites, pontuação,
+   simulação visual dos disparos nem ordem dos turnos. 2026-11-07 */
+:root{
+  --cm-art-gold:#f6c860;
+  --cm-art-cream:#fff0cd;
+  --cm-art-navy:#07183a;
+}
+.cm-vs-overlay{
+  background:
+    linear-gradient(180deg,rgba(1,11,30,.54) 0%,rgba(1,11,30,.24) 36%,rgba(1,9,24,.76) 100%),
+    url("assets/scenes/aguia.webp") center/cover no-repeat!important;
+  overscroll-behavior:contain;
+}
+.cm-vs-overlay[data-house="B"]{
+  background:
+    linear-gradient(180deg,rgba(24,4,17,.58),rgba(14,4,18,.25) 40%,rgba(14,4,18,.78)),
+    url("assets/scenes/leao.webp") center/cover no-repeat!important;
+}
+.cm-vs-overlay[data-house="C"]{
+  background:
+    linear-gradient(180deg,rgba(3,30,27,.53),rgba(3,20,30,.22) 40%,rgba(3,20,30,.79)),
+    url("assets/scenes/dragao.webp") center/cover no-repeat!important;
+}
+.cm-vs-overlay .cm-vs-shell{
+  width:min(96vw,1140px)!important;
+  max-width:1140px!important;
+  gap:clamp(8px,1.45vh,16px)!important;
+}
+.cm-vs-overlay .cm-vs-title{
+  width:min(92%,850px)!important;
+  padding:clamp(9px,1.6vh,16px) clamp(18px,2.5vw,35px)!important;
+  margin:0!important;
+  font:900 clamp(20px,3.2vw,43px)/1.12 'Cinzel',Georgia,serif!important;
+  color:#fff2c9!important;
+  letter-spacing:.035em!important;
+  background:linear-gradient(165deg,#9d1333,#58051e 58%,#30000e)!important;
+  border:4px ridge #ffd678!important;
+  border-radius:16px 16px 11px 11px!important;
+  box-shadow:inset 0 1px 0 #fff6c1a8,inset 0 0 0 2px #701c21,0 5px 0 #4c220d,0 18px 26px #0008!important;
+  text-shadow:0 2px #3c0614,0 4px 5px #000b!important;
+}
+.cm-vs-overlay .cm-vs-sub{
+  font:900 clamp(11px,1.35vw,17px)/1.2 'Nunito',sans-serif!important;
+  letter-spacing:.16em!important;
+  text-shadow:0 3px 4px #000e!important;
+  margin:0!important;
+  color:#ffe3a0!important;
+}
+.cm-vs-overlay .cm-vs-fighters{
+  width:min(100%,1020px)!important;
+  margin-inline:auto!important;
+  grid-template-columns:minmax(0,1fr) clamp(58px,9vw,124px) minmax(0,1fr)!important;
+  gap:clamp(8px,1.4vw,18px)!important;
+  align-items:center!important;
+}
+.cm-vs-overlay .cm-vs-fighter{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:420px!important;
+  height:clamp(240px,51vh,485px)!important;
+  max-height:485px!important;
+  overflow:hidden!important;
+  border:5px ridge #f6ca6d!important;
+  border-radius:21px 21px 14px 14px!important;
+  background:
+    radial-gradient(ellipse at 46% 41%,#489be777,transparent 62%),
+    linear-gradient(145deg,#1c4c92 0%,#071e4b 58%,#030d25 100%)!important;
+  box-shadow:inset 0 0 0 2px #fff0a25d,inset 0 0 40px #6ab8ff20,0 0 0 2px #51300e,0 15px 26px #000b!important;
+}
+.cm-vs-overlay .cm-vs-fighter[data-house="B"]{
+  background:radial-gradient(ellipse at 45% 41%,#fa723b78,transparent 62%),linear-gradient(145deg,#912540,#420e25 65%,#200718)!important;
+}
+.cm-vs-overlay .cm-vs-fighter[data-house="C"]{
+  background:radial-gradient(ellipse at 45% 41%,#62d9aa70,transparent 62%),linear-gradient(145deg,#176c54,#093f40 65%,#052421)!important;
+}
+.cm-vs-overlay .cm-vs-fighter img{
+  box-sizing:border-box!important;
+  display:block!important;
+  flex:1 1 auto!important;
+  width:100%!important;
+  height:calc(100% - 84px)!important;
+  min-height:0!important;
+  padding:5px 4px 0!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:transparent!important;
+  filter:drop-shadow(0 8px 8px #0007)!important;
+}
+.cm-vs-overlay .cm-vs-fighter[data-house]::before{
+  content:"";
+  position:absolute;
+  z-index:3;
+  top:8px;
+  left:9px;
+  width:clamp(42px,5.5vw,79px);
+  aspect-ratio:1;
+  background:center/contain no-repeat url("assets/ui/hud/brasao-aguia-dourada.png");
+  filter:drop-shadow(0 3px 3px #0008);
+  pointer-events:none;
+}
+.cm-vs-overlay .cm-vs-fighter[data-house="B"]::before{background-image:url("assets/ui/hud/brasao-leao-de-fogo.png")}
+.cm-vs-overlay .cm-vs-fighter[data-house="C"]::before{background-image:url("assets/ui/hud/brasao-dragao-esmeralda.png")}
+.cm-vs-overlay .cm-vs-fighter-info{
+  flex:0 0 auto!important;
+  min-height:75px!important;
+  box-sizing:border-box!important;
+  padding:10px 7px 11px!important;
+  border-top:4px ridge #e8b455!important;
+  background:linear-gradient(180deg,#174074,#061633 94%)!important;
+  box-shadow:0 -5px 17px #0005,inset 0 1px 0 #fff1b75c!important;
+}
+.cm-vs-overlay .cm-vs-fighter[data-house="B"] .cm-vs-fighter-info{background:linear-gradient(#78223a,#300c21)!important}
+.cm-vs-overlay .cm-vs-fighter[data-house="C"] .cm-vs-fighter-info{background:linear-gradient(#156750,#082a2d)!important}
+.cm-vs-overlay .cm-vs-fighter-info strong{
+  font:900 clamp(14px,2.05vw,26px)/1.05 'Cinzel',Georgia,serif!important;
+  color:#fff3d8!important;
+  overflow-wrap:anywhere!important;
+  text-shadow:0 3px 4px #000c!important;
+}
+.cm-vs-overlay .cm-vs-fighter-info small{
+  display:block!important;
+  margin-top:5px!important;
+  font:900 clamp(9px,1.1vw,14px)/1.15 'Nunito',sans-serif!important;
+  color:#f9d792!important;
+}
+.cm-vs-overlay .cm-vs-mark{
+  font:italic 900 clamp(44px,7vw,100px)/1 Georgia,serif!important;
+  color:#ffe2a2!important;
+  -webkit-text-stroke:1px #95511c;
+  text-shadow:0 2px #a14d1b,0 5px #3b1609,0 0 24px #ffbc42d4!important;
+  filter:drop-shadow(0 6px 12px #000b);
+}
+.cm-vs-overlay .cm-vs-actions button{
+  box-sizing:border-box!important;
+  min-height:clamp(44px,6.9vh,65px)!important;
+  border-radius:12px!important;
+  font:900 clamp(13px,1.7vw,22px)/1.1 'Cinzel',Georgia,serif!important;
+  text-shadow:0 2px 4px #000c!important;
+}
+.cm-vs-overlay .cm-vs-start{
+  background:linear-gradient(180deg,#39da69 0%,#117c3b 55%,#075327 100%)!important;
+  border:5px ridge #f5d071!important;
+  box-shadow:inset 0 2px 0 #b2ffc16b,0 5px 0 #6c4015,0 10px 20px #0008!important;
+}
+.cm-vs-overlay .cm-vs-cancel{
+  background:linear-gradient(180deg,#2a5492 0%,#081b47 100%)!important;
+  border:4px ridge #ebc373!important;
+  box-shadow:0 5px 0 #5c3813!important;
+}
+
+/* Placar final: componentes existentes preservados, apenas reestilizados. */
+#finish.cm-cinematic-result{
+  background:
+    linear-gradient(180deg,#07142cb8,#020b23dc),
+    url("assets/scenes/aguia.webp") center/cover no-repeat!important;
+  padding:clamp(7px,1.8vh,18px)!important;
+}
+#finish.cm-cinematic-result .finish-card{
+  width:min(97vw,1160px)!important;
+  max-width:1160px!important;
+  box-sizing:border-box!important;
+  padding:clamp(13px,2.1vw,24px)!important;
+  background:linear-gradient(155deg,#173763f5,#071c40fa 57%,#06112dfc)!important;
+  border:5px ridge #f7d27b!important;
+  border-radius:21px!important;
+  box-shadow:inset 0 0 0 2px #815723,inset 0 0 36px #79beff20,0 14px 38px #000d!important;
+}
+#finish.cm-cinematic-result #finish-title{
+  margin:3px 0 8px!important;
+  font:900 clamp(26px,4.5vw,62px)/1.06 'Cinzel',Georgia,serif!important;
+  color:#ffdb87!important;
+  letter-spacing:.035em!important;
+  text-shadow:0 3px #4b220d,0 7px 8px #000c!important;
+}
+#finish.cm-cinematic-result .cm-final-duel{
+  width:100%!important;
+  max-width:980px!important;
+  margin:clamp(8px,1.6vh,20px) auto!important;
+  grid-template-columns:minmax(0,1fr) clamp(42px,6.5vw,95px) minmax(0,1fr)!important;
+  gap:clamp(5px,1.4vw,19px)!important;
+}
+#finish.cm-cinematic-result .cm-final-player{
+  min-width:0!important;
+  padding:clamp(7px,1.25vw,16px)!important;
+  gap:6px!important;
+  border:4px ridge #efbe68!important;
+  border-radius:14px!important;
+  background:linear-gradient(150deg,#21518d,#071b42 80%)!important;
+  box-shadow:inset 0 0 0 1px #ffe6aa6e,0 9px 14px #0007!important;
+}
+#finish.cm-cinematic-result .cm-final-player img{
+  width:auto!important;
+  max-width:100%!important;
+  max-height:clamp(120px,27vh,285px)!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:none!important;
+  filter:drop-shadow(0 7px 6px #0008);
+}
+#finish.cm-cinematic-result .cm-final-player b{
+  font:900 clamp(13px,2vw,26px)/1.1 'Cinzel',Georgia,serif!important;
+  color:#fff0d3!important;
+  text-shadow:0 2px 3px #000!important;
+}
+#finish.cm-cinematic-result .cm-final-player small{
+  color:#f8ddaa!important;
+  font:900 clamp(10px,1.1vw,14px)/1.12 'Nunito',sans-serif!important;
+}
+#finish.cm-cinematic-result .cm-final-shots{
+  display:flex!important;
+  justify-content:center!important;
+  flex-wrap:wrap!important;
+  gap:clamp(3px,.65vw,9px)!important;
+}
+#finish.cm-cinematic-result .cm-final-shots span{
+  box-sizing:border-box!important;
+  min-width:clamp(23px,3.3vw,44px)!important;
+  padding:clamp(4px,.65vw,8px)!important;
+  color:#ffebba!important;
+  background:#071735!important;
+  border:2px ridge #d1a044!important;
+  font:900 clamp(13px,1.5vw,21px)/1 Georgia,serif!important;
+}
+#finish.cm-cinematic-result .cm-final-vs{
+  font:italic 900 clamp(31px,5.7vw,78px)/1 Georgia,serif!important;
+  color:#ffe3a0!important;
+  text-shadow:0 4px #78411a,0 0 19px #edbd71!important;
+}
+#finish.cm-cinematic-result .finish-actions{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:clamp(8px,1.3vw,17px)!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#finish.cm-cinematic-result .finish-actions button{
+  min-height:44px!important;
+  border:3px ridge #f5ca73!important;
+  color:#fff1cf!important;
+  background:linear-gradient(#25518d,#071e4f)!important;
+  font:900 clamp(12px,1.3vw,17px)/1.1 Georgia,serif!important;
+}
+#finish.cm-cinematic-result .finish-actions button:first-child{
+  background:linear-gradient(#28ac61,#08643b)!important;
+}
+@media(max-width:700px){
+  .cm-vs-overlay{padding:6px!important}
+  .cm-vs-overlay .cm-vs-shell{width:100%!important;gap:7px!important}
+  .cm-vs-overlay .cm-vs-title{width:min(98%,520px)!important;font-size:clamp(16px,4.8vw,24px)!important;padding:7px 10px!important}
+  .cm-vs-overlay .cm-vs-sub{font-size:clamp(9px,2.4vw,12px)!important;letter-spacing:.05em!important}
+  .cm-vs-overlay .cm-vs-fighters{grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr)!important;gap:3px!important}
+  .cm-vs-overlay .cm-vs-fighter{height:clamp(190px,40vh,330px)!important;min-width:0!important;border-width:3px!important;border-radius:12px!important}
+  .cm-vs-overlay .cm-vs-fighter img{height:calc(100% - 69px)!important;padding:2px!important}
+  .cm-vs-overlay .cm-vs-fighter-info{min-height:64px!important;padding:6px 2px!important}
+  .cm-vs-overlay .cm-vs-fighter-info strong{font-size:clamp(11px,3vw,15px)!important}
+  .cm-vs-overlay .cm-vs-fighter-info small{font-size:clamp(8px,2vw,11px)!important}
+  .cm-vs-overlay .cm-vs-fighter[data-house]::before{width:38px!important;top:3px;left:2px}
+  .cm-vs-overlay .cm-vs-mark{font-size:clamp(30px,7vw,46px)!important}
+  .cm-vs-overlay .cm-vs-actions{gap:7px!important}
+  .cm-vs-overlay .cm-vs-actions button{font-size:clamp(11px,2.8vw,15px)!important;min-height:43px!important;padding:7px 10px!important}
+  #finish.cm-cinematic-result .finish-card{width:98vw!important;padding:9px!important;max-height:calc(100dvh - 10px)!important}
+  #finish.cm-cinematic-result .cm-final-duel{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)!important;gap:4px!important}
+  #finish.cm-cinematic-result .cm-final-player{padding:5px!important;border-width:2px!important}
+  #finish.cm-cinematic-result .cm-final-player img{max-height:clamp(88px,23vh,180px)!important}
+  #finish.cm-cinematic-result .cm-final-player b{font-size:clamp(11px,3.2vw,16px)!important}
+  #finish.cm-cinematic-result .cm-final-player small{font-size:9px!important}
+  #finish.cm-cinematic-result .cm-final-shots span{min-width:20px!important;padding:4px 2px!important;font-size:12px!important}
+  #finish.cm-cinematic-result .cm-final-vs{font-size:31px!important}
+}
+@media(max-height:590px) and (min-width:701px){
+  .cm-vs-overlay .cm-vs-fighter{height:clamp(190px,42vh,280px)!important}
+  .cm-vs-overlay .cm-vs-shell{gap:6px!important}
+  .cm-vs-overlay .cm-vs-title{font-size:clamp(17px,3vh,25px)!important}
+  #finish.cm-cinematic-result .cm-final-player img{max-height:120px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .cm-vs-overlay .cm-vs-fighter,.cm-vs-overlay .cm-vs-mark,.cm-vs-overlay .cm-vs-shell{
+    animation:none!important;
+  }
+}
